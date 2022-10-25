@@ -1,0 +1,856 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+
+public class Controls : MonoBehaviour
+{
+    public static Controls main;
+
+    public const string strMoveForward = "keyControlsMoveForward";
+    public const string strMoveBack = "keyControlsMoveBack";
+    public const string strMoveRight = "keyControlsMoveRight";
+    public const string strMoveLeft = "keyControlsMoveLeft";
+    public const string strMoveUp = "keyControlsMoveUp";
+    public const string strMoveJump = "keyControlsMoveJump";
+    public const string strMoveDown = "keyControlsMoveDown";
+    public const string strMoveSit = "keyControlsMoveSit";
+    public const string strOpenInventory = "keyControlsOpenInvetory";
+    public const string strOpenInteraction = "keyControlsOpenInteraction";
+    public const string strAttack = "keyControlsAttack";
+    public const string strItemNext = "keyControlsItemNext";
+    public const string strItemBack = "keyControlsItemBack";
+
+    public const string strItem1 = "keyControlsItem1";
+    public const string strItem2 = "keyControlsItem2";
+    public const string strItem3 = "keyControlsItem3";
+    public const string strItem4 = "keyControlsItem4";
+    public const string strItem5 = "keyControlsItem5";
+    public const string strItem6 = "keyControlsItem6";
+    public const string strItem7 = "keyControlsItem7";
+    public const string strItem8 = "keyControlsItem8";
+    public const string strItem9 = "keyControlsItem9";
+
+    public static KeyCode keyMoveForward = KeyCode.W;
+    public static KeyCode keyMoveBack = KeyCode.S;
+    public static KeyCode keyMoveRight = KeyCode.D;
+    public static KeyCode keyMoveLeft = KeyCode.A;
+    public static KeyCode keyMoveUp = KeyCode.Space;
+    public static KeyCode keyMoveJump = KeyCode.Space;
+    public static KeyCode keyMoveDown = KeyCode.LeftControl;
+    public static KeyCode keyMoveSit = KeyCode.LeftControl;
+    public static KeyCode keyOpenInventory = KeyCode.Tab;
+    public static KeyCode keyOpenInteraction = KeyCode.Mouse1;
+    public static KeyCode keyAttack = KeyCode.Mouse0;
+
+    public static KeyCode keyItemNext = KeyCode.Equals;
+    public static KeyCode keyItemBack = KeyCode.Minus;
+
+    public static KeyCode keyItem1 = KeyCode.Alpha1;
+    public static KeyCode keyItem2 = KeyCode.Alpha2;
+    public static KeyCode keyItem3 = KeyCode.Alpha3;
+    public static KeyCode keyItem4 = KeyCode.Alpha4;
+    public static KeyCode keyItem5 = KeyCode.Alpha5;
+    public static KeyCode keyItem6 = KeyCode.Alpha6;
+    public static KeyCode keyItem7 = KeyCode.Alpha7;
+    public static KeyCode keyItem8 = KeyCode.Alpha8;
+    public static KeyCode keyItem9 = KeyCode.Alpha9;
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        main = this;
+        Load();
+    }
+
+    //Загрузить настройки управления в игру
+    static void Load() {
+        keyMoveForward = (KeyCode)PlayerPrefs.GetInt(strMoveForward, (int)KeyCode.W);
+        keyMoveBack = (KeyCode)PlayerPrefs.GetInt(strMoveBack, (int)KeyCode.S);
+        keyMoveRight = (KeyCode)PlayerPrefs.GetInt(strMoveRight, (int)KeyCode.D);
+        keyMoveLeft = (KeyCode)PlayerPrefs.GetInt(strMoveLeft, (int)KeyCode.A);
+        keyMoveUp = (KeyCode)PlayerPrefs.GetInt(strMoveUp, (int)KeyCode.Space);
+        keyMoveJump = (KeyCode)PlayerPrefs.GetInt(strMoveJump, (int)KeyCode.Space);
+        keyMoveDown = (KeyCode)PlayerPrefs.GetInt(strMoveDown, (int)KeyCode.LeftControl);
+        keyMoveSit = (KeyCode)PlayerPrefs.GetInt(strMoveSit, (int)KeyCode.LeftControl);
+        keyOpenInventory = (KeyCode)PlayerPrefs.GetInt(strOpenInventory, (int)KeyCode.Tab);
+        keyOpenInteraction = (KeyCode)PlayerPrefs.GetInt(strOpenInteraction, (int)KeyCode.Mouse1);
+        keyAttack = (KeyCode)PlayerPrefs.GetInt(strAttack, (int)KeyCode.Mouse0);
+    }
+    static void Save() {
+        Save(strMoveForward);
+        Save(strMoveBack);
+        Save(strMoveRight);
+        Save(strMoveLeft);
+        Save(strMoveUp);
+        Save(strMoveJump);
+        Save(strMoveDown);
+        Save(strMoveSit);
+        Save(strOpenInventory);
+        Save(strOpenInteraction);
+        Save(strAttack);
+    }
+    static void Save(string strKey) {
+        if (strKey == strMoveForward)
+            PlayerPrefs.SetInt(strMoveForward, (int)keyMoveForward);
+        else if (strKey == strMoveBack)
+            PlayerPrefs.SetInt(strMoveBack, (int)keyMoveBack);
+        else if (strKey == strMoveRight)
+            PlayerPrefs.SetInt(strMoveRight, (int)keyMoveRight);
+        else if (strKey == strMoveLeft)
+            PlayerPrefs.SetInt(strMoveLeft, (int)keyMoveLeft);
+        else if (strKey == strMoveUp)
+            PlayerPrefs.SetInt(strMoveUp, (int)keyMoveUp);
+        else if (strKey == strMoveJump)
+            PlayerPrefs.SetInt(strMoveJump, (int)keyMoveJump);
+        else if (strKey == strMoveDown)
+            PlayerPrefs.SetInt(strMoveDown, (int)keyMoveDown);
+        else if (strKey == strMoveSit)
+            PlayerPrefs.SetInt(strMoveSit, (int)keyMoveSit);
+        else if (strKey == strOpenInventory)
+            PlayerPrefs.SetInt(strOpenInventory, (int)keyOpenInventory);
+        else if (strKey == strOpenInteraction)
+            PlayerPrefs.SetInt(strOpenInteraction, (int)keyOpenInteraction);
+        else if (strKey == strAttack)
+            PlayerPrefs.SetInt(strAttack, (int)keyAttack);
+    }
+
+    static void SetKey(string strKey, KeyCode keyCodeNew) {
+        if (strKey == strMoveForward)
+            keyMoveForward = keyCodeNew;
+        else if (strKey == strMoveBack)
+            keyMoveBack = keyCodeNew;
+        else if (strKey == strMoveRight)
+            keyMoveRight = keyCodeNew;
+        else if (strKey == strMoveLeft)
+            keyMoveLeft = keyCodeNew;
+        else if (strKey == strMoveUp)
+            keyMoveUp = keyCodeNew;
+        else if (strKey == strMoveJump)
+            keyMoveJump = keyCodeNew;
+        else if (strKey == strMoveDown)
+            keyMoveDown = keyCodeNew;
+        else if (strKey == strMoveSit)
+            keyMoveSit = keyCodeNew;
+        else if (strKey == strOpenInventory)
+            keyOpenInventory = keyCodeNew;
+        else if (strKey == strOpenInteraction)
+            keyOpenInteraction = keyCodeNew;
+        else if (strKey == strAttack)
+            keyAttack = keyCodeNew;
+
+        Save(strKey);
+    }
+
+    static public void SetDefault(string strKey)
+    {
+        if (strKey == strMoveForward)
+            keyMoveForward = KeyCode.W;
+        else if (strKey == strMoveBack)
+            keyMoveBack = KeyCode.S;
+        else if (strKey == strMoveRight)
+            keyMoveRight = KeyCode.D;
+        else if (strKey == strMoveLeft)
+            keyMoveLeft = KeyCode.A;
+        else if (strKey == strMoveUp)
+            keyMoveUp = KeyCode.Space;
+        else if (strKey == strMoveJump)
+            keyMoveJump = KeyCode.Space;
+        else if (strKey == strMoveDown)
+            keyMoveDown = KeyCode.LeftControl;
+        else if (strKey == strMoveSit)
+            keyMoveSit = KeyCode.LeftControl;
+        else if (strKey == strOpenInventory)
+            keyOpenInventory = KeyCode.Tab;
+        else if (strKey == strOpenInteraction)
+            keyOpenInteraction = KeyCode.Mouse1;
+        else if (strKey == strAttack)
+            keyAttack = KeyCode.Mouse0;
+
+
+        Save();
+    }
+    static public void SetDefault() {
+        SetDefault(strMoveForward);
+        SetDefault(strMoveBack);
+        SetDefault(strMoveRight);
+        SetDefault(strMoveLeft);
+        SetDefault(strMoveUp);
+        SetDefault(strMoveDown);
+        SetDefault(strMoveJump);
+        SetDefault(strMoveSit);
+        SetDefault(strOpenInventory);
+        SetDefault(strOpenInteraction);
+        SetDefault(strAttack);
+    }
+
+    public static string GetNameKeyName(KeyCode keyCode) {
+        switch(keyCode){
+            case KeyCode.A: return "A";
+            case KeyCode.Alpha0: return "Alpha0";
+            case KeyCode.Alpha1: return "Alpha1";
+            case KeyCode.Alpha2: return "Alpha2";
+            case KeyCode.Alpha3: return "Alpha3";
+            case KeyCode.Alpha4: return "Alpha4";
+            case KeyCode.Alpha5: return "Alpha5";
+            case KeyCode.Alpha6: return "Alpha6";
+            case KeyCode.Alpha7: return "Alpha7";
+            case KeyCode.Alpha8: return "Alpha8";
+            case KeyCode.Alpha9: return "Alpha9";
+            case KeyCode.AltGr: return "AltGr";
+            case KeyCode.Ampersand: return "&";
+            case KeyCode.Asterisk: return "*";
+            case KeyCode.At: return "@";
+            case KeyCode.B: return "B";
+            case KeyCode.BackQuote: return "`";
+            case KeyCode.Backslash: return "" + '\\';
+            case KeyCode.Backspace: return "Backspace";
+            case KeyCode.C: return "C";
+            case KeyCode.CapsLock: return "CapsLock";
+            case KeyCode.Caret: return "^";
+            case KeyCode.Clear: return "Clear";
+            case KeyCode.Colon: return ":";
+            case KeyCode.Comma: return ",";
+            case KeyCode.D: return "D";
+            case KeyCode.Delete: return "Delete";
+            case KeyCode.Dollar: return "$";
+            case KeyCode.DoubleQuote: return "" + '\"';
+            case KeyCode.DownArrow: return "DownArrow";
+            case KeyCode.E: return "E";
+            case KeyCode.End: return "End";
+            case KeyCode.Equals: return "Equals";
+            case KeyCode.Escape: return "Escape";
+            case KeyCode.Exclaim: return "!";
+            case KeyCode.F: return "F";
+            case KeyCode.F1: return "F1";
+            case KeyCode.F2: return "F2";
+            case KeyCode.F3: return "F3";
+            case KeyCode.F4: return "F4";
+            case KeyCode.F5: return "F5";
+            case KeyCode.F6: return "F6";
+            case KeyCode.F7: return "F7";
+            case KeyCode.F8: return "F8";
+            case KeyCode.F9: return "F9";
+            case KeyCode.F10: return "F10";
+            case KeyCode.F11: return "F11";
+            case KeyCode.F12: return "F12";
+            case KeyCode.F13: return "F13";
+            case KeyCode.F14: return "F14";
+            case KeyCode.F15: return "F15";
+            case KeyCode.G: return "G";
+            case KeyCode.Greater: return ">";
+            case KeyCode.H: return "H";
+            case KeyCode.Hash: return "#";
+            case KeyCode.Help: return "Help";
+            case KeyCode.Home: return "Home";
+            case KeyCode.I: return "I";
+            case KeyCode.Insert: return "Insert";
+            case KeyCode.J: return "J";
+            case KeyCode.Joystick1Button0: return "J1B0";
+            case KeyCode.Joystick1Button1: return "J1B1";
+            case KeyCode.Joystick1Button2: return "J1B2";
+            case KeyCode.Joystick1Button3: return "J1B3";
+            case KeyCode.Joystick1Button4: return "J1B4";
+            case KeyCode.Joystick1Button5: return "J1B5";
+            case KeyCode.Joystick1Button6: return "J1B6";
+            case KeyCode.Joystick1Button7: return "J1B7";
+            case KeyCode.Joystick1Button8: return "J1B8";
+            case KeyCode.Joystick1Button9: return "J1B9";
+            case KeyCode.Joystick1Button10: return "J1B10";
+            case KeyCode.Joystick1Button11: return "J1B11";
+            case KeyCode.Joystick1Button12: return "J1B12";
+            case KeyCode.Joystick1Button13: return "J1B13";
+            case KeyCode.Joystick1Button14: return "J1B14";
+            case KeyCode.Joystick1Button15: return "J1B15";
+            case KeyCode.Joystick1Button16: return "J1B16";
+            case KeyCode.Joystick1Button17: return "J1B17";
+            case KeyCode.Joystick1Button18: return "J1B18";
+            case KeyCode.Joystick1Button19: return "J1B19";
+            case KeyCode.Joystick2Button0: return "J2B0";
+            case KeyCode.Joystick2Button1: return "J2B1";
+            case KeyCode.Joystick2Button2: return "J2B2";
+            case KeyCode.Joystick2Button3: return "J2B3";
+            case KeyCode.Joystick2Button4: return "J2B4";
+            case KeyCode.Joystick2Button5: return "J2B5";
+            case KeyCode.Joystick2Button6: return "J2B6";
+            case KeyCode.Joystick2Button7: return "J2B7";
+            case KeyCode.Joystick2Button8: return "J2B8";
+            case KeyCode.Joystick2Button9: return "J2B9";
+            case KeyCode.Joystick2Button10: return "J2B10";
+            case KeyCode.Joystick2Button11: return "J2B11";
+            case KeyCode.Joystick2Button12: return "J2B12";
+            case KeyCode.Joystick2Button13: return "J2B13";
+            case KeyCode.Joystick2Button14: return "J2B14";
+            case KeyCode.Joystick2Button15: return "J2B15";
+            case KeyCode.Joystick2Button16: return "J2B16";
+            case KeyCode.Joystick2Button17: return "J2B17";
+            case KeyCode.Joystick2Button18: return "J2B18";
+            case KeyCode.Joystick2Button19: return "J2B19";
+            case KeyCode.Joystick3Button0: return "J3B0";
+            case KeyCode.Joystick3Button1: return "J3B1";
+            case KeyCode.Joystick3Button2: return "J3B2";
+            case KeyCode.Joystick3Button3: return "J3B3";
+            case KeyCode.Joystick3Button4: return "J3B4";
+            case KeyCode.Joystick3Button5: return "J3B5";
+            case KeyCode.Joystick3Button6: return "J3B6";
+            case KeyCode.Joystick3Button7: return "J3B7";
+            case KeyCode.Joystick3Button8: return "J3B8";
+            case KeyCode.Joystick3Button9: return "J3B9";
+            case KeyCode.Joystick3Button10: return "J3B10";
+            case KeyCode.Joystick3Button11: return "J3B11";
+            case KeyCode.Joystick3Button12: return "J3B12";
+            case KeyCode.Joystick3Button13: return "J3B13";
+            case KeyCode.Joystick3Button14: return "J3B14";
+            case KeyCode.Joystick3Button15: return "J3B15";
+            case KeyCode.Joystick3Button16: return "J3B16";
+            case KeyCode.Joystick3Button17: return "J3B17";
+            case KeyCode.Joystick3Button18: return "J3B18";
+            case KeyCode.Joystick3Button19: return "J3B19";
+            case KeyCode.Joystick4Button0: return "J4B0";
+            case KeyCode.Joystick4Button1: return "J4B1";
+            case KeyCode.Joystick4Button2: return "J4B2";
+            case KeyCode.Joystick4Button3: return "J4B3";
+            case KeyCode.Joystick4Button4: return "J4B4";
+            case KeyCode.Joystick4Button5: return "J4B5";
+            case KeyCode.Joystick4Button6: return "J4B6";
+            case KeyCode.Joystick4Button7: return "J4B7";
+            case KeyCode.Joystick4Button8: return "J4B8";
+            case KeyCode.Joystick4Button9: return "J4B9";
+            case KeyCode.Joystick4Button10: return "J4B10";
+            case KeyCode.Joystick4Button11: return "J4B11";
+            case KeyCode.Joystick4Button12: return "J4B12";
+            case KeyCode.Joystick4Button13: return "J4B13";
+            case KeyCode.Joystick4Button14: return "J4B14";
+            case KeyCode.Joystick4Button15: return "J4B15";
+            case KeyCode.Joystick4Button16: return "J4B16";
+            case KeyCode.Joystick4Button17: return "J4B17";
+            case KeyCode.Joystick4Button18: return "J4B18";
+            case KeyCode.Joystick4Button19: return "J4B19";
+            case KeyCode.Joystick5Button0: return "J5B0";
+            case KeyCode.Joystick5Button1: return "J5B1";
+            case KeyCode.Joystick5Button2: return "J5B2";
+            case KeyCode.Joystick5Button3: return "J5B3";
+            case KeyCode.Joystick5Button4: return "J5B4";
+            case KeyCode.Joystick5Button5: return "J5B5";
+            case KeyCode.Joystick5Button6: return "J5B6";
+            case KeyCode.Joystick5Button7: return "J5B7";
+            case KeyCode.Joystick5Button8: return "J5B8";
+            case KeyCode.Joystick5Button9: return "J5B9";
+            case KeyCode.Joystick5Button10: return "J5B10";
+            case KeyCode.Joystick5Button11: return "J5B11";
+            case KeyCode.Joystick5Button12: return "J5B12";
+            case KeyCode.Joystick5Button13: return "J5B13";
+            case KeyCode.Joystick5Button14: return "J5B14";
+            case KeyCode.Joystick5Button15: return "J5B15";
+            case KeyCode.Joystick5Button16: return "J5B16";
+            case KeyCode.Joystick5Button17: return "J5B17";
+            case KeyCode.Joystick5Button18: return "J5B18";
+            case KeyCode.Joystick5Button19: return "J5B19";
+            case KeyCode.Joystick6Button0: return "J6B0";
+            case KeyCode.Joystick6Button1: return "J6B1";
+            case KeyCode.Joystick6Button2: return "J6B2";
+            case KeyCode.Joystick6Button3: return "J6B3";
+            case KeyCode.Joystick6Button4: return "J6B4";
+            case KeyCode.Joystick6Button5: return "J6B5";
+            case KeyCode.Joystick6Button6: return "J6B6";
+            case KeyCode.Joystick6Button7: return "J6B7";
+            case KeyCode.Joystick6Button8: return "J6B8";
+            case KeyCode.Joystick6Button9: return "J6B9";
+            case KeyCode.Joystick6Button10: return "J6B10";
+            case KeyCode.Joystick6Button11: return "J6B11";
+            case KeyCode.Joystick6Button12: return "J6B12";
+            case KeyCode.Joystick6Button13: return "J6B13";
+            case KeyCode.Joystick6Button14: return "J6B14";
+            case KeyCode.Joystick6Button15: return "J6B15";
+            case KeyCode.Joystick6Button16: return "J6B16";
+            case KeyCode.Joystick6Button17: return "J6B17";
+            case KeyCode.Joystick6Button18: return "J6B18";
+            case KeyCode.Joystick6Button19: return "J6B19";
+            case KeyCode.Joystick7Button0: return "J7B0";
+            case KeyCode.Joystick7Button1: return "J7B1";
+            case KeyCode.Joystick7Button2: return "J7B2";
+            case KeyCode.Joystick7Button3: return "J7B3";
+            case KeyCode.Joystick7Button4: return "J7B4";
+            case KeyCode.Joystick7Button5: return "J7B5";
+            case KeyCode.Joystick7Button6: return "J7B6";
+            case KeyCode.Joystick7Button7: return "J7B7";
+            case KeyCode.Joystick7Button8: return "J7B8";
+            case KeyCode.Joystick7Button9: return "J7B9";
+            case KeyCode.Joystick7Button10: return "J7B10";
+            case KeyCode.Joystick7Button11: return "J7B11";
+            case KeyCode.Joystick7Button12: return "J7B12";
+            case KeyCode.Joystick7Button13: return "J7B13";
+            case KeyCode.Joystick7Button14: return "J7B14";
+            case KeyCode.Joystick7Button15: return "J7B15";
+            case KeyCode.Joystick7Button16: return "J7B16";
+            case KeyCode.Joystick7Button17: return "J7B17";
+            case KeyCode.Joystick7Button18: return "J7B18";
+            case KeyCode.Joystick7Button19: return "J7B19";
+            case KeyCode.Joystick8Button0: return "J8B0";
+            case KeyCode.Joystick8Button1: return "J8B1";
+            case KeyCode.Joystick8Button2: return "J8B2";
+            case KeyCode.Joystick8Button3: return "J8B3";
+            case KeyCode.Joystick8Button4: return "J8B4";
+            case KeyCode.Joystick8Button5: return "J8B5";
+            case KeyCode.Joystick8Button6: return "J8B6";
+            case KeyCode.Joystick8Button7: return "J8B7";
+            case KeyCode.Joystick8Button8: return "J8B8";
+            case KeyCode.Joystick8Button9: return "J8B9";
+            case KeyCode.Joystick8Button10: return "J8B10";
+            case KeyCode.Joystick8Button11: return "J8B11";
+            case KeyCode.Joystick8Button12: return "J8B12";
+            case KeyCode.Joystick8Button13: return "J8B13";
+            case KeyCode.Joystick8Button14: return "J8B14";
+            case KeyCode.Joystick8Button15: return "J8B15";
+            case KeyCode.Joystick8Button16: return "J8B16";
+            case KeyCode.Joystick8Button17: return "J8B17";
+            case KeyCode.Joystick8Button18: return "J8B18";
+            case KeyCode.Joystick8Button19: return "J8B19";
+            case KeyCode.JoystickButton0: return "J B0";
+            case KeyCode.JoystickButton1: return "J B1";
+            case KeyCode.JoystickButton2: return "J B2";
+            case KeyCode.JoystickButton3: return "J B3";
+            case KeyCode.JoystickButton4: return "J B4";
+            case KeyCode.JoystickButton5: return "J B5";
+            case KeyCode.JoystickButton6: return "J B6";
+            case KeyCode.JoystickButton7: return "J B7";
+            case KeyCode.JoystickButton8: return "J B8";
+            case KeyCode.JoystickButton9: return "J B9";
+            case KeyCode.JoystickButton10: return "J B10";
+            case KeyCode.JoystickButton11: return "J B11";
+            case KeyCode.JoystickButton12: return "J B12";
+            case KeyCode.JoystickButton13: return "J B13";
+            case KeyCode.JoystickButton14: return "J B14";
+            case KeyCode.JoystickButton15: return "J B15";
+            case KeyCode.JoystickButton16: return "J B16";
+            case KeyCode.JoystickButton17: return "J B17";
+            case KeyCode.JoystickButton18: return "J B18";
+            case KeyCode.JoystickButton19: return "J B19";
+            case KeyCode.K: return "K";
+            case KeyCode.Keypad0: return "Keypad0";
+            case KeyCode.Keypad1: return "Keypad1";
+            case KeyCode.Keypad2: return "Keypad2";
+            case KeyCode.Keypad3: return "Keypad3";
+            case KeyCode.Keypad4: return "Keypad4";
+            case KeyCode.Keypad5: return "Keypad5";
+            case KeyCode.Keypad6: return "Keypad6";
+            case KeyCode.Keypad7: return "Keypad7";
+            case KeyCode.Keypad8: return "Keypad8";
+            case KeyCode.Keypad9: return "Keypad9";
+            case KeyCode.KeypadDivide: return "Keypad/";
+            case KeyCode.KeypadEnter: return "Keypad Enter";
+            case KeyCode.KeypadEquals: return "Keypad =";
+            case KeyCode.KeypadMinus: return "Keypad -";
+            case KeyCode.KeypadMultiply: return "Keypad *";
+            case KeyCode.KeypadPeriod: return "Keypad .";
+            case KeyCode.KeypadPlus: return "Keypad +";
+            case KeyCode.L: return "L";
+            case KeyCode.LeftAlt: return "LeftAlt";
+            case KeyCode.LeftApple: return "LeftApple";
+            case KeyCode.LeftArrow: return "LeftArrow";
+            case KeyCode.LeftBracket: return "[";
+            //case KeyCode.LeftCommand: return "LeftCommand";
+            case KeyCode.LeftControl: return "L Control";
+            case KeyCode.LeftCurlyBracket: return "{";
+            //case KeyCode.LeftMeta: return "LeftMeta";
+            case KeyCode.LeftParen: return "(";
+            case KeyCode.LeftShift: return "L Shift";
+            case KeyCode.LeftWindows: return "L Windows";
+            case KeyCode.Less: return "<";
+            case KeyCode.M: return "M";
+            case KeyCode.Menu: return "Menu";
+            case KeyCode.Minus: return "-";
+            case KeyCode.Mouse0: return "L Mouse";
+            case KeyCode.Mouse1: return "R Mouse";
+            case KeyCode.Mouse2: return "M Mouse";
+            case KeyCode.Mouse3: return "Mouse 4";
+            case KeyCode.Mouse4: return "Mouse 5";
+            case KeyCode.Mouse5: return "Mouse 6";
+            case KeyCode.Mouse6: return "Mouse 7";
+            case KeyCode.N: return "N";
+            case KeyCode.Numlock: return "Numlock";
+            case KeyCode.O: return "O";
+            case KeyCode.P: return "P";
+            case KeyCode.PageDown: return "PageDown";
+            case KeyCode.PageUp: return "PageUp";
+            case KeyCode.Pause: return "Pause";
+            case KeyCode.Percent: return "%";
+            case KeyCode.Period: return "Period";
+            case KeyCode.Pipe: return "|";
+            case KeyCode.Plus: return "+";
+            case KeyCode.Print: return "Print";
+            case KeyCode.Q: return "Q";
+            case KeyCode.Question: return "?";
+            case KeyCode.Quote: return "Quote";
+            case KeyCode.R: return "R";
+            case KeyCode.Return: return "Return";
+            case KeyCode.RightAlt: return "RightAlt";
+            case KeyCode.RightApple: return "RightApple";
+            case KeyCode.RightArrow: return "RightArrow";
+            case KeyCode.RightBracket: return "]";
+            //case KeyCode.RightCommand: return "RightCommand";
+            case KeyCode.RightControl: return "RightControl";
+            case KeyCode.RightCurlyBracket: return "}";
+            //case KeyCode.RightMeta: return "RightMeta";
+            case KeyCode.RightParen: return ")";
+            case KeyCode.RightShift: return "RightShift";
+            case KeyCode.RightWindows: return "RightWindows";
+            case KeyCode.S: return "S";
+            case KeyCode.ScrollLock: return "ScrollLock";
+            case KeyCode.Semicolon: return ";";
+            case KeyCode.Slash: return "/";
+            case KeyCode.Space: return "Space";
+            case KeyCode.SysReq: return "SysReq";
+            case KeyCode.T: return "T";
+            case KeyCode.Tab: return "Tab";
+            case KeyCode.Tilde: return "~";
+            case KeyCode.U: return "U";
+            case KeyCode.Underscore: return "_";
+            case KeyCode.UpArrow: return "UpArrow";
+            case KeyCode.V: return "V";
+            case KeyCode.W: return "W";
+            case KeyCode.X: return "X";
+            case KeyCode.Y: return "Y";
+            case KeyCode.Z: return "Z";
+            default: return ((int)keyCode).ToString();
+        }
+    }
+
+    //Возвращает нажатую клавишу или нуль
+    public static KeyCode GetPressKey() {
+        if (Input.GetKey(KeyCode.A)) return KeyCode.A;
+        else if (Input.GetKey(KeyCode.Alpha0)) return KeyCode.Alpha0;
+        else if (Input.GetKey(KeyCode.Alpha1)) return KeyCode.Alpha1;
+        else if (Input.GetKey(KeyCode.Alpha2)) return KeyCode.Alpha2;
+        else if (Input.GetKey(KeyCode.Alpha3)) return KeyCode.Alpha3;
+        else if (Input.GetKey(KeyCode.Alpha4)) return KeyCode.Alpha4;
+        else if (Input.GetKey(KeyCode.Alpha5)) return KeyCode.Alpha5;
+        else if (Input.GetKey(KeyCode.Alpha6)) return KeyCode.Alpha6;
+        else if (Input.GetKey(KeyCode.Alpha7)) return KeyCode.Alpha7;
+        else if (Input.GetKey(KeyCode.Alpha8)) return KeyCode.Alpha8;
+        else if (Input.GetKey(KeyCode.Alpha9)) return KeyCode.Alpha9;
+        else if (Input.GetKey(KeyCode.AltGr)) return KeyCode.AltGr;
+        else if (Input.GetKey(KeyCode.Ampersand)) return KeyCode.Ampersand;
+        else if (Input.GetKey(KeyCode.Asterisk)) return KeyCode.Asterisk;
+        else if (Input.GetKey(KeyCode.At)) return KeyCode.At;
+        else if (Input.GetKey(KeyCode.B)) return KeyCode.B;
+        else if (Input.GetKey(KeyCode.BackQuote)) return KeyCode.BackQuote;
+        else if (Input.GetKey(KeyCode.Backslash)) return KeyCode.Backslash;
+        else if (Input.GetKey(KeyCode.Backspace)) return KeyCode.Backspace;
+        else if (Input.GetKey(KeyCode.Break)) return KeyCode.Break;
+        else if (Input.GetKey(KeyCode.C)) return KeyCode.C;
+        else if (Input.GetKey(KeyCode.CapsLock)) return KeyCode.CapsLock;
+        else if (Input.GetKey(KeyCode.Caret)) return KeyCode.Caret;
+        else if (Input.GetKey(KeyCode.Clear)) return KeyCode.Clear;
+        else if (Input.GetKey(KeyCode.Colon)) return KeyCode.Colon;
+        else if (Input.GetKey(KeyCode.Comma)) return KeyCode.Comma;
+        else if (Input.GetKey(KeyCode.D)) return KeyCode.D;
+        else if (Input.GetKey(KeyCode.Delete)) return KeyCode.Delete;
+        else if (Input.GetKey(KeyCode.Dollar)) return KeyCode.Dollar;
+        else if (Input.GetKey(KeyCode.DoubleQuote)) return KeyCode.DoubleQuote;
+        else if (Input.GetKey(KeyCode.DownArrow)) return KeyCode.DownArrow;
+        else if (Input.GetKey(KeyCode.E)) return KeyCode.E;
+        else if (Input.GetKey(KeyCode.End)) return KeyCode.End;
+        else if (Input.GetKey(KeyCode.Equals)) return KeyCode.Equals;
+        else if (Input.GetKey(KeyCode.Escape)) return KeyCode.Escape;
+        else if (Input.GetKey(KeyCode.Exclaim)) return KeyCode.Exclaim;
+        else if (Input.GetKey(KeyCode.F)) return KeyCode.F;
+        else if (Input.GetKey(KeyCode.F1)) return KeyCode.F1;
+        else if (Input.GetKey(KeyCode.F2)) return KeyCode.F2;
+        else if (Input.GetKey(KeyCode.F3)) return KeyCode.F3;
+        else if (Input.GetKey(KeyCode.F4)) return KeyCode.F4;
+        else if (Input.GetKey(KeyCode.F5)) return KeyCode.F5;
+        else if (Input.GetKey(KeyCode.F6)) return KeyCode.F6;
+        else if (Input.GetKey(KeyCode.F7)) return KeyCode.F7;
+        else if (Input.GetKey(KeyCode.F8)) return KeyCode.F8;
+        else if (Input.GetKey(KeyCode.F9)) return KeyCode.F9;
+        else if (Input.GetKey(KeyCode.F10)) return KeyCode.F10;
+        else if (Input.GetKey(KeyCode.F11)) return KeyCode.F11;
+        else if (Input.GetKey(KeyCode.F12)) return KeyCode.F12;
+        else if (Input.GetKey(KeyCode.F13)) return KeyCode.F13;
+        else if (Input.GetKey(KeyCode.F14)) return KeyCode.F14;
+        else if (Input.GetKey(KeyCode.F15)) return KeyCode.F15;
+        else if (Input.GetKey(KeyCode.G)) return KeyCode.G;
+        else if (Input.GetKey(KeyCode.Greater)) return KeyCode.Greater;
+        else if (Input.GetKey(KeyCode.H)) return KeyCode.H;
+        else if (Input.GetKey(KeyCode.Hash)) return KeyCode.Hash;
+        else if (Input.GetKey(KeyCode.Help)) return KeyCode.Help;
+        else if (Input.GetKey(KeyCode.Home)) return KeyCode.Home;
+        else if (Input.GetKey(KeyCode.I)) return KeyCode.I;
+        else if (Input.GetKey(KeyCode.Insert)) return KeyCode.Insert;
+        else if (Input.GetKey(KeyCode.J)) return KeyCode.J;
+        else if (Input.GetKey(KeyCode.Joystick1Button0)) return KeyCode.Joystick1Button0;
+        else if (Input.GetKey(KeyCode.Joystick1Button1)) return KeyCode.Joystick1Button1;
+        else if (Input.GetKey(KeyCode.Joystick1Button2)) return KeyCode.Joystick1Button2;
+        else if (Input.GetKey(KeyCode.Joystick1Button3)) return KeyCode.Joystick1Button3;
+        else if (Input.GetKey(KeyCode.Joystick1Button4)) return KeyCode.Joystick1Button4;
+        else if (Input.GetKey(KeyCode.Joystick1Button5)) return KeyCode.Joystick1Button5;
+        else if (Input.GetKey(KeyCode.Joystick1Button6)) return KeyCode.Joystick1Button6;
+        else if (Input.GetKey(KeyCode.Joystick1Button7)) return KeyCode.Joystick1Button7;
+        else if (Input.GetKey(KeyCode.Joystick1Button8)) return KeyCode.Joystick1Button8;
+        else if (Input.GetKey(KeyCode.Joystick1Button9)) return KeyCode.Joystick1Button9;
+        else if (Input.GetKey(KeyCode.Joystick1Button10)) return KeyCode.Joystick1Button10;
+        else if (Input.GetKey(KeyCode.Joystick1Button11)) return KeyCode.Joystick1Button11;
+        else if (Input.GetKey(KeyCode.Joystick1Button12)) return KeyCode.Joystick1Button12;
+        else if (Input.GetKey(KeyCode.Joystick1Button13)) return KeyCode.Joystick1Button13;
+        else if (Input.GetKey(KeyCode.Joystick1Button14)) return KeyCode.Joystick1Button14;
+        else if (Input.GetKey(KeyCode.Joystick1Button15)) return KeyCode.Joystick1Button15;
+        else if (Input.GetKey(KeyCode.Joystick1Button16)) return KeyCode.Joystick1Button16;
+        else if (Input.GetKey(KeyCode.Joystick1Button17)) return KeyCode.Joystick1Button17;
+        else if (Input.GetKey(KeyCode.Joystick1Button18)) return KeyCode.Joystick1Button18;
+        else if (Input.GetKey(KeyCode.Joystick1Button19)) return KeyCode.Joystick1Button19;
+        else if (Input.GetKey(KeyCode.Joystick2Button0)) return KeyCode.Joystick2Button0;
+        else if (Input.GetKey(KeyCode.Joystick2Button1)) return KeyCode.Joystick2Button1;
+        else if (Input.GetKey(KeyCode.Joystick2Button2)) return KeyCode.Joystick2Button2;
+        else if (Input.GetKey(KeyCode.Joystick2Button3)) return KeyCode.Joystick2Button3;
+        else if (Input.GetKey(KeyCode.Joystick2Button4)) return KeyCode.Joystick2Button4;
+        else if (Input.GetKey(KeyCode.Joystick2Button5)) return KeyCode.Joystick2Button5;
+        else if (Input.GetKey(KeyCode.Joystick2Button6)) return KeyCode.Joystick2Button6;
+        else if (Input.GetKey(KeyCode.Joystick2Button7)) return KeyCode.Joystick2Button7;
+        else if (Input.GetKey(KeyCode.Joystick2Button8)) return KeyCode.Joystick2Button8;
+        else if (Input.GetKey(KeyCode.Joystick2Button9)) return KeyCode.Joystick2Button9;
+        else if (Input.GetKey(KeyCode.Joystick2Button10)) return KeyCode.Joystick2Button10;
+        else if (Input.GetKey(KeyCode.Joystick2Button11)) return KeyCode.Joystick2Button11;
+        else if (Input.GetKey(KeyCode.Joystick2Button12)) return KeyCode.Joystick2Button12;
+        else if (Input.GetKey(KeyCode.Joystick2Button13)) return KeyCode.Joystick2Button13;
+        else if (Input.GetKey(KeyCode.Joystick2Button14)) return KeyCode.Joystick2Button14;
+        else if (Input.GetKey(KeyCode.Joystick2Button15)) return KeyCode.Joystick2Button15;
+        else if (Input.GetKey(KeyCode.Joystick2Button16)) return KeyCode.Joystick2Button16;
+        else if (Input.GetKey(KeyCode.Joystick2Button17)) return KeyCode.Joystick2Button17;
+        else if (Input.GetKey(KeyCode.Joystick2Button18)) return KeyCode.Joystick2Button18;
+        else if (Input.GetKey(KeyCode.Joystick2Button19)) return KeyCode.Joystick2Button19;
+        else if (Input.GetKey(KeyCode.Joystick3Button0)) return KeyCode.Joystick3Button0;
+        else if (Input.GetKey(KeyCode.Joystick3Button1)) return KeyCode.Joystick3Button1;
+        else if (Input.GetKey(KeyCode.Joystick3Button2)) return KeyCode.Joystick3Button2;
+        else if (Input.GetKey(KeyCode.Joystick3Button3)) return KeyCode.Joystick3Button3;
+        else if (Input.GetKey(KeyCode.Joystick3Button4)) return KeyCode.Joystick3Button4;
+        else if (Input.GetKey(KeyCode.Joystick3Button5)) return KeyCode.Joystick3Button5;
+        else if (Input.GetKey(KeyCode.Joystick3Button6)) return KeyCode.Joystick3Button6;
+        else if (Input.GetKey(KeyCode.Joystick3Button7)) return KeyCode.Joystick3Button7;
+        else if (Input.GetKey(KeyCode.Joystick3Button8)) return KeyCode.Joystick3Button8;
+        else if (Input.GetKey(KeyCode.Joystick3Button9)) return KeyCode.Joystick3Button9;
+        else if (Input.GetKey(KeyCode.Joystick3Button10)) return KeyCode.Joystick3Button10;
+        else if (Input.GetKey(KeyCode.Joystick3Button11)) return KeyCode.Joystick3Button11;
+        else if (Input.GetKey(KeyCode.Joystick3Button12)) return KeyCode.Joystick3Button12;
+        else if (Input.GetKey(KeyCode.Joystick3Button13)) return KeyCode.Joystick3Button13;
+        else if (Input.GetKey(KeyCode.Joystick3Button14)) return KeyCode.Joystick3Button14;
+        else if (Input.GetKey(KeyCode.Joystick3Button15)) return KeyCode.Joystick3Button15;
+        else if (Input.GetKey(KeyCode.Joystick3Button16)) return KeyCode.Joystick3Button16;
+        else if (Input.GetKey(KeyCode.Joystick3Button17)) return KeyCode.Joystick3Button17;
+        else if (Input.GetKey(KeyCode.Joystick3Button18)) return KeyCode.Joystick3Button18;
+        else if (Input.GetKey(KeyCode.Joystick3Button19)) return KeyCode.Joystick3Button19;
+        else if (Input.GetKey(KeyCode.Joystick4Button0)) return KeyCode.Joystick4Button0;
+        else if (Input.GetKey(KeyCode.Joystick4Button1)) return KeyCode.Joystick4Button1;
+        else if (Input.GetKey(KeyCode.Joystick4Button2)) return KeyCode.Joystick4Button2;
+        else if (Input.GetKey(KeyCode.Joystick4Button3)) return KeyCode.Joystick4Button3;
+        else if (Input.GetKey(KeyCode.Joystick4Button4)) return KeyCode.Joystick4Button4;
+        else if (Input.GetKey(KeyCode.Joystick4Button5)) return KeyCode.Joystick4Button5;
+        else if (Input.GetKey(KeyCode.Joystick4Button6)) return KeyCode.Joystick4Button6;
+        else if (Input.GetKey(KeyCode.Joystick4Button7)) return KeyCode.Joystick4Button7;
+        else if (Input.GetKey(KeyCode.Joystick4Button8)) return KeyCode.Joystick4Button8;
+        else if (Input.GetKey(KeyCode.Joystick4Button9)) return KeyCode.Joystick4Button9;
+        else if (Input.GetKey(KeyCode.Joystick4Button10)) return KeyCode.Joystick4Button10;
+        else if (Input.GetKey(KeyCode.Joystick4Button11)) return KeyCode.Joystick4Button11;
+        else if (Input.GetKey(KeyCode.Joystick4Button12)) return KeyCode.Joystick4Button12;
+        else if (Input.GetKey(KeyCode.Joystick4Button13)) return KeyCode.Joystick4Button13;
+        else if (Input.GetKey(KeyCode.Joystick4Button14)) return KeyCode.Joystick4Button14;
+        else if (Input.GetKey(KeyCode.Joystick4Button15)) return KeyCode.Joystick4Button15;
+        else if (Input.GetKey(KeyCode.Joystick4Button16)) return KeyCode.Joystick4Button16;
+        else if (Input.GetKey(KeyCode.Joystick4Button17)) return KeyCode.Joystick4Button17;
+        else if (Input.GetKey(KeyCode.Joystick4Button18)) return KeyCode.Joystick4Button18;
+        else if (Input.GetKey(KeyCode.Joystick4Button19)) return KeyCode.Joystick4Button19;
+        else if (Input.GetKey(KeyCode.Joystick5Button0)) return KeyCode.Joystick5Button0;
+        else if (Input.GetKey(KeyCode.Joystick5Button1)) return KeyCode.Joystick5Button1;
+        else if (Input.GetKey(KeyCode.Joystick5Button2)) return KeyCode.Joystick5Button2;
+        else if (Input.GetKey(KeyCode.Joystick5Button3)) return KeyCode.Joystick5Button3;
+        else if (Input.GetKey(KeyCode.Joystick5Button4)) return KeyCode.Joystick5Button4;
+        else if (Input.GetKey(KeyCode.Joystick5Button5)) return KeyCode.Joystick5Button5;
+        else if (Input.GetKey(KeyCode.Joystick5Button6)) return KeyCode.Joystick5Button6;
+        else if (Input.GetKey(KeyCode.Joystick5Button7)) return KeyCode.Joystick5Button7;
+        else if (Input.GetKey(KeyCode.Joystick5Button8)) return KeyCode.Joystick5Button8;
+        else if (Input.GetKey(KeyCode.Joystick5Button9)) return KeyCode.Joystick5Button9;
+        else if (Input.GetKey(KeyCode.Joystick5Button10)) return KeyCode.Joystick5Button10;
+        else if (Input.GetKey(KeyCode.Joystick5Button11)) return KeyCode.Joystick5Button11;
+        else if (Input.GetKey(KeyCode.Joystick5Button12)) return KeyCode.Joystick5Button12;
+        else if (Input.GetKey(KeyCode.Joystick5Button13)) return KeyCode.Joystick5Button13;
+        else if (Input.GetKey(KeyCode.Joystick5Button14)) return KeyCode.Joystick5Button14;
+        else if (Input.GetKey(KeyCode.Joystick5Button15)) return KeyCode.Joystick5Button15;
+        else if (Input.GetKey(KeyCode.Joystick5Button16)) return KeyCode.Joystick5Button16;
+        else if (Input.GetKey(KeyCode.Joystick5Button17)) return KeyCode.Joystick5Button17;
+        else if (Input.GetKey(KeyCode.Joystick5Button18)) return KeyCode.Joystick5Button18;
+        else if (Input.GetKey(KeyCode.Joystick5Button19)) return KeyCode.Joystick5Button19;
+        else if (Input.GetKey(KeyCode.Joystick6Button0)) return KeyCode.Joystick6Button0;
+        else if (Input.GetKey(KeyCode.Joystick6Button1)) return KeyCode.Joystick6Button1;
+        else if (Input.GetKey(KeyCode.Joystick6Button2)) return KeyCode.Joystick6Button2;
+        else if (Input.GetKey(KeyCode.Joystick6Button3)) return KeyCode.Joystick6Button3;
+        else if (Input.GetKey(KeyCode.Joystick6Button4)) return KeyCode.Joystick6Button4;
+        else if (Input.GetKey(KeyCode.Joystick6Button5)) return KeyCode.Joystick6Button5;
+        else if (Input.GetKey(KeyCode.Joystick6Button6)) return KeyCode.Joystick6Button6;
+        else if (Input.GetKey(KeyCode.Joystick6Button7)) return KeyCode.Joystick6Button7;
+        else if (Input.GetKey(KeyCode.Joystick6Button8)) return KeyCode.Joystick6Button8;
+        else if (Input.GetKey(KeyCode.Joystick6Button9)) return KeyCode.Joystick6Button9;
+        else if (Input.GetKey(KeyCode.Joystick6Button10)) return KeyCode.Joystick6Button10;
+        else if (Input.GetKey(KeyCode.Joystick6Button11)) return KeyCode.Joystick6Button11;
+        else if (Input.GetKey(KeyCode.Joystick6Button12)) return KeyCode.Joystick6Button12;
+        else if (Input.GetKey(KeyCode.Joystick6Button13)) return KeyCode.Joystick6Button13;
+        else if (Input.GetKey(KeyCode.Joystick6Button14)) return KeyCode.Joystick6Button14;
+        else if (Input.GetKey(KeyCode.Joystick6Button15)) return KeyCode.Joystick6Button15;
+        else if (Input.GetKey(KeyCode.Joystick6Button16)) return KeyCode.Joystick6Button16;
+        else if (Input.GetKey(KeyCode.Joystick6Button17)) return KeyCode.Joystick6Button17;
+        else if (Input.GetKey(KeyCode.Joystick6Button18)) return KeyCode.Joystick6Button18;
+        else if (Input.GetKey(KeyCode.Joystick6Button19)) return KeyCode.Joystick6Button19;
+        else if (Input.GetKey(KeyCode.Joystick7Button0)) return KeyCode.Joystick7Button0;
+        else if (Input.GetKey(KeyCode.Joystick7Button1)) return KeyCode.Joystick7Button1;
+        else if (Input.GetKey(KeyCode.Joystick7Button2)) return KeyCode.Joystick7Button2;
+        else if (Input.GetKey(KeyCode.Joystick7Button3)) return KeyCode.Joystick7Button3;
+        else if (Input.GetKey(KeyCode.Joystick7Button4)) return KeyCode.Joystick7Button4;
+        else if (Input.GetKey(KeyCode.Joystick7Button5)) return KeyCode.Joystick7Button5;
+        else if (Input.GetKey(KeyCode.Joystick7Button6)) return KeyCode.Joystick7Button6;
+        else if (Input.GetKey(KeyCode.Joystick7Button7)) return KeyCode.Joystick7Button7;
+        else if (Input.GetKey(KeyCode.Joystick7Button8)) return KeyCode.Joystick7Button8;
+        else if (Input.GetKey(KeyCode.Joystick7Button9)) return KeyCode.Joystick7Button9;
+        else if (Input.GetKey(KeyCode.Joystick7Button10)) return KeyCode.Joystick7Button10;
+        else if (Input.GetKey(KeyCode.Joystick7Button11)) return KeyCode.Joystick7Button11;
+        else if (Input.GetKey(KeyCode.Joystick7Button12)) return KeyCode.Joystick7Button12;
+        else if (Input.GetKey(KeyCode.Joystick7Button13)) return KeyCode.Joystick7Button13;
+        else if (Input.GetKey(KeyCode.Joystick7Button14)) return KeyCode.Joystick7Button14;
+        else if (Input.GetKey(KeyCode.Joystick7Button15)) return KeyCode.Joystick7Button15;
+        else if (Input.GetKey(KeyCode.Joystick7Button16)) return KeyCode.Joystick7Button16;
+        else if (Input.GetKey(KeyCode.Joystick7Button17)) return KeyCode.Joystick7Button17;
+        else if (Input.GetKey(KeyCode.Joystick7Button18)) return KeyCode.Joystick7Button18;
+        else if (Input.GetKey(KeyCode.Joystick7Button19)) return KeyCode.Joystick7Button19;
+        else if (Input.GetKey(KeyCode.Joystick8Button0)) return KeyCode.Joystick8Button0;
+        else if (Input.GetKey(KeyCode.Joystick8Button1)) return KeyCode.Joystick8Button1;
+        else if (Input.GetKey(KeyCode.Joystick8Button2)) return KeyCode.Joystick8Button2;
+        else if (Input.GetKey(KeyCode.Joystick8Button3)) return KeyCode.Joystick8Button3;
+        else if (Input.GetKey(KeyCode.Joystick8Button4)) return KeyCode.Joystick8Button4;
+        else if (Input.GetKey(KeyCode.Joystick8Button5)) return KeyCode.Joystick8Button5;
+        else if (Input.GetKey(KeyCode.Joystick8Button6)) return KeyCode.Joystick8Button6;
+        else if (Input.GetKey(KeyCode.Joystick8Button7)) return KeyCode.Joystick8Button7;
+        else if (Input.GetKey(KeyCode.Joystick8Button8)) return KeyCode.Joystick8Button8;
+        else if (Input.GetKey(KeyCode.Joystick8Button9)) return KeyCode.Joystick8Button9;
+        else if (Input.GetKey(KeyCode.Joystick8Button10)) return KeyCode.Joystick8Button10;
+        else if (Input.GetKey(KeyCode.Joystick8Button11)) return KeyCode.Joystick8Button11;
+        else if (Input.GetKey(KeyCode.Joystick8Button12)) return KeyCode.Joystick8Button12;
+        else if (Input.GetKey(KeyCode.Joystick8Button13)) return KeyCode.Joystick8Button13;
+        else if (Input.GetKey(KeyCode.Joystick8Button14)) return KeyCode.Joystick8Button14;
+        else if (Input.GetKey(KeyCode.Joystick8Button15)) return KeyCode.Joystick8Button15;
+        else if (Input.GetKey(KeyCode.Joystick8Button16)) return KeyCode.Joystick8Button16;
+        else if (Input.GetKey(KeyCode.Joystick8Button17)) return KeyCode.Joystick8Button17;
+        else if (Input.GetKey(KeyCode.Joystick8Button18)) return KeyCode.Joystick8Button18;
+        else if (Input.GetKey(KeyCode.Joystick8Button19)) return KeyCode.Joystick8Button19;
+        else if (Input.GetKey(KeyCode.JoystickButton0)) return KeyCode.JoystickButton0;
+        else if (Input.GetKey(KeyCode.JoystickButton1)) return KeyCode.JoystickButton1;
+        else if (Input.GetKey(KeyCode.JoystickButton2)) return KeyCode.JoystickButton2;
+        else if (Input.GetKey(KeyCode.JoystickButton3)) return KeyCode.JoystickButton3;
+        else if (Input.GetKey(KeyCode.JoystickButton4)) return KeyCode.JoystickButton4;
+        else if (Input.GetKey(KeyCode.JoystickButton5)) return KeyCode.JoystickButton5;
+        else if (Input.GetKey(KeyCode.JoystickButton6)) return KeyCode.JoystickButton6;
+        else if (Input.GetKey(KeyCode.JoystickButton7)) return KeyCode.JoystickButton7;
+        else if (Input.GetKey(KeyCode.JoystickButton8)) return KeyCode.JoystickButton8;
+        else if (Input.GetKey(KeyCode.JoystickButton9)) return KeyCode.JoystickButton9;
+        else if (Input.GetKey(KeyCode.JoystickButton10)) return KeyCode.JoystickButton10;
+        else if (Input.GetKey(KeyCode.JoystickButton11)) return KeyCode.JoystickButton11;
+        else if (Input.GetKey(KeyCode.JoystickButton12)) return KeyCode.JoystickButton12;
+        else if (Input.GetKey(KeyCode.JoystickButton13)) return KeyCode.JoystickButton13;
+        else if (Input.GetKey(KeyCode.JoystickButton14)) return KeyCode.JoystickButton14;
+        else if (Input.GetKey(KeyCode.JoystickButton15)) return KeyCode.JoystickButton15;
+        else if (Input.GetKey(KeyCode.JoystickButton16)) return KeyCode.JoystickButton16;
+        else if (Input.GetKey(KeyCode.JoystickButton17)) return KeyCode.JoystickButton17;
+        else if (Input.GetKey(KeyCode.JoystickButton18)) return KeyCode.JoystickButton18;
+        else if (Input.GetKey(KeyCode.JoystickButton19)) return KeyCode.JoystickButton19;
+        else if (Input.GetKey(KeyCode.K)) return KeyCode.K;
+        else if (Input.GetKey(KeyCode.Keypad0)) return KeyCode.Keypad0;
+        else if (Input.GetKey(KeyCode.Keypad1)) return KeyCode.Keypad1;
+        else if (Input.GetKey(KeyCode.Keypad2)) return KeyCode.Keypad2;
+        else if (Input.GetKey(KeyCode.Keypad3)) return KeyCode.Keypad3;
+        else if (Input.GetKey(KeyCode.Keypad4)) return KeyCode.Keypad4;
+        else if (Input.GetKey(KeyCode.Keypad5)) return KeyCode.Keypad5;
+        else if (Input.GetKey(KeyCode.Keypad6)) return KeyCode.Keypad6;
+        else if (Input.GetKey(KeyCode.Keypad7)) return KeyCode.Keypad7;
+        else if (Input.GetKey(KeyCode.Keypad8)) return KeyCode.Keypad8;
+        else if (Input.GetKey(KeyCode.Keypad9)) return KeyCode.Keypad9;
+        else if (Input.GetKey(KeyCode.KeypadDivide)) return KeyCode.KeypadDivide;
+        else if (Input.GetKey(KeyCode.KeypadEnter)) return KeyCode.KeypadEnter;
+        else if (Input.GetKey(KeyCode.KeypadEquals)) return KeyCode.KeypadEquals;
+        else if (Input.GetKey(KeyCode.KeypadMinus)) return KeyCode.KeypadMinus;
+        else if (Input.GetKey(KeyCode.KeypadMultiply)) return KeyCode.KeypadMultiply;
+        else if (Input.GetKey(KeyCode.KeypadPeriod)) return KeyCode.KeypadPeriod;
+        else if (Input.GetKey(KeyCode.KeypadPlus)) return KeyCode.KeypadPlus;
+        else if (Input.GetKey(KeyCode.L)) return KeyCode.L;
+        else if (Input.GetKey(KeyCode.LeftAlt)) return KeyCode.LeftAlt;
+        else if (Input.GetKey(KeyCode.LeftApple)) return KeyCode.LeftApple;
+        else if (Input.GetKey(KeyCode.LeftArrow)) return KeyCode.LeftArrow;
+        else if (Input.GetKey(KeyCode.LeftBracket)) return KeyCode.LeftBracket;
+        else if (Input.GetKey(KeyCode.LeftCommand)) return KeyCode.LeftCommand;
+        else if (Input.GetKey(KeyCode.LeftControl)) return KeyCode.LeftControl;
+        else if (Input.GetKey(KeyCode.LeftCurlyBracket)) return KeyCode.LeftCurlyBracket;
+        else if (Input.GetKey(KeyCode.LeftMeta)) return KeyCode.LeftMeta;
+        else if (Input.GetKey(KeyCode.LeftParen)) return KeyCode.LeftParen;
+        else if (Input.GetKey(KeyCode.LeftShift)) return KeyCode.LeftShift;
+        else if (Input.GetKey(KeyCode.LeftWindows)) return KeyCode.LeftWindows;
+        else if (Input.GetKey(KeyCode.Less)) return KeyCode.Less;
+        else if (Input.GetKey(KeyCode.M)) return KeyCode.M;
+        else if (Input.GetKey(KeyCode.Menu)) return KeyCode.Menu;
+        else if (Input.GetKey(KeyCode.Minus)) return KeyCode.Minus;
+        else if (Input.GetKey(KeyCode.Mouse0)) return KeyCode.Mouse0;
+        else if (Input.GetKey(KeyCode.Mouse1)) return KeyCode.Mouse1;
+        else if (Input.GetKey(KeyCode.Mouse2)) return KeyCode.Mouse2;
+        else if (Input.GetKey(KeyCode.Mouse3)) return KeyCode.Mouse3;
+        else if (Input.GetKey(KeyCode.Mouse4)) return KeyCode.Mouse4;
+        else if (Input.GetKey(KeyCode.Mouse5)) return KeyCode.Mouse5;
+        else if (Input.GetKey(KeyCode.N)) return KeyCode.N;
+        else if (Input.GetKey(KeyCode.Numlock)) return KeyCode.Numlock;
+        else if (Input.GetKey(KeyCode.O)) return KeyCode.O;
+        else if (Input.GetKey(KeyCode.P)) return KeyCode.P;
+        else if (Input.GetKey(KeyCode.PageDown)) return KeyCode.PageDown;
+        else if (Input.GetKey(KeyCode.PageUp)) return KeyCode.PageUp;
+        else if (Input.GetKey(KeyCode.Pause)) return KeyCode.Pause;
+        else if (Input.GetKey(KeyCode.Percent)) return KeyCode.Percent;
+        else if (Input.GetKey(KeyCode.Period)) return KeyCode.Period;
+        else if (Input.GetKey(KeyCode.Pipe)) return KeyCode.Pipe;
+        else if (Input.GetKey(KeyCode.Plus)) return KeyCode.Plus;
+        else if (Input.GetKey(KeyCode.Print)) return KeyCode.Print;
+        else if (Input.GetKey(KeyCode.Q)) return KeyCode.Q;
+        else if (Input.GetKey(KeyCode.Question)) return KeyCode.Question;
+        else if (Input.GetKey(KeyCode.Quote)) return KeyCode.Quote;
+        else if (Input.GetKey(KeyCode.R)) return KeyCode.R;
+        else if (Input.GetKey(KeyCode.Return)) return KeyCode.Return;
+        else if (Input.GetKey(KeyCode.RightAlt)) return KeyCode.RightAlt;
+        else if (Input.GetKey(KeyCode.RightApple)) return KeyCode.RightApple;
+        else if (Input.GetKey(KeyCode.RightArrow)) return KeyCode.RightArrow;
+        else if (Input.GetKey(KeyCode.RightBracket)) return KeyCode.RightBracket;
+        else if (Input.GetKey(KeyCode.RightCommand)) return KeyCode.RightCommand;
+        else if (Input.GetKey(KeyCode.RightControl)) return KeyCode.RightControl;
+        else if (Input.GetKey(KeyCode.RightCurlyBracket)) return KeyCode.RightCurlyBracket;
+        else if (Input.GetKey(KeyCode.RightMeta)) return KeyCode.RightMeta;
+        else if (Input.GetKey(KeyCode.RightParen)) return KeyCode.RightParen;
+        else if (Input.GetKey(KeyCode.RightShift)) return KeyCode.RightShift;
+        else if (Input.GetKey(KeyCode.RightWindows)) return KeyCode.RightWindows;
+        else if (Input.GetKey(KeyCode.S)) return KeyCode.S;
+        else if (Input.GetKey(KeyCode.ScrollLock)) return KeyCode.ScrollLock;
+        else if (Input.GetKey(KeyCode.Semicolon)) return KeyCode.Semicolon;
+        else if (Input.GetKey(KeyCode.Slash)) return KeyCode.Slash;
+        else if (Input.GetKey(KeyCode.Space)) return KeyCode.Space;
+        else if (Input.GetKey(KeyCode.SysReq)) return KeyCode.SysReq;
+        else if (Input.GetKey(KeyCode.T)) return KeyCode.T;
+        else if (Input.GetKey(KeyCode.Tab)) return KeyCode.Tab;
+        else if (Input.GetKey(KeyCode.Tilde)) return KeyCode.Tilde;
+        else if (Input.GetKey(KeyCode.U)) return KeyCode.U;
+        else if (Input.GetKey(KeyCode.Underscore)) return KeyCode.Underscore;
+        else if (Input.GetKey(KeyCode.UpArrow)) return KeyCode.UpArrow;
+        else if (Input.GetKey(KeyCode.V)) return KeyCode.V;
+        else if (Input.GetKey(KeyCode.W)) return KeyCode.W;
+        else if (Input.GetKey(KeyCode.X)) return KeyCode.X;
+        else if (Input.GetKey(KeyCode.Y)) return KeyCode.Y;
+        else if (Input.GetKey(KeyCode.Z)) return KeyCode.Z;
+
+        else return KeyCode.None;
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        
+    }
+}

@@ -1,0 +1,144 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+
+int sizeShader;
+
+
+// Create a RenderTexture with enableRandomWrite flag and set it
+// with cs.SetTexture
+
+struct Data{
+    float result;
+};
+
+RWStructuredBuffer<Data> datas;
+
+float _offsetX;
+float _offsetY;
+float _offsetZ;
+float _scale;
+float _frequency;
+float _octaves;
+bool _best;
+
+float _value;
+
+float perlin(float3 p, float frequency);
+
+
+[numthreads(8,8,8)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    // TODO: insert actual code here!
+    float dataID = 64*id.x + 8*id.y + id.z;
+
+    datas[dataID].result = dataID;
+
+    //Need calc perlin
+
+    //1 Grid definition
+    
+    
+    //2 dot product
+    
+    
+    //3 interpolation
+    //float FactorX = 0.875170906246 / _scale;
+    //float FactorY = 0.875170906246 / _scale;
+
+    float Factor = 0.875170906246 / _scale;
+
+    float x = Factor * id.x + _offsetX;
+    float y = Factor * id.y + _offsetY;
+    float z = Factor * id.z + _offsetZ;
+
+    //x = x / (_frequency) + _offsetX;
+    //y = y / (_frequency) + _offsetY;
+
+    float3 p = float3(x, y, z);
+
+
+    datas[dataID].result = perlin(p, _frequency);
+
+}
+
+float perlin(float3 p, float frequency)
+{
+
+    float freq = frequency;
+    float result = 0;
+
+    if(_best)
+        result = -1;
+
+    for (int _octNum = 0; _octNum < _octaves; _octNum++)
+    {
+
+        float3 i = floor(p * freq);
+        float3 f = frac(p * freq);
+        float3 t = f * f * f * (f * (f * 6.0 - 15.0) + 10.0);
+        //plant of UP
+        float3 a = i + float3(0.0, 0.0, 0.0);
+        float3 b = i + float3(1.0, 0.0, 0.0);
+        float3 c = i + float3(0.0, 1.0, 0.0);
+        float3 d = i + float3(1.0, 1.0, 0.0);
+
+        float3 az = i + float3(0.0, 0.0, 1.0);
+        float3 bz = i + float3(1.0, 0.0, 1.0);
+        float3 cz = i + float3(0.0, 1.0, 1.0);
+        float3 dz = i + float3(1.0, 1.0, 1.0);
+
+        a = -1.0 + 2.0 * frac(sin( float3(dot(a, float3(127.1, 311.7, 233.5)), dot(a, float3(269.5, 183.3, 351.9)), dot(a, float3(111.1, 346.7, 59.1)))) *43758.5453123);
+        b = -1.0 + 2.0 * frac(sin( float3(dot(b, float3(127.1, 311.7, 233.5)), dot(b, float3(269.5, 183.3, 351.9)), dot(b, float3(111.1, 346.7, 59.1)))) *43758.5453123);
+        c = -1.0 + 2.0 * frac(sin( float3(dot(c, float3(127.1, 311.7, 233.5)), dot(c, float3(269.5, 183.3, 351.9)), dot(c, float3(111.1, 346.7, 59.1)))) *43758.5453123);
+        d = -1.0 + 2.0 * frac(sin( float3(dot(d, float3(127.1, 311.7, 233.5)), dot(d, float3(269.5, 183.3, 351.9)), dot(d, float3(111.1, 346.7, 59.1)))) *43758.5453123);
+
+        az = -1.0 + 2.0 * frac(sin(float3(dot(az, float3(127.1, 311.7, 233.5)), dot(az, float3(269.5, 183.3, 351.9)), dot(az, float3(111.1, 346.7, 59.1)))) * 43758.5453123);
+        bz = -1.0 + 2.0 * frac(sin(float3(dot(bz, float3(127.1, 311.7, 233.5)), dot(bz, float3(269.5, 183.3, 351.9)), dot(bz, float3(111.1, 346.7, 59.1)))) * 43758.5453123);
+        cz = -1.0 + 2.0 * frac(sin(float3(dot(cz, float3(127.1, 311.7, 233.5)), dot(cz, float3(269.5, 183.3, 351.9)), dot(cz, float3(111.1, 346.7, 59.1)))) * 43758.5453123);
+        dz = -1.0 + 2.0 * frac(sin(float3(dot(dz, float3(127.1, 311.7, 233.5)), dot(dz, float3(269.5, 183.3, 351.9)), dot(dz, float3(111.1, 346.7, 59.1)))) * 43758.5453123);
+
+        float A = dot(a, f - float3(0.0, 0.0, 0.0));
+        float B = dot(b, f - float3(1.0, 0.0, 0.0));
+        float C = dot(c, f - float3(0.0, 1.0, 0.0));
+        float D = dot(d, f - float3(1.0, 1.0, 0.0));
+
+        float Az = dot(az, f - float3(0.0, 0.0, 1.0));
+        float Bz = dot(bz, f - float3(1.0, 0.0, 1.0));
+        float Cz = dot(cz, f - float3(0.0, 1.0, 1.0));
+        float Dz = dot(dz, f - float3(1.0, 1.0, 1.0));
+
+        float noiseXY =lerp(lerp(A, B, t.x), lerp(C, D, t.x), t.y);
+        float noiseZ = lerp(lerp(Az, Bz, t.x), lerp(Cz, Dz, t.x), t.y);
+
+        float noise = lerp(noiseXY, noiseZ, t.z);
+
+        if (_best) {
+            if (result < noise) {
+                result = noise;
+            }
+        }
+        else {
+            noise /= (_octNum + 1.0f);
+
+            result += noise;
+        }
+
+        freq *= 2.0f;
+
+    }
+
+    //result /= _octaves;
+
+    if (_best) {
+        result = result * _octaves;
+        result = (result + (_octaves))/(2* _octaves) ;
+    }
+    else {
+        result = result / 2 + 0.5f;
+    }
+
+    result = clamp(result, 0, 1.0);
+
+    return result;
+}

@@ -1,0 +1,44 @@
+﻿это текстовый тест
+это тестовый |=| текст
+
+CreateGameTitle |=| Create
+CreateGameEnterServerName |=| Enter server name...
+CreateGameEnterPassword |=| Enter password...
+CreateGamePlayers |=| Players
+CreateGamePlayersMax1 |=| Single
+CreateGameLobbyType |=| Visibility
+CreateGameLobbyTypePrivate |=| Private
+CreateGameLobbyTypeFriendsOnly |=| Friends
+CreateGameLobbyTypePublic |=| Public
+
+ConnectSliderPlayersVacancies |=| Vacancies
+ConnectSliderPlayersVacanciesALL |=| All
+
+ConnectSliderDistance |=| Distance
+ConnectSliderDistanceAllPlanet |=| All Planet
+ConnectSliderDistanceHalfPlanet |=| Half Planet
+ConnectSliderDistanceRegion |=| Region
+ConnectSliderDistanceClose |=| Close
+
+ConnectSliderLobbyesMax |=| Lobbyes Max
+
+keyControlsMoveForward |=| Forward
+keyControlsMoveBack |=| Bask
+keyControlsMoveRight |=| Right
+keyControlsMoveLeft |=| Left
+keyControlsMoveUp |=| Up
+keyControlsMoveJump |=| Jump
+keyControlsMoveDown |=| Down
+keyControlsMoveSit |=| Sit
+keyControlsOpenInvetory |=| Invetory
+keyControlsOpenInteraction |=| Interation
+keyControlsAttack |=| Attack
+keyControlsItemNext |=| Next Item
+keyControlsItemBack |=| Back Item
+
+AudioTitle |=| Audio
+AudioVolumeAll |=| Volume all
+AudioVolumeMusic |=| Volume music
+AudioVolumeEffect |=| Volume effect
+AudioVolumeMAX |=| Full
+AudioVolumeOff |=| Off

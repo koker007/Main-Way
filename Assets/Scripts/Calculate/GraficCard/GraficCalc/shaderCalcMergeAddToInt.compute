@@ -1,0 +1,36 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+
+
+struct Integer{
+    int num;
+};
+
+RWStructuredBuffer<Integer> _buffResult;
+
+RWStructuredBuffer<Integer> _buffArray;
+
+int _arrayLenght;
+int _addNum;
+
+//Functions
+void calcAddInt(uint3 id, int iteration);
+
+[numthreads(1000,1,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    uint arrayLenghtUint = _arrayLenght;
+    uint iterationMax = arrayLenghtUint/1000 + 1;
+
+    for(uint iteration = 0; iteration < iterationMax; iteration++){
+        calcAddInt(id, iteration);
+    }
+}
+
+void calcAddInt(uint3 id, int iteration){
+    int ID = iteration * 1000 + id.x;
+
+    if(ID < _arrayLenght){
+        _buffResult[ID].num = _buffArray[ID].num + _addNum;
+    }
+}

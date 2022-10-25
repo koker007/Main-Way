@@ -1,0 +1,68 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+
+
+struct Vec2{
+    float x;
+    float y;
+};
+
+RWStructuredBuffer<Vec2> _buffResult;
+
+RWStructuredBuffer<Vec2> _buffVec0;
+RWStructuredBuffer<Vec2> _buffVec1;
+RWStructuredBuffer<Vec2> _buffVec2;
+RWStructuredBuffer<Vec2> _buffVec3;
+RWStructuredBuffer<Vec2> _buffVec4;
+RWStructuredBuffer<Vec2> _buffVec5;
+
+int _countResult;
+
+int _countVec0;
+int _countVec1;
+int _countVec2;
+int _countVec3;
+int _countVec4;
+int _countVec5;
+
+//Functions
+void calcVec2(uint3 id, int iteration);
+
+[numthreads(1000,1,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    uint countResultUint = _countResult;
+    uint iterationMax = countResultUint/1000 + 1;
+    for(uint iteration = 0; iteration < iterationMax; iteration++){
+        calcVec2(id, iteration);
+    }
+}
+
+void calcVec2(uint3 id, int iteration){
+    int resultID = iteration * 1000 + id.x;
+
+    if(resultID < _countVec0){
+        int meshID = resultID;
+        _buffResult[resultID] = _buffVec0[meshID];
+    }
+    else if(resultID < _countVec0 + _countVec1){
+        int meshID = resultID - _countVec0;
+        _buffResult[resultID] = _buffVec1[meshID];
+    }
+    else if(resultID < _countVec0 + _countVec1 + _countVec2){
+        int meshID = resultID - (_countVec0 + _countVec1);
+        _buffResult[resultID] = _buffVec2[meshID];
+    }
+    else if(resultID < _countVec0 + _countVec1 + _countVec2 + _countVec3){
+        int meshID = resultID - (_countVec0 + _countVec1 + _countVec2);
+        _buffResult[resultID] = _buffVec3[meshID];
+    }
+    else if(resultID < _countVec0 + _countVec1 + _countVec2 + _countVec3 + _countVec4){
+        int meshID = resultID - (_countVec0 + _countVec1 + _countVec2 + _countVec3);
+        _buffResult[resultID] = _buffVec4[meshID];
+    }
+    else if(resultID < _countVec0 + _countVec1 + _countVec2 + _countVec3 + _countVec4 + _countVec5){
+        int meshID = resultID - (_countVec0 + _countVec1 + _countVec2 + _countVec3 + _countVec4);
+        _buffResult[resultID] = _buffVec5[meshID];
+    }
+}

@@ -1,0 +1,272 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+
+int sizeShader;
+
+
+// Create a RenderTexture with enableRandomWrite flag and set it
+// with cs.SetTexture
+
+struct Data {
+    float x;
+};
+struct Vec3{
+    float x;
+    float y;
+    float z;
+
+    float lenght() {
+        return sqrt(x*x + y*y + z*x);
+    }
+
+    Vec3 normalize() {
+        float l = lenght();
+
+        x /= l;
+        y /= l;
+        z /= l;
+
+        return this;
+    }
+};
+
+struct Color {
+    float r;
+    float g;
+    float b;
+    float a;
+};
+
+struct Quternion {
+    float x;
+    float y;
+    float z;
+    float w;
+
+    float lenght() {
+        return sqrt(x * x + y * y + z * z + w * w);
+    }
+
+    Quternion normalize() {
+        float l = lenght();
+
+        x /= l;
+        y /= l;
+        z /= l;
+        w /= l;
+
+        return this;
+    }
+
+    Quternion conjugate() {
+        x *= -1;
+        y *= -1;
+        z *= -1;
+
+        return this;
+    }
+
+    Quternion mul(Quternion r) {
+        float w_ = w * r.w - x * r.x - y * r.y - z * r.z;
+        float x_ = x * r.w + w * r.x + y * r.z - z * r.y;
+        float y_ = y * r.w + w * r.y + z * r.x - x * r.z;
+        float z_ = z * r.w + w * r.z + x * r.y - y * r.x;
+
+        w = w_;
+        x = x_;
+        y = y_;
+        z = z_;
+
+        return this;
+    }
+    Quternion mul(float3 r) {
+        float w_ = -x * r.x - y * r.y - z * r.z;
+        float x_ = w * r.x + y * r.z - z * r.y;
+        float y_ = w * r.y + z * r.x - x * r.z;
+        float z_ = w * r.z + x * r.y - y * r.x;
+
+        w = w_;
+        x = x_;
+        y = y_;
+        z = z_;
+
+        return this;
+    }
+
+    Quternion lookAt(float3 from, float3 to)
+    {
+
+        Vec3 forward;
+        forward.x = to.x - from.x;
+        forward.y = to.y - from.y;
+        forward.z = to.z - from.z;
+        forward.normalize();
+
+        Vec3 up;
+        up.x = 0.0f;
+        up.y = 0.0f;
+        up.z = 0.0f;
+
+        //Cross
+        Vec3 right; //v3_cross(up, forward);
+        right.x = up.y * forward.z - up.z * forward.y;
+        right.y = up.z * forward.x - up.x * forward.z;
+        right.z = up.x * forward.y - up.y * forward.x;
+
+        float mat00 = right.x;
+        float mat01 = up.x;
+        float mat02 = forward.x;
+
+        float mat10 = right.y;
+        float mat11 = up.y;
+        float mat12 = forward.y;
+        
+        float mat20 = right.z;
+        float mat21 = up.z;
+        float mat22 = forward.z;
+
+        w = sqrt(1.0f +
+           mat00 +
+            mat11 +
+            mat22) * 0.5f;
+
+        float w4_recip = 1.0f / (4.0f * w);
+
+        x = (mat21 - mat12) * w4_recip;
+
+        y = (mat02 - mat20) * w4_recip;
+
+        z = (mat10 - mat01) * w4_recip;
+
+        this.normalize();
+
+        return this;
+    }
+};
+
+RWStructuredBuffer<float3> _resultSize;
+RWStructuredBuffer<Quternion> _resultRotate;
+RWStructuredBuffer<float4> _resultColor;
+RWStructuredBuffer<float3> _basePosition;
+RWStructuredBuffer<Data> _baseRotateSpeed;
+RWStructuredBuffer<float4> _baseColor;
+RWStructuredBuffer<float> _baseStarSize;
+RWStructuredBuffer<float> _baseStarBright;
+
+float _time;
+float _camPosX;
+float _camPosY;
+float _camPosZ;
+
+
+float GetSize(float dist, float baseStarSize, float timeNow, float time360);
+float4 GetColor(float dist, float4 _baseColor, float timeNow, float time360, float _baseStarBright);
+
+float Distance(float3 a, float3 b);
+int GetSizeStepen(int size);
+
+//Quternions
+float QuternionLenght(Quternion quternion);
+
+[numthreads(64, 1, 1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    
+
+    //_resultSize[id.x].x = 1;
+    _resultColor[id.x] = float4(abs(cos(_time)), abs(sin(_time)), abs(sin(_time * 2)), 1.0f);
+
+    float3 posCam = float3(_camPosX, _camPosY, _camPosZ);
+    float3 posStar = _basePosition[id.x];
+
+    float distCam = Distance(posCam, posStar);
+
+    float scale = GetSize(distCam, _baseStarSize[id.x], _time, _baseRotateSpeed[id.x].x);
+
+    _resultSize[id.x] = float3(scale, scale, scale);
+    _resultColor[id.x] = GetColor(distCam, _baseColor[id.x], _time, _baseRotateSpeed[id.x].x, _baseStarBright[id.x].x);
+
+    //Rotate
+    _resultRotate[id.x] = _resultRotate[id.x].lookAt(_basePosition[id.x], posCam);
+}
+
+float GetSize(float dist, float baseStarSize, float timeNow, float time360)
+{
+    float size = dist;
+
+    float sizeData = baseStarSize / 1000000;
+
+    float coof = (float)GetSizeStepen(baseStarSize);
+    float visualSize = (dist * 0.3333f * 10) / coof;
+    if (visualSize < sizeData * 50)
+        visualSize = sizeData * 50;
+
+    float distToMinSize = 10;
+    if (dist > distToMinSize)
+        visualSize /= (dist / distToMinSize);
+
+    //float distToLongSize = 15;
+    //if (dist > distToLongSize)
+    //    visualSize *= (dist-distToLongSize+5)/(5);
+
+    visualSize *= abs(cos(time360 * + timeNow / 10)) / 10 + 0.90f;
+
+    return visualSize;
+}
+float4 GetColor(float dist, float4 _baseColor, float timeNow, float time360, float _baseStarBright) {
+    
+    //float4 result = float4(1.0f, 1.0f, 1.0f, 1.0f);
+    float4 result = _baseColor;
+
+    //base color modify distance
+    float colorDistMin = 3;
+    float colorDistCoof = dist/ colorDistMin;
+    if (colorDistCoof > 1.0f) {
+        result += float4(1.0f, 1.0f, 1.0f, 1.0f) * _baseStarBright * (colorDistCoof - 1) * (1 - _baseStarBright) * 4;
+        //calc alpha
+        float alpha = (_baseStarBright)/ ((colorDistCoof-1)/4);
+
+        result.w = alpha;
+        
+        result = clamp(result, 0.0f, 1.0f);
+    }
+
+
+    result *= abs(sin(timeNow/10))/10 + 0.90f;
+
+    return result;
+}
+
+//found dist on 2 vectors
+float Distance(float3 a, float3 b) {
+    return sqrt(pow(b.x - a.x, 2) + pow(b.y - a.y, 2) + pow(b.z - a.z, 2));;
+}
+
+int GetSizeStepen(int size) {
+    int stepen = 1;
+
+    if (size >= 65536) stepen = 17;
+    else if (size >= 32768) stepen = 16;
+    else if (size >= 16384) stepen = 15;
+    else if (size >= 8192) stepen = 14;
+    else if (size >= 4096) stepen = 13;
+    else if (size >= 2048) stepen = 12;
+    else if (size >= 1024) stepen = 11;
+    else if (size >= 512) stepen = 10;
+    else if (size >= 256) stepen = 9;
+    else if (size >= 128) stepen = 8;
+    else if (size >= 64) stepen = 7;
+    else if (size >= 32) stepen = 6;
+    else if (size >= 16) stepen = 5;
+    else if (size >= 8) stepen = 4;
+    else if (size >= 4) stepen = 2;
+    else if (size >= 2) stepen = 1;
+
+    return stepen;
+}
+
+////////////////////////////////
+//Quternion calc
+float QuternionLenght(Quternion quternion) {
+    return sqrt(quternion.x * quternion.x + quternion.y * quternion.y + quternion.z * quternion.z + quternion.w * quternion.w);
+}

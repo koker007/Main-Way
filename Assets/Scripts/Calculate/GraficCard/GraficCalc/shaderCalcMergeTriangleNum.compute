@@ -1,0 +1,73 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+
+
+struct Integer{
+    int num;
+};
+
+RWStructuredBuffer<Integer> _buffResult;
+
+RWStructuredBuffer<Integer> _buffTri0;
+RWStructuredBuffer<Integer> _buffTri1;
+RWStructuredBuffer<Integer> _buffTri2;
+RWStructuredBuffer<Integer> _buffTri3;
+RWStructuredBuffer<Integer> _buffTri4;
+RWStructuredBuffer<Integer> _buffTri5;
+
+int _countResult;
+
+int _countTria0;
+int _countTria1;
+int _countTria2;
+int _countTria3;
+int _countTria4;
+int _countTria5;
+
+//Functions
+void calcTria(uint3 id, int iteration);
+
+[numthreads(1000,1,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    uint countResultUint = _countResult;
+    uint iterationMax = countResultUint/1000 + 1;
+
+    for(uint iteration = 0; iteration < iterationMax; iteration++){
+        calcTria(id, iteration);
+    }
+}
+
+void calcTria(uint3 id, int iteration){
+    int resultID = iteration * 1000 + id.x;
+
+    if(resultID < _countTria0){
+        int meshID = resultID;
+        _buffResult[resultID].num = _buffTri0[meshID].num;
+    }
+    else if(resultID < _countTria0 + _countTria1){
+        int trianglePreviously = _countTria0;
+        int meshID = resultID - trianglePreviously;
+        _buffResult[resultID].num = _buffTri1[meshID].num + trianglePreviously;
+    }
+    else if(resultID < _countTria0 + _countTria1 + _countTria2){
+        int trianglePreviously = _countTria0 + _countTria1;
+        int meshID = resultID - trianglePreviously;
+        _buffResult[resultID].num = _buffTri2[meshID].num + trianglePreviously;
+    }
+    else if(resultID < _countTria0 + _countTria1 + _countTria2 + _countTria3){
+        int trianglePreviously = _countTria0 + _countTria1 + _countTria2;
+        int meshID = resultID - trianglePreviously;
+        _buffResult[resultID].num = _buffTri3[meshID].num + trianglePreviously;
+    }
+    else if(resultID < _countTria0 + _countTria1 + _countTria2 + _countTria3 + _countTria4){
+        int trianglePreviously = _countTria0 + _countTria1 + _countTria2 + _countTria3;
+        int meshID = resultID - trianglePreviously;
+        _buffResult[resultID].num = _buffTri4[meshID].num + trianglePreviously;
+    }
+    else if(resultID < _countTria0 + _countTria1 + _countTria2 + _countTria3 + _countTria4 + _countTria5){
+        int trianglePreviously = _countTria0 + _countTria1 + _countTria2 + _countTria3 + _countTria4;
+        int meshID = resultID - trianglePreviously;
+        _buffResult[resultID].num = _buffTri5[meshID].num + trianglePreviously;
+    }
+}

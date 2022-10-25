@@ -1,0 +1,183 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+
+
+struct Vec3{
+    float x;
+    float y;
+    float z;
+};
+
+struct Integer{
+    int num;
+};
+
+struct TexUV{
+    float u;
+    float v;
+};
+
+RWStructuredBuffer<Vec3> _buffResultVertices;
+RWStructuredBuffer<Integer> _buffResultTriangles;
+RWStructuredBuffer<TexUV> _buffResultUV;
+
+RWStructuredBuffer<Vec3> _buffMesh0Vertices;
+RWStructuredBuffer<Integer> _buffMesh0Triangles;
+RWStructuredBuffer<TexUV> _buffMesh0UV;
+
+RWStructuredBuffer<Vec3> _buffMesh1Vertices;
+RWStructuredBuffer<Integer> _buffMesh1Triangles;
+RWStructuredBuffer<TexUV> _buffMesh1UV;
+
+RWStructuredBuffer<Vec3> _buffMesh2Vertices;
+RWStructuredBuffer<Integer> _buffMesh2Triangles;
+RWStructuredBuffer<TexUV> _buffMesh2UV;
+
+RWStructuredBuffer<Vec3> _buffMesh3Vertices;
+RWStructuredBuffer<Integer> _buffMesh3Triangles;
+RWStructuredBuffer<TexUV> _buffMesh3UV;
+
+RWStructuredBuffer<Vec3> _buffMesh4Vertices;
+RWStructuredBuffer<Integer> _buffMesh4Triangles;
+RWStructuredBuffer<TexUV> _buffMesh4UV;
+
+RWStructuredBuffer<Vec3> _buffMesh5Vertices;
+RWStructuredBuffer<Integer> _buffMesh5Triangles;
+RWStructuredBuffer<TexUV> _buffMesh5UV;
+
+int _countResultVert;
+int _countResultTria;
+int _countResultUV0;
+
+int _countMesh0Vert;
+int _countMesh0Tria;
+int _countMesh0UV0;
+
+int _countMesh1Vert;
+int _countMesh1Tria;
+int _countMesh1UV0;
+
+int _countMesh2Vert;
+int _countMesh2Tria;
+int _countMesh2UV0;
+
+int _countMesh3Vert;
+int _countMesh3Tria;
+int _countMesh3UV0;
+
+int _countMesh4Vert;
+int _countMesh4Tria;
+int _countMesh4UV0;
+
+int _countMesh5Vert;
+int _countMesh5Tria;
+int _countMesh5UV0;
+
+//Functions
+void calcVert(uint3 id, int iteration);
+void calcUV0(uint3 id, int iteration);
+void calcTria(uint3 id, int iteration);
+
+[numthreads(1000,1,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    for(int iteration = 0; iteration < _countResultVert/1000; iteration++){
+        calcVert(id, iteration);
+    }
+    for(int iteration = 0; iteration < _countResultUV0/1000; iteration++){
+        calcUV0(id, iteration);
+    }
+    for(int iteration = 0; iteration < _countResultTria/1000; iteration++){
+        calcTria(id, iteration);
+    }
+}
+
+void calcVert(uint3 id, int iteration){
+    int resultID = iteration * 1000 + id.x;
+
+    if(resultID < _countMesh0Vert){
+        int meshID = resultID;
+        _buffResultVertices[resultID] = _buffMesh0Vertices[meshID];
+    }
+    else if(resultID < _countMesh0Vert + _countMesh1Vert){
+        int meshID = resultID - _countMesh0Vert;
+        _buffResultVertices[resultID] = _buffMesh1Vertices[meshID];
+    }
+    else if(resultID < _countMesh0Vert + _countMesh1Vert + _countMesh2Vert){
+        int meshID = resultID - (_countMesh0Vert + _countMesh1Vert);
+        _buffResultVertices[resultID] = _buffMesh2Vertices[meshID];
+    }
+    else if(resultID < _countMesh0Vert + _countMesh1Vert + _countMesh2Vert + _countMesh3Vert){
+        int meshID = resultID - (_countMesh0Vert + _countMesh1Vert + _countMesh2Vert);
+        _buffResultVertices[resultID] = _buffMesh3Vertices[meshID];
+    }
+    else if(resultID < _countMesh0Vert + _countMesh1Vert + _countMesh2Vert + _countMesh3Vert + _countMesh4Vert){
+        int meshID = resultID - (_countMesh0Vert + _countMesh1Vert + _countMesh2Vert + _countMesh3Vert);
+        _buffResultVertices[resultID] = _buffMesh4Vertices[meshID];
+    }
+    else if(resultID < _countMesh0Vert + _countMesh1Vert + _countMesh2Vert + _countMesh3Vert + _countMesh4Vert + _countMesh5Vert){
+        int meshID = resultID - (_countMesh0Vert + _countMesh1Vert + _countMesh2Vert + _countMesh3Vert + _countMesh4Vert);
+        _buffResultVertices[resultID] = _buffMesh5Vertices[meshID];
+    }
+}
+void calcUV0(uint3 id, int iteration){
+    int resultID = iteration * 1000 + id.x;
+
+    if(resultID < _countMesh0UV0){
+        int meshID = resultID;
+        _buffResultUV[resultID] = _buffMesh0UV[meshID];
+    }
+    else if(resultID < _countMesh0UV0 + _countMesh1UV0){
+        int meshID = resultID - _countMesh0UV0;
+        _buffResultUV[resultID] = _buffMesh1UV[meshID];
+    }
+    else if(resultID < _countMesh0UV0 + _countMesh1UV0 + _countMesh2UV0){
+        int meshID = resultID - (_countMesh0UV0 + _countMesh1UV0);
+        _buffResultUV[resultID] = _buffMesh2UV[meshID];
+    }
+    else if(resultID < _countMesh0UV0 + _countMesh1UV0 + _countMesh2UV0 + _countMesh3UV0){
+        int meshID = resultID - (_countMesh0UV0 + _countMesh1UV0 + _countMesh2UV0);
+        _buffResultUV[resultID] = _buffMesh3UV[meshID];
+    }
+    else if(resultID < _countMesh0UV0 + _countMesh1UV0 + _countMesh2UV0 + _countMesh3UV0 + _countMesh4UV0){
+        int meshID = resultID - (_countMesh0UV0 + _countMesh1UV0 + _countMesh2UV0 + _countMesh3UV0);
+        _buffResultUV[resultID] = _buffMesh4UV[meshID];
+    }
+    else if(resultID < _countMesh0UV0 + _countMesh1UV0 + _countMesh2UV0 + _countMesh3UV0 + _countMesh4UV0 + _countMesh5UV0){
+        int meshID = resultID - (_countMesh0UV0 + _countMesh1UV0 + _countMesh2UV0 + _countMesh3UV0 + _countMesh4UV0);
+        _buffResultUV[resultID] = _buffMesh5UV[meshID];
+    }
+}
+void calcTria(uint3 id, int iteration){
+    int resultID = iteration * 1000 + id.x;
+
+    if(resultID < _countMesh0Tria){
+        int meshID = resultID;
+        _buffResultTriangles[resultID].num = _buffMesh0Triangles[meshID].num;
+    }
+    else if(resultID < _countMesh0Tria + _countMesh1Tria){
+        int trianglePreviously = _countMesh0Tria;
+        int meshID = resultID - trianglePreviously;
+        _buffResultTriangles[resultID].num = _buffMesh1Triangles[meshID].num + trianglePreviously;
+    }
+    else if(resultID < _countMesh0Tria + _countMesh1Tria + _countMesh2Tria){
+        int trianglePreviously = _countMesh0Tria + _countMesh1Tria;
+        int meshID = resultID - trianglePreviously;
+        _buffResultTriangles[resultID].num = _buffMesh2Triangles[meshID].num + trianglePreviously;
+    }
+    else if(resultID < _countMesh0Tria + _countMesh1Tria + _countMesh2Tria + _countMesh3Tria){
+        int trianglePreviously = _countMesh0Tria + _countMesh1Tria + _countMesh2Tria;
+        int meshID = resultID - trianglePreviously;
+        _buffResultTriangles[resultID].num = _buffMesh3Triangles[meshID].num + trianglePreviously;
+    }
+    else if(resultID < _countMesh0Tria + _countMesh1Tria + _countMesh2Tria + _countMesh3Tria + _countMesh4Tria){
+        int trianglePreviously = _countMesh0Tria + _countMesh1Tria + _countMesh2Tria + _countMesh3Tria;
+        int meshID = resultID - trianglePreviously;
+        _buffResultTriangles[resultID].num = _buffMesh4Triangles[meshID].num + trianglePreviously;
+    }
+    else if(resultID < _countMesh0Tria + _countMesh1Tria + _countMesh2Tria + _countMesh3Tria + _countMesh4Tria + _countMesh5Tria){
+        int trianglePreviously = _countMesh0Tria + _countMesh1Tria + _countMesh2Tria + _countMesh3Tria + _countMesh4Tria;
+        int meshID = resultID - trianglePreviously;
+        _buffResultTriangles[resultID].num = _buffMesh5Triangles[meshID].num + trianglePreviously;
+    }
+}

@@ -1,0 +1,437 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+
+
+// Create a RenderTexture with enableRandomWrite flag and set it
+// with cs.SetTexture
+
+struct Voxel{
+    float height;
+};
+struct Vec3{
+    float x;
+    float y;
+    float z;
+};
+
+struct Integer{
+    int num;
+};
+
+struct TexUV{
+    float u;
+    float v;
+};
+
+RWStructuredBuffer<Voxel> _voxel;
+RWStructuredBuffer<Vec3> _vertices;
+RWStructuredBuffer<Integer> _triangles;
+RWStructuredBuffer<TexUV> _uv;
+
+int _typeWall;
+
+//float _offsetX;
+
+//Functions
+void drawBack(int vertStart, int vertCount, int vertStartLeft, int vertStartDown);
+void drawRight(int vertStart, int vertCount, int vertStartLeft, int vertStartDown);
+void drawLeft(int vertStart, int vertCount, int vertStartLeft, int vertStartDown);
+void drawUp(int vertStart, int vertCount, int vertStartLeft, int vertStartDown);
+void drawDown(int vertStart, int vertCount, int vertStartLeft, int vertStartDown);
+
+[numthreads(16,16,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    // TODO: insert actual code here!
+    int dataID = 16*id.x + id.y + id.z;
+
+    int voxIDu = dataID + 1;
+    int voxIDd = dataID - 1;
+    int voxIDr = dataID + 16;
+    int voxIDl = dataID - 16;
+    int voxIDMax = 16*16;
+
+    //3 = side
+    //2 = triangles
+    //3 = points
+    int vertCount = 3 * 2 * 3;
+
+    int vertStart = vertCount * dataID;
+
+    int vertDown = 2 * 3 * id.x;
+    int vertLeft = 2 * 3 * 16;
+    if(id.x == 0){
+        vertLeft = 2 * 3 * id.y;
+    }
+
+    float sizeVoxel = 1/16.0f;
+
+    for(int num = 0; num < vertCount; num++){
+        _uv[vertStart + num].u = id.x * sizeVoxel + sizeVoxel/2;
+        _uv[vertStart + num].v = id.y * sizeVoxel + sizeVoxel/2;
+
+        _triangles[vertStart + num].num = vertStart + num;
+    }
+
+    //Face
+    _vertices[vertStart].x = id.x * sizeVoxel;
+    _vertices[vertStart].y = id.y * sizeVoxel;
+    _vertices[vertStart].z = _voxel[dataID].height/16.0f * -1;
+
+    _vertices[vertStart + 1].x = id.x * sizeVoxel;
+    _vertices[vertStart + 1].y = id.y * sizeVoxel + sizeVoxel;
+    _vertices[vertStart + 1].z = _voxel[dataID].height/16.0f * -1;
+
+    _vertices[vertStart + 2].x = id.x * sizeVoxel + sizeVoxel;
+    _vertices[vertStart + 2].y = id.y * sizeVoxel + sizeVoxel;
+    _vertices[vertStart + 2].z = _voxel[dataID].height/16.0f * -1;
+
+    _vertices[vertStart + 3].x = id.x * sizeVoxel;
+    _vertices[vertStart + 3].y = id.y * sizeVoxel;
+    _vertices[vertStart + 3].z = _voxel[dataID].height/16.0f * -1;
+
+    _vertices[vertStart + 4].x = id.x * sizeVoxel + sizeVoxel;
+    _vertices[vertStart + 4].y = id.y * sizeVoxel + sizeVoxel;
+    _vertices[vertStart + 4].z = _voxel[dataID].height/16.0f * -1;
+
+    _vertices[vertStart + 5].x = id.x * sizeVoxel + sizeVoxel;
+    _vertices[vertStart + 5].y = id.y * sizeVoxel;
+    _vertices[vertStart + 5].z = _voxel[dataID].height/16.0f * -1;
+
+
+    //right
+    float rightHeight = 0.0f;
+    if(id.x < 15){
+        rightHeight = _voxel[voxIDr].height/16.0f * -1;
+
+        if(_voxel[dataID].height < _voxel[voxIDr].height){
+           for(int num = 0; num < 2*3; num++){
+               _uv[vertStart + 6*1 + num].u = id.x * sizeVoxel + sizeVoxel/2 + sizeVoxel;
+               _uv[vertStart + 6*1 + num].v = id.y * sizeVoxel + sizeVoxel/2;
+           }
+        }
+    }
+
+    //point down Face
+    _vertices[vertStart + 6*1].x = id.x * sizeVoxel + sizeVoxel;
+    _vertices[vertStart + 6*1].y = id.y * sizeVoxel;
+    _vertices[vertStart + 6*1].z = _voxel[dataID].height/16.0f * -1;
+    //point up face
+    _vertices[vertStart + 6*1 + 1].x = id.x * sizeVoxel + sizeVoxel;
+    _vertices[vertStart + 6*1 + 1].y = id.y * sizeVoxel + sizeVoxel;
+    _vertices[vertStart + 6*1 + 1].z = _voxel[dataID].height/16.0f * -1;
+    //point up back
+    _vertices[vertStart + 6*1 + 2].x = id.x * sizeVoxel + sizeVoxel;
+    _vertices[vertStart + 6*1 + 2].y = id.y * sizeVoxel + sizeVoxel;
+    _vertices[vertStart + 6*1 + 2].z = rightHeight;
+
+    //point up back
+    _vertices[vertStart + 6*1 + 3].x = id.x * sizeVoxel + sizeVoxel;
+    _vertices[vertStart + 6*1 + 3].y = id.y * sizeVoxel + sizeVoxel;
+    _vertices[vertStart + 6*1 + 3].z = rightHeight;
+    //point down back
+    _vertices[vertStart + 6*1 + 4].x = id.x * sizeVoxel + sizeVoxel;
+    _vertices[vertStart + 6*1 + 4].y = id.y * sizeVoxel;
+    _vertices[vertStart + 6*1 + 4].z = rightHeight;
+    //point down Face
+    _vertices[vertStart + 6*1 + 5].x = id.x * sizeVoxel + sizeVoxel;
+    _vertices[vertStart + 6*1 + 5].y = id.y * sizeVoxel;
+    _vertices[vertStart + 6*1 + 5].z = _voxel[dataID].height/16.0f * -1;
+
+
+    //up
+    float upHeight = 0.0f;
+    if(id.y < 15){
+        upHeight = _voxel[voxIDu].height/16.0f * -1;
+
+        if(_voxel[dataID].height < _voxel[voxIDu].height){
+           for(int num = 0; num < 2*3; num++){
+               _uv[vertStart + 6*2 + num].u = id.x * sizeVoxel + sizeVoxel/2;
+               _uv[vertStart + 6*2 + num].v = id.y * sizeVoxel + sizeVoxel/2 + + sizeVoxel;
+           }
+        }
+    }
+    //point right Face
+    _vertices[vertStart + 6*2].x = id.x * sizeVoxel + sizeVoxel;
+    _vertices[vertStart + 6*2].y = id.y * sizeVoxel + sizeVoxel;
+    _vertices[vertStart + 6*2].z = _voxel[dataID].height/16.0f * -1;
+    //point left face
+    _vertices[vertStart + 6*2 + 1].x = id.x * sizeVoxel;
+    _vertices[vertStart + 6*2 + 1].y = id.y * sizeVoxel + sizeVoxel;
+    _vertices[vertStart + 6*2 + 1].z = _voxel[dataID].height/16.0f * -1;
+    //point left back
+    _vertices[vertStart + 6*2 + 2].x = id.x * sizeVoxel;
+    _vertices[vertStart + 6*2 + 2].y = id.y * sizeVoxel + sizeVoxel;
+    _vertices[vertStart + 6*2 + 2].z = upHeight;
+
+    //point left back
+    _vertices[vertStart + 6*2 + 3].x = id.x * sizeVoxel;
+    _vertices[vertStart + 6*2 + 3].y = id.y * sizeVoxel + sizeVoxel;
+    _vertices[vertStart + 6*2 + 3].z = upHeight;
+    //point right back
+    _vertices[vertStart + 6*2 + 4].x = id.x * sizeVoxel + sizeVoxel;
+    _vertices[vertStart + 6*2 + 4].y = id.y * sizeVoxel + sizeVoxel;
+    _vertices[vertStart + 6*2 + 4].z = upHeight;
+    //point right Face
+    _vertices[vertStart + 6*2 + 5].x = id.x * sizeVoxel + sizeVoxel;
+    _vertices[vertStart + 6*2 + 5].y = id.y * sizeVoxel + sizeVoxel;
+    _vertices[vertStart + 6*2 + 5].z = _voxel[dataID].height/16.0f * -1;
+
+
+
+    //if it left texel
+    int vertStartLeft = 0;
+    if(id.x == 0){
+        vertStartLeft = vertCount * voxIDMax + (2 * 3 * id.y);
+
+        //point up Face
+        _vertices[vertStartLeft].x = id.x * sizeVoxel;
+        _vertices[vertStartLeft].y = id.y * sizeVoxel + sizeVoxel;
+        _vertices[vertStartLeft].z = _voxel[dataID].height/16.0f * -1;
+        //point down face
+        _vertices[vertStartLeft + 1].x = id.x * sizeVoxel;
+        _vertices[vertStartLeft + 1].y = id.y * sizeVoxel;
+        _vertices[vertStartLeft + 1].z = _voxel[dataID].height/16.0f * -1;
+        //point down back
+        _vertices[vertStartLeft + 2].x = id.x * sizeVoxel;
+        _vertices[vertStartLeft + 2].y = id.y * sizeVoxel;
+        _vertices[vertStartLeft + 2].z = 0;
+
+        //point down back
+        _vertices[vertStartLeft + 3].x = id.x * sizeVoxel;
+        _vertices[vertStartLeft + 3].y = id.y * sizeVoxel;
+        _vertices[vertStartLeft + 3].z = 0;
+        //point up back
+        _vertices[vertStartLeft + 4].x = id.x * sizeVoxel;
+        _vertices[vertStartLeft + 4].y = id.y * sizeVoxel + sizeVoxel;
+        _vertices[vertStartLeft + 4].z = 0;
+        //point up Face
+        _vertices[vertStartLeft + 5].x = id.x * sizeVoxel;
+        _vertices[vertStartLeft + 5].y = id.y * sizeVoxel + sizeVoxel;
+        _vertices[vertStartLeft + 5].z = _voxel[dataID].height/16.0f * -1;
+
+        for(int num = 0; num < 2*3; num++){
+            _uv[vertStartLeft + num].u = id.x * sizeVoxel + sizeVoxel/2;
+            _uv[vertStartLeft + num].v = id.y * sizeVoxel + sizeVoxel/2;
+
+            _triangles[vertStartLeft + num].num = vertStartLeft + num;
+        }
+    }
+    //if it down texel
+    int vertStartDown = 0;
+    if(id.y == 0){
+        vertStartDown = vertCount * voxIDMax + (2 * 3 * 16) + (2 * 3 * id.x);
+
+        //point left Face
+        _vertices[vertStartDown].x = id.x * sizeVoxel;
+        _vertices[vertStartDown].y = id.y * sizeVoxel;
+        _vertices[vertStartDown].z = _voxel[dataID].height/16.0f * -1;
+        //point right face
+        _vertices[vertStartDown + 1].x = id.x * sizeVoxel + sizeVoxel;
+        _vertices[vertStartDown + 1].y = id.y * sizeVoxel;
+        _vertices[vertStartDown + 1].z = _voxel[dataID].height/16.0f * -1;
+        //point right back
+        _vertices[vertStartDown + 2].x = id.x * sizeVoxel + sizeVoxel;
+        _vertices[vertStartDown + 2].y = id.y * sizeVoxel;
+        _vertices[vertStartDown + 2].z = 0;
+        //point right back
+        _vertices[vertStartDown + 3].x = id.x * sizeVoxel + sizeVoxel;
+        _vertices[vertStartDown + 3].y = id.y * sizeVoxel;
+        _vertices[vertStartDown + 3].z = 0;
+        //point left back
+        _vertices[vertStartDown + 4].x = id.x * sizeVoxel;
+        _vertices[vertStartDown + 4].y = id.y * sizeVoxel;
+        _vertices[vertStartDown + 4].z = 0;
+        //point left Face
+        _vertices[vertStartDown + 5].x = id.x * sizeVoxel;
+        _vertices[vertStartDown + 5].y = id.y * sizeVoxel;
+        _vertices[vertStartDown + 5].z = _voxel[dataID].height/16.0f * -1;
+
+        for(int num = 0; num < 2*3; num++){
+            _uv[vertStartDown + num].u = id.x * sizeVoxel + sizeVoxel/2;
+            _uv[vertStartDown + num].v = id.y * sizeVoxel + sizeVoxel/2;
+
+            _triangles[vertStartDown + num].num = vertStartDown + num;
+        }
+    }
+
+    if(_typeWall == 1){
+        drawBack(vertStart, vertCount, vertStartLeft, vertStartDown);    
+    }
+    else if(_typeWall == 2){
+        drawRight(vertStart, vertCount, vertStartLeft, vertStartDown);
+    }
+    else if(_typeWall == 3){
+        drawLeft(vertStart, vertCount, vertStartLeft, vertStartDown);
+    }
+    else if(_typeWall == 4){
+        drawUp(vertStart, vertCount, vertStartLeft, vertStartDown);
+    }
+    else if(_typeWall == 5){
+        drawDown(vertStart, vertCount, vertStartLeft, vertStartDown);
+    }
+}
+
+void drawBack(int vertStart, int vertCount, int vertStartLeft, int vertStartDown) {
+    for(int num = 0; num < vertCount; num++){
+        float oldX = _vertices[vertStart + num].x;
+        float oldY = _vertices[vertStart + num].y;
+        float oldZ = _vertices[vertStart + num].z;
+
+        _vertices[vertStart + num].x = 1.0f - oldX;
+        _vertices[vertStart + num].z = 1.0f - oldZ;
+    }
+
+    if(vertStartLeft != 0){
+        for(int num = 0; num < 2*3; num++){
+            float oldX = _vertices[vertStartLeft + num].x;
+            float oldY = _vertices[vertStartLeft + num].y;
+            float oldZ = _vertices[vertStartLeft + num].z;
+
+            _vertices[vertStartLeft + num].x = 1.0f - oldX;
+            _vertices[vertStartLeft + num].z = 1.0f - oldZ;
+        }
+    }
+    if(vertStartDown != 0){
+        for(int num = 0; num < 2*3; num++){
+            float oldX = _vertices[vertStartDown + num].x;
+            float oldY = _vertices[vertStartDown + num].y;
+            float oldZ = _vertices[vertStartDown + num].z;
+
+            _vertices[vertStartDown + num].x = 1.0f - oldX;
+            _vertices[vertStartDown + num].z = 1.0f - oldZ;
+        }
+    }
+}
+
+void drawRight(int vertStart, int vertCount, int vertStartLeft, int vertStartDown) {
+    for(int num = 0; num < vertCount; num++){
+        float oldX = _vertices[vertStart + num].x;
+        float oldY = _vertices[vertStart + num].y;
+        float oldZ = _vertices[vertStart + num].z;
+
+        _vertices[vertStart + num].x = 1.0f - oldZ;
+        _vertices[vertStart + num].z = oldX;
+    }
+
+
+
+    if(vertStartLeft != 0){
+        for(int num = 0; num < 2*3; num++){
+            float oldX = _vertices[vertStartLeft + num].x;
+            float oldY = _vertices[vertStartLeft + num].y;
+            float oldZ = _vertices[vertStartLeft + num].z;
+
+            _vertices[vertStartLeft + num].x = 1.0f - oldZ;
+            _vertices[vertStartLeft + num].z = oldX;
+        }
+    }
+    if(vertStartDown != 0){
+        for(int num = 0; num < 2*3; num++){
+            float oldX = _vertices[vertStartDown + num].x;
+            float oldY = _vertices[vertStartDown + num].y;
+            float oldZ = _vertices[vertStartDown + num].z;
+
+            _vertices[vertStartDown + num].x = 1.0f - oldZ;
+            _vertices[vertStartDown + num].z = oldX;
+        }
+    }
+}
+
+void drawLeft(int vertStart, int vertCount, int vertStartLeft, int vertStartDown) {
+    for(int num = 0; num < vertCount; num++){
+        float oldX = _vertices[vertStart + num].x;
+        float oldY = _vertices[vertStart + num].y;
+        float oldZ = _vertices[vertStart + num].z;
+
+        _vertices[vertStart + num].x = oldZ;
+        _vertices[vertStart + num].z = 1.0f - oldX;
+    }
+
+    if(vertStartLeft != 0){
+        for(int num = 0; num < 2*3; num++){
+            float oldX = _vertices[vertStartLeft + num].x;
+            float oldY = _vertices[vertStartLeft + num].y;
+            float oldZ = _vertices[vertStartLeft + num].z;
+
+            _vertices[vertStartLeft + num].x = oldZ;
+            _vertices[vertStartLeft + num].z = 1.0f - oldX;
+        }
+    }
+    if(vertStartDown != 0){
+        for(int num = 0; num < 2*3; num++){
+            float oldX = _vertices[vertStartDown + num].x;
+            float oldY = _vertices[vertStartDown + num].y;
+            float oldZ = _vertices[vertStartDown + num].z;
+
+            _vertices[vertStartDown + num].x = oldZ;
+            _vertices[vertStartDown + num].z = 1.0f - oldX;
+        }
+    }
+}
+
+void drawUp(int vertStart, int vertCount, int vertStartLeft, int vertStartDown) {
+    for(int num = 0; num < vertCount; num++){
+        float oldX = _vertices[vertStart + num].x;
+        float oldY = _vertices[vertStart + num].y;
+        float oldZ = _vertices[vertStart + num].z;
+
+        _vertices[vertStart + num].z = oldY;
+        _vertices[vertStart + num].y = 1.0f - oldZ;
+
+    }
+
+    if(vertStartLeft != 0){
+        for(int num = 0; num < 2*3; num++){
+            float oldX = _vertices[vertStartLeft + num].x;
+            float oldY = _vertices[vertStartLeft + num].y;
+            float oldZ = _vertices[vertStartLeft + num].z;
+
+            _vertices[vertStartLeft + num].z = oldY;
+            _vertices[vertStartLeft + num].y = 1.0f - oldZ;
+        }
+    }
+    if(vertStartDown != 0){
+        for(int num = 0; num < 2*3; num++){
+            float oldX = _vertices[vertStartDown + num].x;
+            float oldY = _vertices[vertStartDown + num].y;
+            float oldZ = _vertices[vertStartDown + num].z;
+
+            _vertices[vertStartDown + num].z = oldY;
+            _vertices[vertStartDown + num].y = 1.0f - oldZ;
+        }
+    }
+}
+
+void drawDown(int vertStart, int vertCount, int vertStartLeft, int vertStartDown) {
+    for(int num = 0; num < vertCount; num++){
+        float oldX = _vertices[vertStart + num].x;
+        float oldY = _vertices[vertStart + num].y;
+        float oldZ = _vertices[vertStart + num].z;
+
+        _vertices[vertStart + num].z = 1.0f - oldY;
+        _vertices[vertStart + num].y = oldZ;
+
+    }
+
+    if(vertStartLeft != 0){
+        for(int num = 0; num < 2*3; num++){
+            float oldX = _vertices[vertStartLeft + num].x;
+            float oldY = _vertices[vertStartLeft + num].y;
+            float oldZ = _vertices[vertStartLeft + num].z;
+
+            _vertices[vertStartLeft + num].z = 1.0f - oldY;
+            _vertices[vertStartLeft + num].y = oldZ;
+        }
+    }
+    if(vertStartDown != 0){
+        for(int num = 0; num < 2*3; num++){
+            float oldX = _vertices[vertStartDown + num].x;
+            float oldY = _vertices[vertStartDown + num].y;
+            float oldZ = _vertices[vertStartDown + num].z;
+
+            _vertices[vertStartDown + num].z = 1.0f - oldY;
+            _vertices[vertStartDown + num].y = oldZ;
+        }
+    }
+}
