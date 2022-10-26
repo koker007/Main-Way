@@ -24,6 +24,11 @@ public class RedactorBlocksCTRL : MonoBehaviour
 
     bool needSave = false;
 
+    [SerializeField]
+    InputFieldCTRL inputModName;
+    [SerializeField]
+    InputFieldCTRL inputBlockName;
+
     [Header("Visual")]
     [SerializeField]
     SliderCTRL sliderTransparent;
@@ -110,6 +115,68 @@ public class RedactorBlocksCTRL : MonoBehaviour
         }
     }
 
+    public void acceptModName() {
+        //Можем применять только если поле ввода есть
+        if (inputModName == null ||
+            inputModName.inputField.text == null ||
+            inputModName.inputField.text.Length == 0
+            ) {
+            return;
+        }
+
+        //Проверяем сам текст
+        if (inputModName.inputField.text[0] == ' ') {
+            string textNew = "";
+            bool symbolOld = false;
+            for (int x = 0; x < inputModName.inputField.text.Length; x++) {
+                if (inputModName.inputField.text[x] == ' ')
+                {
+                    if (!symbolOld)
+                        continue;
+                }
+                else {
+                    symbolOld = true;
+                }
+                textNew += inputModName.inputField.text;
+            }
+
+            inputModName.inputField.text = textNew;
+        }
+
+        blockDataLocal.mod = inputModName.inputField.text;
+
+    }
+    public void acceptBlockName() {
+        if (inputBlockName == null ||
+           inputBlockName.inputField.text == null ||
+           inputBlockName.inputField.text.Length == 0) {
+            return;
+        }
+
+        //Проверяем сам текст
+        if (inputBlockName.inputField.text[0] == ' ')
+        {
+            string textNew = "";
+            bool symbolOld = false;
+            for (int x = 0; x < inputBlockName.inputField.text.Length; x++)
+            {
+                if (inputBlockName.inputField.text[x] == ' ')
+                {
+                    if (!symbolOld)
+                        continue;
+                }
+                else
+                {
+                    symbolOld = true;
+                }
+                textNew += inputBlockName.inputField.text;
+            }
+
+            inputBlockName.inputField.text = textNew;
+        }
+
+        blockDataLocal.name = inputBlockName.inputField.text;
+    }
 
     public void acceptTransparent() {
         if (sliderTransparent.slider.value == (int)TypeBlockTransparent.NoTransparent) {
@@ -148,6 +215,33 @@ public class RedactorBlocksCTRL : MonoBehaviour
         sliderLightRange.SetValueText();
     }
 
+    public void clickButtonSave() {
+        //проверяем что имя мода есть
+        if (blockDataLocal.mod == null || blockDataLocal.mod.Length == 0) {
+            Debug.Log("NotSave Need Mod Name");
+            return;
+        }
+        //проверяем что имя мода больше 3
+        if (blockDataLocal.mod.Length < 3) {
+            Debug.Log("NotSave Need Mod Name Lenght > 3");
+            return;
+        }
+        //Проверяем что имя блока есть
+        if (blockDataLocal.name == null || blockDataLocal.name.Length == 0) {
+            Debug.Log("NotSave Need Block Name");
+            return;
+        }
+        //Проверняем что имя больше 3х символов
+        if (blockDataLocal.name.Length < 3) {
+            Debug.Log("NotSave Need Block Name Lenght > 3");
+            return;
+        }
+
+        BlockData.SaveData(blockDataLocal);
+    }
+    public void clickButtonLoad() {
+        
+    }
 }
 
 public enum TypeBlockTransparent {

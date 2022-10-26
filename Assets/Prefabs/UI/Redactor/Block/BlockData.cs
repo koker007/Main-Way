@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 
 public class BlockData
 {
@@ -29,6 +30,27 @@ public class BlockData
     public BlockWall wallDown;
 
     public BlockPhysics physics;
+
+    public class Str
+    {
+        public const string name = "name";
+        public const string mod = "mod";
+
+        public const string wall = "Wall";
+
+        public const string face = "face";
+        public const string back = "back";
+        public const string left = "left";
+        public const string right = "right";
+        public const string up = "up";
+        public const string down = "down";
+
+        public const string physics = "physics";
+
+        public const string texture = "texture";
+        public const string height = "height";
+        public const string formatPNG = ".png";
+    }
 
     //Получить меш куба на основе того какие стены нужно отрисовать
     public Mesh GetMesh(bool face, bool back, bool left, bool right, bool up, bool down) {
@@ -78,20 +100,67 @@ public class BlockData
         physics.parameters = new BlockPhysics.Parameters();
     }
 
+    //Сохранить все данные блока который отправляется
     static public void SaveData(BlockData blockData) {
         //Создаем путь к папке блоке
         string path = GameData.pathMod + "/" + blockData.mod + "/" + blockData.name;
-
+         
         //Проверяем есть ли папка
         if (!Directory.Exists(path)) {
             Directory.CreateDirectory(path);
         }
 
-        
+        //Сохраняем стены
+        saveBlockWall(path);
+        //Сохраняем физику
+        saveBlockPhysics(path);
+
+        void saveBlockWall(string pathBlock) {
+            string pathWalls = pathBlock + "/" + Str.wall;
+
+            blockData.wallFace.SaveTo(pathWalls);
+            blockData.wallBack.SaveTo(pathWalls);
+            blockData.wallLeft.SaveTo(pathWalls);
+            blockData.wallRight.SaveTo(pathWalls);
+            blockData.wallUp.SaveTo(pathWalls);
+            blockData.wallDown.SaveTo(pathWalls);
+        }       
+        void saveBlockPhysics(string pathBlock) {
+            string pathPhysics = pathBlock + "/" + Str.physics;
+
+        }
     }
     static public BlockData LoadData(string pathBlock) {
+        //Если пипки блока нет - выходим
+        if (!Directory.Exists(pathBlock))
+        {
+            Debug.Log(pathBlock + " Not exist");
+            return null;
+        }
+
         BlockData resultData = new BlockData();
+
+        //проверяем стены
+
+        loadBlockWall(pathBlock);
+        loadBlockPhysics(pathBlock);
+
         return resultData;
+
+        void loadBlockWall(string path) {
+            string pathWalls = path + "/" + Str.wall;
+
+            resultData.wallFace.LoadFrom(pathWalls);
+            resultData.wallBack.LoadFrom(pathWalls);
+            resultData.wallLeft.LoadFrom(pathWalls);
+            resultData.wallRight.LoadFrom(pathWalls);
+            resultData.wallUp.LoadFrom(pathWalls);
+            resultData.wallDown.LoadFrom(pathWalls);
+        }
+        void loadBlockPhysics(string path)
+        {
+            string pathPhysics = path + "/" + Str.physics;
+        }
     }
 }
 
@@ -109,6 +178,115 @@ public class BlockWall
         this.side = side;
 
         forms = new BlockForms();
+    }
+
+    public void LoadFrom(string path) {
+        if (!Directory.Exists(path)) {
+            Debug.Log(path + " Block wall not Exist");
+            return;
+        }
+
+        string pathWall = path + "/" + BlockData.Str.wall;
+        string pathTexture = path + "/" + BlockData.Str.texture;
+
+        if (side == Side.face)
+        {
+            pathWall += BlockData.Str.face;
+            pathTexture += BlockData.Str.face;
+        }
+        else if (side == Side.back)
+        {
+            pathWall += BlockData.Str.back;
+            pathTexture += BlockData.Str.back;
+        }
+        else if (side == Side.left)
+        {
+            pathWall += BlockData.Str.left;
+            pathTexture += BlockData.Str.left;
+        }
+        else if (side == Side.right)
+        {
+            pathWall += BlockData.Str.right;
+            pathTexture += BlockData.Str.right;
+        }
+        else if (side == Side.up)
+        {
+            pathWall += BlockData.Str.up;
+            pathTexture += BlockData.Str.up;
+        }
+        else {
+            pathWall += BlockData.Str.down;
+            pathTexture += BlockData.Str.down;
+        }
+        pathTexture += BlockData.Str.formatPNG;
+
+        Texture2D texture = new Texture2D(16,16);
+
+        if (File.Exists(pathTexture)) {
+            byte[] data = File.ReadAllBytes(pathTexture);
+            texture.LoadImage(data);
+        }
+
+        if (File.Exists(pathWall)) {
+
+            BinaryFormatter bf = new BinaryFormatter();
+            FileStream fileStream = File.Open(pathWall, FileMode.Open);
+            BlockForms.voxels voxs = (BlockForms.voxels)bf.Deserialize(fileStream);
+            fileStream.Close();
+
+
+            forms.voxel = voxs.height;
+        }
+
+        this.texture = texture;
+    }
+    public void SaveTo(string path) {
+        string pathTexture = path + "/" + BlockData.Str.texture;
+        string pathWall = path + "/" + BlockData.Str.wall;
+
+        if (side == Side.face)
+        {
+            pathTexture += BlockData.Str.face;
+            pathWall += BlockData.Str.face;
+        }
+        else if (side == Side.back)
+        {
+            pathTexture += BlockData.Str.back;
+            pathWall += BlockData.Str.back;
+        }
+        else if (side == Side.left)
+        {
+            pathTexture += BlockData.Str.left;
+            pathWall += BlockData.Str.left;
+        }
+        else if (side == Side.right)
+        {
+            pathTexture += BlockData.Str.right;
+            pathWall += BlockData.Str.right;
+        }
+        else if (side == Side.up)
+        {
+            pathTexture += BlockData.Str.up;
+            pathWall += BlockData.Str.up;
+        }
+        else {
+            pathTexture += BlockData.Str.down;
+            pathWall += BlockData.Str.down;
+        }
+
+        pathTexture += BlockData.Str.formatPNG;
+
+        byte[] textureData = texture.EncodeToPNG();
+        FileStream textureStream = File.Open(pathTexture, FileMode.OpenOrCreate);
+        textureStream.Write(textureData);
+        textureStream.Close();
+
+        BlockForms.voxels voxels = new BlockForms.voxels();
+        voxels.height = forms.voxel;
+        BinaryFormatter bf = new BinaryFormatter();
+        FileStream voxStream = File.Open(pathWall, FileMode.OpenOrCreate);
+        bf.Serialize(voxStream, voxels);
+        voxStream.Close();
     }
 
     //Установить цвет тестовую текстуру
@@ -203,6 +381,9 @@ public class BlockForms {
     public int[] triangles;
     public Vector2[] uv;
 
+    public class voxels {
+        public float[,] height = new float[16, 16];
+    }
 }
 
 public class BlockPhysics {
@@ -220,6 +401,7 @@ public class BlockPhysics {
 
     }
 }
+
 
 public enum Side
 {
