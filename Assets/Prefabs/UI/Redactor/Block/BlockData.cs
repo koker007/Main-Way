@@ -241,6 +241,10 @@ public class BlockWall
         this.texture = texture;
     }
     public void SaveTo(string path) {
+        if (!Directory.Exists(path)) {
+            Directory.CreateDirectory(path);
+        }
+
         string pathTexture = path + "/" + BlockData.Str.texture;
         string pathWall = path + "/" + BlockData.Str.wall;
 
@@ -284,7 +288,10 @@ public class BlockWall
         BlockForms.voxels voxels = new BlockForms.voxels();
         voxels.height = forms.voxel;
         BinaryFormatter bf = new BinaryFormatter();
-        FileStream voxStream = File.Open(pathWall, FileMode.OpenOrCreate);
+        //if (File.Exists(pathWall))
+        //    File.Delete(pathWall);
+
+        FileStream voxStream = File.OpenWrite(pathWall);
         bf.Serialize(voxStream, voxels);
         voxStream.Close();
     }
@@ -381,6 +388,7 @@ public class BlockForms {
     public int[] triangles;
     public Vector2[] uv;
 
+    [System.Serializable]
     public class voxels {
         public float[,] height = new float[16, 16];
     }
