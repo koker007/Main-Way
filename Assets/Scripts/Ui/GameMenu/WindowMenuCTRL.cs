@@ -40,6 +40,10 @@ public class WindowMenuCTRL : MonoBehaviour
     [SerializeField]
     WindowMenu Graffic;
 
+    [Header("Redactors")]
+    [SerializeField]
+    WindowMenu RedactorBlockLoad;
+
 
     public bool FirstPress = false;
 
@@ -91,6 +95,13 @@ public class WindowMenuCTRL : MonoBehaviour
     static public void ClickGraffic()
     {
         GameObject Obj = Instantiate(main.Graffic.gameObject, main.gameObject.transform);
+        AddInBuffer(Obj.GetComponent<WindowMenu>());
+    }
+
+    static public void ClickRedactorBlockLoad()
+    {
+        UICTRL.IsOpenMainMenu = true;
+        GameObject Obj = Instantiate(main.RedactorBlockLoad.gameObject, main.gameObject.transform);
         AddInBuffer(Obj.GetComponent<WindowMenu>());
     }
 

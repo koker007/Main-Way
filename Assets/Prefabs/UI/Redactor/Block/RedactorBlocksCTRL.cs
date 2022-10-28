@@ -240,7 +240,7 @@ public class RedactorBlocksCTRL : MonoBehaviour
         BlockData.SaveData(blockDataLocal);
     }
     public void clickButtonLoad() {
-        
+        WindowMenuCTRL.ClickRedactorBlockLoad();
     }
 }
 

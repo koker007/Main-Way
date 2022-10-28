@@ -7432,7 +7432,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7176533566875976478, guid: d7b2deb1b6f117c4b92abfc7b1942566, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -0.0000009536743
+      value: 0.000011444092
       objectReference: {fileID: 0}
     - target: {fileID: 7417510024086745306, guid: d7b2deb1b6f117c4b92abfc7b1942566, type: 3}
       propertyPath: m_AnchorMax.x
@@ -8060,7 +8060,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7176533566875976478, guid: d7b2deb1b6f117c4b92abfc7b1942566, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: 0.000012397766
       objectReference: {fileID: 0}
     - target: {fileID: 7417510024086745306, guid: d7b2deb1b6f117c4b92abfc7b1942566, type: 3}
       propertyPath: m_AnchorMax.x
@@ -17222,6 +17222,7 @@ MonoBehaviour:
   Audio: {fileID: 9125279551392085249, guid: 97fabcf1f90971944b0bdb99ca50a044, type: 3}
   Controll: {fileID: 4027373998311081172, guid: e766ca12e3aa35446919c61229a4da97, type: 3}
   Graffic: {fileID: 0}
+  RedactorBlockLoad: {fileID: 7817550422028120696, guid: e3f2f232ed76a9c4ea498b87f79bf637, type: 3}
   FirstPress: 0
 --- !u!224 &1929535313 stripped
 RectTransform:
@@ -18880,7 +18881,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8565318879435177363, guid: ddd654f5ffc289c419f68b6faf80a328, type: 3}
       propertyPath: m_RootOrder
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8565318879435177363, guid: ddd654f5ffc289c419f68b6faf80a328, type: 3}
       propertyPath: m_AnchorMax.x
