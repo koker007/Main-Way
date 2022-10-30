@@ -136,7 +136,8 @@ public class WindowMenuCTRL : MonoBehaviour
         {
             buffer[0].PlayOpenLeft();
 
-            if (buffer.Count == 1)
+            WindowMain windowMain = buffer[0].GetComponent<WindowMain>();
+            if (buffer.Count == 1 && windowMain != null)
             {
                 GameTitleCTRL.ViewFirstMenu();
             }

@@ -92,7 +92,8 @@ public class RedactorBlocksVisualizator : MonoBehaviour, IPointerEnterHandler, I
         }
 
         //ѕолучаем меш куба
-        meshFilter.sharedMesh = RedactorBlocksCTRL.blockData.GetMesh(true, true, true, true, true, true);
+        BlockData blockData = RedactorBlocksCTRL.blockData;
+        meshFilter.sharedMesh = blockData.GetMesh(true, true, true, true, true, true);
         meshFilter.sharedMesh.Optimize();
 
         //примен€ем материалы к мешу

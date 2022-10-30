@@ -99,6 +99,34 @@ PrefabInstance:
       propertyPath: m_text
       value: Load
       objectReference: {fileID: 0}
+    - target: {fileID: 3749112547988860521, guid: a57782a0f03e17442ae070dc02fb7542, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3749112547988860521, guid: a57782a0f03e17442ae070dc02fb7542, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3749112547988860521, guid: a57782a0f03e17442ae070dc02fb7542, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1841942780}
+    - target: {fileID: 3749112547988860521, guid: a57782a0f03e17442ae070dc02fb7542, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3749112547988860521, guid: a57782a0f03e17442ae070dc02fb7542, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: clickButtonLoad
+      objectReference: {fileID: 0}
+    - target: {fileID: 3749112547988860521, guid: a57782a0f03e17442ae070dc02fb7542, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: WindowRedactorBlockLoad, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 3749112547988860521, guid: a57782a0f03e17442ae070dc02fb7542, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
     - target: {fileID: 7775468419393479030, guid: a57782a0f03e17442ae070dc02fb7542, type: 3}
       propertyPath: m_text
       value: Load
@@ -348,6 +376,22 @@ PrefabInstance:
     - target: {fileID: 4214369326212180235, guid: 7d0590f3b5a9e0a4cb6d7cd8b25eb5ca, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5299666138369463862, guid: 7d0590f3b5a9e0a4cb6d7cd8b25eb5ca, type: 3}
+      propertyPath: m_Name
+      value: ButtonClose
+      objectReference: {fileID: 0}
+    - target: {fileID: 7965957027801989778, guid: 7d0590f3b5a9e0a4cb6d7cd8b25eb5ca, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1841942780}
+    - target: {fileID: 7965957027801989778, guid: 7d0590f3b5a9e0a4cb6d7cd8b25eb5ca, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: clickButtonClose
+      objectReference: {fileID: 0}
+    - target: {fileID: 7965957027801989778, guid: 7d0590f3b5a9e0a4cb6d7cd8b25eb5ca, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: WindowRedactorBlockLoad, Assembly-CSharp
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7d0590f3b5a9e0a4cb6d7cd8b25eb5ca, type: 3}
@@ -749,6 +793,14 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6428759398118587056, guid: 01b84696695d3cb4a98521f42a03b9e1, type: 3}
+      propertyPath: m_Value
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6428759398118587056, guid: 01b84696695d3cb4a98521f42a03b9e1, type: 3}
+      propertyPath: m_MaxValue
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6428759398118587056, guid: 01b84696695d3cb4a98521f42a03b9e1, type: 3}
       propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.size
       value: 1
       objectReference: {fileID: 0}
@@ -915,6 +967,14 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 273429895643774188, guid: 01b84696695d3cb4a98521f42a03b9e1, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6428759398118587056, guid: 01b84696695d3cb4a98521f42a03b9e1, type: 3}
+      propertyPath: m_Value
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6428759398118587056, guid: 01b84696695d3cb4a98521f42a03b9e1, type: 3}
+      propertyPath: m_MaxValue
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6428759398118587056, guid: 01b84696695d3cb4a98521f42a03b9e1, type: 3}

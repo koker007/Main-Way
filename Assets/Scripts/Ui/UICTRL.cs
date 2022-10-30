@@ -73,7 +73,6 @@ public class UICTRL : MonoBehaviour
             
 
             WindowMenuCTRL.main.gameObject.SetActive(isActive);
-            WindowMenuCTRL.CloseALL(true);
 
             GameTitleCTRL.main.gameObject.SetActive(isActive);
             GameTitleCTRL.MenuIsOpen();

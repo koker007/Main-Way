@@ -240,7 +240,46 @@ public class RedactorBlocksCTRL : MonoBehaviour
         BlockData.SaveData(blockDataLocal);
     }
     public void clickButtonLoad() {
+        WindowMenuCTRL.CloseALL(true);
         WindowMenuCTRL.ClickRedactorBlockLoad();
+    }
+
+    public void loadBlock(string pathBlock) {
+        blockDataLocal = BlockData.LoadData(pathBlock);
+        reDrawBlock();
+    }
+
+    public void reDrawBlock() {
+        if (blockDataLocal.wallFace != null)
+        {
+            blockDataLocal.wallFace.calcVertices();
+            RedactorBlocksColiders.main.delCollidersWall(blockDataLocal.wallFace);
+        }
+        if (blockDataLocal.wallBack != null)
+        {
+            blockDataLocal.wallBack.calcVertices();
+            RedactorBlocksColiders.main.delCollidersWall(blockDataLocal.wallBack);
+        }
+        if (blockDataLocal.wallLeft != null)
+        {
+            blockDataLocal.wallLeft.calcVertices();
+            RedactorBlocksColiders.main.delCollidersWall(blockDataLocal.wallLeft);
+        }
+        if (blockDataLocal.wallRight != null)
+        {
+            blockDataLocal.wallRight.calcVertices();
+            RedactorBlocksColiders.main.delCollidersWall(blockDataLocal.wallRight);
+        }
+        if (blockDataLocal.wallUp != null)
+        {
+            blockDataLocal.wallUp.calcVertices();
+            RedactorBlocksColiders.main.delCollidersWall(blockDataLocal.wallUp);
+        }
+        if (blockDataLocal.wallDown != null)
+        {
+            blockDataLocal.wallDown.calcVertices();
+            RedactorBlocksColiders.main.delCollidersWall(blockDataLocal.wallDown);
+        }
     }
 }
 

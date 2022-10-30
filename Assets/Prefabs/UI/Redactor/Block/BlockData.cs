@@ -95,6 +95,27 @@ public class BlockData
     }
 
     public BlockData() {
+        wallFace = new BlockWall(Side.face);
+        wallBack = new BlockWall(Side.back);
+        wallRight = new BlockWall(Side.right);
+        wallLeft = new BlockWall(Side.left);
+        wallUp = new BlockWall(Side.up);
+        wallDown = new BlockWall(Side.down);
+
+        wallFace.SetTextureTest();
+        wallBack.SetTextureTest();
+        wallRight.SetTextureTest();
+        wallLeft.SetTextureTest();
+        wallUp.SetTextureTest();
+        wallDown.SetTextureTest();
+
+        wallFace.calcVertices();
+        wallBack.calcVertices();
+        wallRight.calcVertices();
+        wallLeft.calcVertices();
+        wallUp.calcVertices();
+        wallDown.calcVertices();
+
         //Инициализация блока по умолчанию
         physics = new BlockPhysics();
         physics.parameters = new BlockPhysics.Parameters();
@@ -140,13 +161,23 @@ public class BlockData
 
         BlockData resultData = new BlockData();
 
-        //проверяем стены
+        //Загрузка основных данных блока
+        loadBlockMain(pathBlock);
 
         loadBlockWall(pathBlock);
         loadBlockPhysics(pathBlock);
 
         return resultData;
 
+        void loadBlockMain(string path) {
+            //Вытаскиваем путь
+            string[] pathPart = path.Split("/");
+            if (pathPart.Length <= 2)
+                Debug.LogError(path + " load name error");
+
+            resultData.mod = pathPart[pathPart.Length - 2];
+            resultData.name = pathPart[pathPart.Length - 1];
+        }
         void loadBlockWall(string path) {
             string pathWalls = path + "/" + Str.wall;
 
