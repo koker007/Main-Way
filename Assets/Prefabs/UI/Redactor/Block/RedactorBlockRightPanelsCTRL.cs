@@ -51,6 +51,7 @@ public class RedactorBlockRightPanelsCTRL : MonoBehaviour
 
         string strVoxel = "Voxel";
         string strPhysics = "Physics";
+        string strVisual = "Visual";
 
         //Узнаем какого рода эта панель
         if (panelSelect.GetComponent<RedactorBlocksVoxel>() != null)
@@ -60,6 +61,9 @@ public class RedactorBlockRightPanelsCTRL : MonoBehaviour
         else if (panelSelect.GetComponent<RedactorBlocksPhysics>() != null)
         {
             sliderPanels.SetValueText(strPhysics);
+        }
+        else if (panelSelect.GetComponent<RedactorBlocksVisual>() != null) {
+            sliderPanels.SetValueText(strVisual);
         }
 
 

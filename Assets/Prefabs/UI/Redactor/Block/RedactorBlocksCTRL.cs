@@ -29,16 +29,6 @@ public class RedactorBlocksCTRL : MonoBehaviour
     [SerializeField]
     InputFieldCTRL inputBlockName;
 
-    [Header("Visual")]
-    [SerializeField]
-    SliderCTRL sliderTransparent;
-    [SerializeField]
-    SliderCTRL sliderTransparentPower;
-    [SerializeField]
-    SliderCTRL sliderLight;
-    [SerializeField]
-    SliderCTRL sliderLightRange;
-
     // Start is called before the first frame update
     void Start()
     {
@@ -115,6 +105,36 @@ public class RedactorBlocksCTRL : MonoBehaviour
         }
     }
 
+    void updateMainParameters() {
+        //если блока нет - выходим
+        if (blockDataLocal == null)
+            return;
+
+        getModName();
+        getBlockName();
+
+        void getModName() {
+            if (blockDataLocal.mod == null ||
+                blockDataLocal.mod.Length <= 0) {
+
+                inputModName.inputField.text = "";
+                return;
+            }
+
+            inputModName.inputField.text = blockDataLocal.mod;
+        }
+        void getBlockName() {
+            if (blockDataLocal.name == null ||
+                blockDataLocal.name.Length <= 0)
+            {
+
+                inputBlockName.inputField.text = "";
+                return;
+            }
+
+            inputBlockName.inputField.text = blockDataLocal.name;
+        }
+    }
     public void acceptModName() {
         //ћожем примен€ть только если поле ввода есть
         if (inputModName == null ||
@@ -178,43 +198,6 @@ public class RedactorBlocksCTRL : MonoBehaviour
         blockDataLocal.name = inputBlockName.inputField.text;
     }
 
-    public void acceptTransparent() {
-        if (sliderTransparent.slider.value == (int)TypeBlockTransparent.NoTransparent) {
-            sliderTransparent.SetValueText("Off", KeyBlockTransparent.keyOff);
-        }
-        else if (sliderTransparent.slider.value == (int)TypeBlockTransparent.CutOff) {
-            sliderTransparent.SetValueText("CutOff", KeyBlockTransparent.keyCutOff);
-        }
-        else if (sliderTransparent.slider.value == (int)TypeBlockTransparent.Alpha) {
-            sliderTransparent.SetValueText("Alpha", KeyBlockTransparent.keyAlpha);
-        }
-        else {
-            sliderTransparent.SetValueText();
-        }
-    }
-    public void acceptTransparentPower() {
-        sliderTransparentPower.SetValueText((sliderTransparentPower.slider.value/100.0f) + "");
-    }
-
-    public void acceptLight() {
-        if (sliderLight.slider.value == 0)
-        {
-            sliderLight.SetValueText("Off", "keyTextOff");
-        }
-        else if(sliderLight.slider.value == 1) {
-            sliderLight.SetValueText("On", "keyTextOn");
-        }
-        else
-        {
-            sliderLight.SetValueText();
-        }
-    }
-
-    public void acceptLightRange()
-    {
-        sliderLightRange.SetValueText();
-    }
-
     public void clickButtonSave() {
         //провер€ем что им€ мода есть
         if (blockDataLocal.mod == null || blockDataLocal.mod.Length == 0) {
@@ -247,6 +230,8 @@ public class RedactorBlocksCTRL : MonoBehaviour
     public void loadBlock(string pathBlock) {
         blockDataLocal = BlockData.LoadData(pathBlock);
         reDrawBlock();
+
+        updateMainParameters();
     }
 
     public void reDrawBlock() {
