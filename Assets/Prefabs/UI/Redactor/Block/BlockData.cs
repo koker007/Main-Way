@@ -46,6 +46,7 @@ public class BlockData
         public const string down = "down";
 
         public const string physics = "physics";
+        public const string collidersZone = "collidersZone";
 
         public const string texture = "texture";
         public const string height = "height";
@@ -149,6 +150,7 @@ public class BlockData
         void saveBlockPhysics(string pathBlock) {
             string pathPhysics = pathBlock + "/" + Str.physics;
 
+            blockData.physics.saveColliderZone(pathPhysics);
         }
     }
     static public BlockData LoadData(string pathBlock) {
@@ -173,7 +175,14 @@ public class BlockData
             //Вытаскиваем путь
             string[] pathPart = path.Split("/");
             if (pathPart.Length <= 2)
+            {
+                pathPart = path.Split("\\");
+            }
+            if (pathPart.Length <= 2)
+            {
                 Debug.LogError(path + " load name error");
+                return;
+            }
 
             resultData.mod = pathPart[pathPart.Length - 2];
             resultData.name = pathPart[pathPart.Length - 1];
@@ -191,6 +200,8 @@ public class BlockData
         void loadBlockPhysics(string path)
         {
             string pathPhysics = path + "/" + Str.physics;
+
+            resultData.physics.loadColliderZone(pathPhysics);
         }
     }
 }
@@ -319,9 +330,6 @@ public class BlockWall
         BlockForms.voxels voxels = new BlockForms.voxels();
         voxels.height = forms.voxel;
         BinaryFormatter bf = new BinaryFormatter();
-        //if (File.Exists(pathWall))
-        //    File.Delete(pathWall);
-
         FileStream voxStream = File.OpenWrite(pathWall);
         bf.Serialize(voxStream, voxels);
         voxStream.Close();
@@ -428,17 +436,72 @@ public class BlockForms {
 public class BlockPhysics {
 
     public ColliderZone[] zones;
+    public Light light;
     public Parameters parameters;
 
+    [System.Serializable]
     public class ColliderZone
     {
-        public Vector3 pos; //Позиция старта
-        public Vector3 size; //Размер относительно старта        
+        public Vector3S pos; //Позиция старта
+        public Vector3S size; //Размер относительно старта
+    }
+    public class Light {
+        float lightRange;
     }
     public class Parameters {
         float viscosity = 1; //Вязкость
 
     }
+
+    public ColliderZone[] loadColliderZone(string pathPhysics)
+    {
+
+        ColliderZone[] colliderZones = null;
+
+        string pathFileColliders = pathPhysics + '/' + BlockData.Str.collidersZone;
+
+        //Если файла нет
+        if (!File.Exists(pathFileColliders))
+            return colliderZones;
+
+        //Если файл есть - загружаем
+        BinaryFormatter bf = new BinaryFormatter();
+        FileStream fileStream = File.Open(pathFileColliders, FileMode.Open);
+        colliderZones = (ColliderZone[])bf.Deserialize(fileStream);
+        fileStream.Close();
+
+        zones = colliderZones;
+
+
+
+        return colliderZones;
+
+    }
+    public void saveColliderZone(string pathPhysics)
+    {
+        string pathFileColliders = pathPhysics + '/' + BlockData.Str.collidersZone;
+
+        //Если файл есть - удаляем
+        if (File.Exists(pathFileColliders))
+            File.Delete(pathFileColliders);
+
+        //Если создавать файл не надо выходим
+        if (zones == null)
+            return;
+
+        if (!Directory.Exists(pathPhysics)) {
+            Directory.CreateDirectory(pathPhysics);
+        }
+
+
+        //Создаем файл
+        BinaryFormatter bf = new BinaryFormatter();
+        FileStream collidersZoneStream = File.OpenWrite(pathFileColliders);
+        bf.Serialize(collidersZoneStream, zones);
+        collidersZoneStream.Close();
+    }
+
+
 }
 
 

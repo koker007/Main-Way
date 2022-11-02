@@ -25,6 +25,9 @@ public class RedactorBlocksCTRL : MonoBehaviour
     bool needSave = false;
 
     [SerializeField]
+    RedactorBlockRightPanelsCTRL panelsCTRL;
+
+    [SerializeField]
     InputFieldCTRL inputModName;
     [SerializeField]
     InputFieldCTRL inputBlockName;
@@ -230,6 +233,8 @@ public class RedactorBlocksCTRL : MonoBehaviour
     public void loadBlock(string pathBlock) {
         blockDataLocal = BlockData.LoadData(pathBlock);
         reDrawBlock();
+
+        panelsCTRL.ReDrawingAll();
 
         updateMainParameters();
     }

@@ -69,4 +69,22 @@ public class RedactorBlockRightPanelsCTRL : MonoBehaviour
 
         panelSelect.SetActive(true);
     }
+
+    public void ReDrawingAll() {
+        //Перебираем панели
+        foreach (GameObject panel in Panels) {
+            //Узнаем какого рода эта панель
+            if (panel.GetComponent<RedactorBlocksVoxel>() != null)
+            {
+            }
+            else if (panel.GetComponent<RedactorBlocksPhysics>() != null)
+            {
+                panel.GetComponent<RedactorBlocksPhysics>().ReDrawAll();
+            }
+            else if (panel.GetComponent<RedactorBlocksVisual>() != null)
+            {
+
+            }
+        }
+    }
 }

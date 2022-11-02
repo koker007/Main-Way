@@ -72,6 +72,17 @@ public class RedactorBlocksPhysicsCollider : MonoBehaviour
         updateVisualize();
     }
 
+    public void clearVisualize() {
+        //Получаем детей с меткой-скриптом
+        LabelScript[] childs = visualizatorParent.GetComponentsInChildren<LabelScript>();
+        foreach (LabelScript child in childs) {
+            if (child == null)
+                continue;
+
+            Destroy(child.gameObject);
+        }
+
+    }
     public void updateVisualize() {
         visualizatorParent.SetActive(true);
 
@@ -108,8 +119,8 @@ public class RedactorBlocksPhysicsCollider : MonoBehaviour
         if (physics.zones != null)
             for (int num = 0; num < physics.zones.Length; num++)
             {
-                childs[num].transform.localPosition = physics.zones[num].pos;
-                childs[num].transform.localScale = physics.zones[num].size;
+                childs[num].transform.localPosition = physics.zones[num].pos.ToVector3();
+                childs[num].transform.localScale = physics.zones[num].size.ToVector3();
 
                 LineRenderer[] lineRenderers = childs[num].GetComponentsInChildren<LineRenderer>();
                 if (num == colliderSelect.slider.value)
@@ -157,14 +168,34 @@ public class RedactorBlocksPhysicsCollider : MonoBehaviour
         updateColliderMax(physics);
     }
 
-    void updateColliderMax(BlockPhysics physics) {
-        //Если зон не должно быть
-        if (collidersMax.slider.value == 0) {
-            physics.zones = null;
-            return;
+    public void updateColliderMax(BlockPhysics physics) {
+        updateColliderMax(physics, false);
+    }
+    public void updateColliderMax(BlockPhysics physics, bool dataPriority) {
+
+        if (!dataPriority)
+        {
+            //Если зон не должно быть
+            if (collidersMax.slider.value == 0)
+            {
+                physics.zones = null;
+                return;
+            }
+        }
+        else {
+            if (physics.zones == null)
+            {
+                collidersMax.slider.value = 0;
+                
+            }
+            else {
+                collidersMax.slider.value = physics.zones.Length;
+                colliderSelect.slider.value = 0;
+                colliderSelect.slider.maxValue = physics.zones.Length - 1;
+                colliderSelect.slider.minValue = 0;
+            }
         }
 
-        
 
         if (physics.zones != null && physics.zones.Length == collidersMax.slider.value)
             return;
