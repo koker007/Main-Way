@@ -8,6 +8,7 @@ public class BlockData
 {
     public string name;
     public string mod;
+    public int variant;
 
     /// <summary>
     /// Внешний вид
@@ -33,8 +34,9 @@ public class BlockData
 
     public class Str
     {
-        public const string name = "name";
         public const string mod = "mod";
+        public const string block = "blocks";
+        public const string name = "name";
 
         public const string wall = "Wall";
 
@@ -122,10 +124,49 @@ public class BlockData
         physics.parameters = new BlockPhysics.Parameters();
     }
 
+
+    public void SetRandomVoxel()
+    {
+        //wallFace = new BlockWall(Side.face);
+        //wallBack = new BlockWall(Side.back);
+        //wallRight = new BlockWall(Side.right);
+        //wallLeft = new BlockWall(Side.left);
+        //wallUp = new BlockWall(Side.up);
+        //wallDown = new BlockWall(Side.down);
+
+        for (int x = 0; x < wallFace.forms.voxel.GetLength(0); x++)
+        {
+            for (int y = 0; y < wallFace.forms.voxel.GetLength(1); y++)
+            {
+                wallFace.forms.voxel[x, y] = Random.Range(0, 1.0f);
+                wallBack.forms.voxel[x, y] = Random.Range(0, 1.0f);
+                wallRight.forms.voxel[x, y] = Random.Range(0, 1.0f);
+                wallLeft.forms.voxel[x, y] = Random.Range(0, 1.0f);
+                wallUp.forms.voxel[x, y] = Random.Range(0, 1.0f);
+                wallDown.forms.voxel[x, y] = Random.Range(0, 1.0f);
+            }
+        }
+
+        //Установить тестовую текстуру
+        //wallFace.SetTextureTest();
+        //wallBack.SetTextureTest();
+        //wallRight.SetTextureTest();
+        //wallLeft.SetTextureTest();
+        //wallUp.SetTextureTest();
+        //wallDown.SetTextureTest();
+
+        //wallFace.calcVertices();
+        //wallBack.calcVertices();
+        //wallRight.calcVertices();
+        //wallLeft.calcVertices();
+        //wallUp.calcVertices();
+        //wallDown.calcVertices();
+    }
+
     //Сохранить все данные блока который отправляется
     static public void SaveData(BlockData blockData) {
         //Создаем путь к папке блоке
-        string path = GameData.pathMod + "/" + blockData.mod + "/" + blockData.name;
+        string path = GameData.pathMod + "/" + blockData.mod + "/" + Str.block + "/" + blockData.name + "/" + blockData.variant;
          
         //Проверяем есть ли папка
         if (!Directory.Exists(path)) {
@@ -153,39 +194,57 @@ public class BlockData
             blockData.physics.saveColliderZone(pathPhysics);
         }
     }
-    static public BlockData LoadData(string pathBlock) {
+    static public BlockData LoadData(string pathBlockVariant) {
         //Если пипки блока нет - выходим
-        if (!Directory.Exists(pathBlock))
+        if (!Directory.Exists(pathBlockVariant))
         {
-            Debug.Log(pathBlock + " Not exist");
+            Debug.Log(pathBlockVariant + " Not exist");
             return null;
         }
 
         BlockData resultData = new BlockData();
 
         //Загрузка основных данных блока
-        loadBlockMain(pathBlock);
+        loadBlockMain(pathBlockVariant);
 
-        loadBlockWall(pathBlock);
-        loadBlockPhysics(pathBlock);
+        loadBlockWall(pathBlockVariant);
+        loadBlockPhysics(pathBlockVariant);
 
         return resultData;
 
         void loadBlockMain(string path) {
             //Вытаскиваем путь
-            string[] pathPart = path.Split("/");
-            if (pathPart.Length <= 2)
-            {
-                pathPart = path.Split("\\");
+            string[] pathParts1 = path.Split("/");
+
+            List<string> pathList = new List<string>();
+            foreach (string pathCut in pathParts1) {
+                string[] pathParts2 = pathCut.Split("\\");
+                foreach (string part in pathParts2) {
+                    pathList.Add(part);
+                }
             }
-            if (pathPart.Length <= 2)
+
+            string[] pathMass = new string[pathList.Count];
+            for (int num = 0; num < pathList.Count; num++) {
+                pathMass[num] = pathList[num];
+            }
+
+
+
+            if (pathMass.Length <= 3)
+            {
+                pathMass = path.Split("\\");
+            }
+
+            if (pathMass.Length <= 3)
             {
                 Debug.LogError(path + " load name error");
                 return;
             }
 
-            resultData.mod = pathPart[pathPart.Length - 2];
-            resultData.name = pathPart[pathPart.Length - 1];
+            resultData.mod = pathMass[pathMass.Length - 3];
+            resultData.name = pathMass[pathMass.Length - 2];
+            resultData.variant = System.Convert.ToInt32(pathMass[pathMass.Length - 1]);
         }
         void loadBlockWall(string path) {
             string pathWalls = path + "/" + Str.wall;
@@ -203,6 +262,37 @@ public class BlockData
 
             resultData.physics.loadColliderZone(pathPhysics);
         }
+    }
+    static public BlockData[] LoadDatas(string pathBlock) {
+        //Нужно узнать сколько есть вариантов в папке блока
+        string[] pathVariants = Directory.GetDirectories(pathBlock);
+
+        int maxVar = 0;
+        //Создаем список блоков и вытаскиваем данные в него
+        List<BlockData> blockDatasList = new List<BlockData>();
+        foreach (string pathVar in pathVariants) {
+            BlockData blockData = LoadData(pathVar);
+            blockDatasList.Add(blockData);
+
+            //обновляем максимум
+            if (maxVar <= blockData.variant)
+                maxVar = blockData.variant + 1;
+        }
+
+        //Создаем массив вариантов
+        BlockData[] blockDatas = new BlockData[maxVar];
+
+        //Запихиваем
+        foreach (BlockData blockData in blockDatasList) {
+            if (blockDatas[blockData.variant] != null) {
+                Debug.LogError("Block load Error: have variant| " + blockData.mod + " " + blockData.name + " " + blockData.variant);
+                continue;
+            }
+
+            blockDatas[blockData.variant] = blockData;
+        }
+
+        return blockDatas;
     }
 }
 

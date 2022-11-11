@@ -12,13 +12,22 @@ public class RedactorBlocksCTRL : MonoBehaviour
     [SerializeField]
     Image shtorka;
 
-    BlockData blockDataLocal;
+    //BlockData blockDataLocal;
+    BlockData[] blockDatas; //Текуший испозьзуемый буфер
+    BlockData[] blockDatasBuffer; //Буфер на случай возврата старых данных
+
     static public BlockData blockData{
         get {
             if (main == null)
                 return null;
 
-            return main.blockDataLocal;
+            if (main.blockDatas == null)
+                return null;
+
+            if (main.blockDatas.Length <= main.sliderVariationSelected.slider.value)
+                return null;
+
+            return main.blockDatas[(int)main.sliderVariationSelected.slider.value];
         }
     }
 
@@ -31,51 +40,35 @@ public class RedactorBlocksCTRL : MonoBehaviour
     InputFieldCTRL inputModName;
     [SerializeField]
     InputFieldCTRL inputBlockName;
+    [SerializeField]
+    SliderCTRL sliderVariationMaximum;
+    [SerializeField]
+    SliderCTRL sliderVariationSelected;
 
     // Start is called before the first frame update
     void Start()
     {
         main = this;
 
-        SetRandomVoxel();
+        iniBlockDatas();
+
+        variationRedraw();
     }
 
-    void SetRandomVoxel() {
-        blockDataLocal = new BlockData();
+    void iniBlockDatas() {
+        sliderVariationMaximum.slider.value = 0;
+        sliderVariationSelected.slider.value = 0;
 
-        blockDataLocal.wallFace = new BlockWall(Side.face);
-        blockDataLocal.wallBack = new BlockWall(Side.back);
-        blockDataLocal.wallRight = new BlockWall(Side.right);
-        blockDataLocal.wallLeft = new BlockWall(Side.left);
-        blockDataLocal.wallUp = new BlockWall(Side.up);
-        blockDataLocal.wallDown = new BlockWall(Side.down);
-
-        for (int x = 0; x < blockDataLocal.wallFace.forms.voxel.GetLength(0); x++) {
-            for (int y = 0; y < blockDataLocal.wallFace.forms.voxel.GetLength(1); y++) {
-                blockDataLocal.wallFace.forms.voxel[x, y] = Random.Range(0, 1.0f);
-                blockDataLocal.wallBack.forms.voxel[x, y] = Random.Range(0, 1.0f);
-                blockDataLocal.wallRight.forms.voxel[x, y] = Random.Range(0, 1.0f);
-                blockDataLocal.wallLeft.forms.voxel[x, y] = Random.Range(0, 1.0f);
-                blockDataLocal.wallUp.forms.voxel[x, y] = Random.Range(0, 1.0f);
-                blockDataLocal.wallDown.forms.voxel[x, y] = Random.Range(0, 1.0f);
-            }
+        blockDatas = new BlockData[(int)sliderVariationMaximum.slider.value + 1];
+        for (int num = 0; num < blockDatas.Length; num++) {
+            blockDatas[num] = new BlockData();
         }
-        
-        //Установить тестовую текстуру
-        blockDataLocal.wallFace.SetTextureTest();
-        blockDataLocal.wallBack.SetTextureTest();
-        blockDataLocal.wallRight.SetTextureTest();
-        blockDataLocal.wallLeft.SetTextureTest();
-        blockDataLocal.wallUp.SetTextureTest();
-        blockDataLocal.wallDown.SetTextureTest();
 
-        blockDataLocal.wallFace.calcVertices();
-        blockDataLocal.wallBack.calcVertices();
-        blockDataLocal.wallRight.calcVertices();
-        blockDataLocal.wallLeft.calcVertices();
-        blockDataLocal.wallUp.calcVertices();
-        blockDataLocal.wallDown.calcVertices();
-    } 
+        blockDatasBuffer = new BlockData[1];
+
+        acceptVariationMaximum();
+        acceptVariationSelect();
+    }
 
     // Update is called once per frame
     void Update()
@@ -110,32 +103,35 @@ public class RedactorBlocksCTRL : MonoBehaviour
 
     void updateMainParameters() {
         //если блока нет - выходим
+        BlockData blockDataLocal = blockData;
         if (blockDataLocal == null)
             return;
 
         getModName();
         getBlockName();
 
+        variationRedraw();
+
         void getModName() {
-            if (blockDataLocal.mod == null ||
-                blockDataLocal.mod.Length <= 0) {
+            if (blockDatas[0].mod == null ||
+                blockDatas[0].mod.Length <= 0) {
 
                 inputModName.inputField.text = "";
                 return;
             }
 
-            inputModName.inputField.text = blockDataLocal.mod;
+            inputModName.inputField.text = blockDatas[0].mod;
         }
         void getBlockName() {
-            if (blockDataLocal.name == null ||
-                blockDataLocal.name.Length <= 0)
+            if (blockDatas[0].name == null ||
+                blockDatas[0].name.Length <= 0)
             {
 
                 inputBlockName.inputField.text = "";
                 return;
             }
 
-            inputBlockName.inputField.text = blockDataLocal.name;
+            inputBlockName.inputField.text = blockDatas[0].name;
         }
     }
     public void acceptModName() {
@@ -166,7 +162,7 @@ public class RedactorBlocksCTRL : MonoBehaviour
             inputModName.inputField.text = textNew;
         }
 
-        blockDataLocal.mod = inputModName.inputField.text;
+        blockDatas[0].mod = inputModName.inputField.text;
 
     }
     public void acceptBlockName() {
@@ -198,32 +194,125 @@ public class RedactorBlocksCTRL : MonoBehaviour
             inputBlockName.inputField.text = textNew;
         }
 
-        blockDataLocal.name = inputBlockName.inputField.text;
+        blockDatas[0].name = inputBlockName.inputField.text;
+    }
+
+    //Количество вариаций блока
+    public void acceptVariationMaximum()
+    {
+        //Создаем новый список
+        BlockData[] blockDatasNew = new BlockData[(int)sliderVariationMaximum.slider.value];
+
+        //если количество вариаций разширилось
+        if (sliderVariationMaximum.slider.value > blockDatas.Length)
+        {
+            //Заполняем новый список старыми данными
+            for (int num = 0; num < blockDatasNew.Length; num++)
+            {
+                //сперва дублируем то что есть
+                if (num < blockDatas.Length) {
+                    blockDatasNew[num] = blockDatas[num];
+                }
+                else
+                {
+                    //Если в буфере что-то есть вытаскиваем данные из него
+                    if (num < blockDatasBuffer.Length)
+                    {
+                        blockDatasNew[num] = blockDatasBuffer[num];
+                    }
+                    else {
+                        blockDatasNew[num] = new BlockData();
+                    }
+                }
+            }
+
+            blockDatas = blockDatasNew;
+            blockDatasBuffer = blockDatas;
+        }
+        //Иначе если уменьшилось
+        else {
+            //Если буфер меньше то сохраняем
+            if (blockDatasBuffer.Length < blockDatas.Length)
+                blockDatasBuffer = blockDatas;
+
+            //то что есть запоминаем в буфер
+            for (int num = 0; num < blockDatas.Length; num++)
+            {
+                blockDatasBuffer[num] = blockDatas[num];
+            }
+
+            //Применяем новые значения
+            for (int num = 0; num < blockDatasNew.Length; num++) {
+                blockDatasNew[num] = blockDatasBuffer[num];
+            }
+
+            //Заменяем станое новым
+            blockDatas = blockDatasNew;
+        }
+
+        acceptGroupParameters();
+
+        variationRedraw();
+    }
+    public void acceptVariationSelect()
+    {
+        sliderVariationSelected.SetValueText();
+    }
+
+    //Применить груповые данные на все блоки
+    void acceptGroupParameters() {
+        for (int num = 1; num < blockDatas.Length; num++) {
+            blockDatas[num].name = blockDatas[0].name;
+            blockDatas[num].mod = blockDatas[0].mod;
+            blockDatas[num].variant = num;
+        }
+    }
+
+    // перерисовать ползунки вариаций
+    void variationRedraw() {
+        //Обновляем слайдер максимума
+        sliderVariationMaximum.slider.minValue = 1;
+        sliderVariationMaximum.slider.maxValue = 10;
+        sliderVariationMaximum.slider.value = blockDatas.Length;
+        sliderVariationMaximum.SetValueText();
+
+        //Обновляем слайдер выбранного
+        sliderVariationSelected.slider.minValue = 0;
+        sliderVariationSelected.slider.maxValue = sliderVariationMaximum.slider.value - 1;
+        sliderVariationSelected.SetValueText();
     }
 
     public void clickButtonSave() {
+
         //проверяем что имя мода есть
-        if (blockDataLocal.mod == null || blockDataLocal.mod.Length == 0) {
+        if (blockDatas[0].mod == null || blockDatas[0].mod.Length == 0) {
             Debug.Log("NotSave Need Mod Name");
             return;
         }
         //проверяем что имя мода больше 3
-        if (blockDataLocal.mod.Length < 3) {
+        if (blockDatas[0].mod.Length < 3) {
             Debug.Log("NotSave Need Mod Name Lenght > 3");
             return;
         }
         //Проверяем что имя блока есть
-        if (blockDataLocal.name == null || blockDataLocal.name.Length == 0) {
+        if (blockDatas[0].name == null || blockDatas[0].name.Length == 0) {
             Debug.Log("NotSave Need Block Name");
             return;
         }
         //Проверняем что имя больше 3х символов
-        if (blockDataLocal.name.Length < 3) {
+        if (blockDatas[0].name.Length < 3) {
             Debug.Log("NotSave Need Block Name Lenght > 3");
             return;
         }
 
-        BlockData.SaveData(blockDataLocal);
+        //Применяем общие данные на все блоки
+        acceptGroupParameters();
+
+        //Сохраняем все блоки
+        for (int num = 0; num < blockDatas.Length; num++)
+        {
+            BlockData.SaveData(blockDatas[num]);
+        }
     }
     public void clickButtonLoad() {
         WindowMenuCTRL.CloseALL(true);
@@ -231,7 +320,8 @@ public class RedactorBlocksCTRL : MonoBehaviour
     }
 
     public void loadBlock(string pathBlock) {
-        blockDataLocal = BlockData.LoadData(pathBlock);
+
+        blockDatas = BlockData.LoadDatas(pathBlock);
         reDrawBlock();
 
         panelsCTRL.ReDrawingAll();
@@ -240,6 +330,8 @@ public class RedactorBlocksCTRL : MonoBehaviour
     }
 
     public void reDrawBlock() {
+        BlockData blockDataLocal = blockData;
+
         if (blockDataLocal.wallFace != null)
         {
             blockDataLocal.wallFace.calcVertices();

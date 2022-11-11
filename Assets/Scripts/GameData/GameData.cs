@@ -69,7 +69,7 @@ public class GameData : MonoBehaviour
         //Проверяем список блоков
         string[] directoriesBlock = Directory.GetDirectories(pathMod);
         foreach (string blockDirectory in directoriesBlock) {
-            BlockData.LoadData(blockDirectory);
+            BlockData.LoadDatas(blockDirectory);
         }
 
         bool test = false;

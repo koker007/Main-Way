@@ -45,6 +45,7 @@ public class RedactorBlocksColiders : MonoBehaviour
     void Update()
     {
         TestCreateColliders();
+        SelectWall(lastSide);
     }
 
     //Проверка коллайдеров на существование и создание их если их нет
@@ -240,10 +241,12 @@ public class RedactorBlocksColiders : MonoBehaviour
     }
 
     //Последний выбрыннй коллайдер
-    BoxCollider lastCollider;
+    Collider lastCollider;
     //Последний выбраный объект стены
     GameObject lastObjWall;
     BlockWall lastBlockWall;
+    Side lastSide = Side.face;
+
     public BlockWall selectBlockWall
     {
         get
@@ -260,23 +263,36 @@ public class RedactorBlocksColiders : MonoBehaviour
     }
 
     //Принимает коллайдер стены, возвращяет саму стену, чтобы ее можно было менять
+    public void SelectWall(Side selectSide) {
+        lastSide = selectSide;
+
+        lastCollider = GetLastCollider();
+
+        GetWall(lastCollider);
+
+        Collider GetLastCollider() {
+            //Из выбранной стены и позиции выбераем коллайдер
+            if (selectSide == Side.back)
+                return ColidersWallBack[voxelPos.x, voxelPos.y];
+            else if (selectSide == Side.left)
+                return ColidersWallLeft[voxelPos.x, voxelPos.y];
+            else if (selectSide == Side.right)
+                return ColidersWallRight[voxelPos.x, voxelPos.y];
+            else if (selectSide == Side.up)
+                return ColidersWallUp[voxelPos.x, voxelPos.y];
+            else if (selectSide == Side.down)
+                return ColidersWallDown[voxelPos.x, voxelPos.y];
+            else
+                return ColidersWallFace[voxelPos.x, voxelPos.y];
+
+        }
+    }
     public BlockWall GetWall(Collider voxelCollider) {
-        //если это тот-же саммый коллайдер что был выбран в прошлый раз
-        if (lastBlockWall != null && lastCollider == voxelCollider) {
-            return lastBlockWall;    
-        }
+        if (voxelCollider == null)
+            return null;
 
-        //Если поменялся воксель
+        lastCollider = voxelCollider;
 
-        //Но стена все таже
-        if (lastBlockWall != null && voxelCollider.transform.parent.gameObject == lastObjWall)
-        {
-            //Инициализируем воксель из тойже стены
-            iniVoxel(voxelCollider);
-            return lastBlockWall;
-        }
-
-        //Если поменялась даже стена
         //Выбираем новую стену
         iniObjWall(voxelCollider);
         //Теперь выбираем воксель стены
@@ -313,7 +329,7 @@ public class RedactorBlocksColiders : MonoBehaviour
                 //Перебираем колайдеры
                 for (int x = 0; x < Colliders.GetLength(0); x++) {
                     for (int y = 0; y < Colliders.GetLength(1); y++) {
-                        if (Colliders[x, y].gameObject != voxelCollider.gameObject)
+                        if (Colliders[x, y] != voxelCollider)
                             continue;
 
                         voxelPos = new Vector2Int(x,y);
@@ -330,36 +346,43 @@ public class RedactorBlocksColiders : MonoBehaviour
             {
                 lastObjWall = ObjWallFace;
                 lastBlockWall = RedactorBlocksCTRL.blockData.wallFace;
+                lastSide = Side.face;
             }
             else if (voxelCollider.transform.parent.gameObject == ObjWallBack)
             {
                 lastObjWall = ObjWallBack;
                 lastBlockWall = RedactorBlocksCTRL.blockData.wallBack;
+                lastSide = Side.back;
             }
             else if (voxelCollider.transform.parent.gameObject == ObjWallLeft)
             {
                 lastObjWall = ObjWallLeft;
                 lastBlockWall = RedactorBlocksCTRL.blockData.wallLeft;
+                lastSide = Side.left;
             }
             else if (voxelCollider.transform.parent.gameObject == ObjWallRight)
             {
                 lastObjWall = ObjWallRight;
                 lastBlockWall = RedactorBlocksCTRL.blockData.wallRight;
+                lastSide = Side.right;
             }
             else if (voxelCollider.transform.parent.gameObject == ObjWallUp)
             {
                 lastObjWall = ObjWallUp;
                 lastBlockWall = RedactorBlocksCTRL.blockData.wallUp;
+                lastSide = Side.up;
             }
             else if (voxelCollider.transform.parent.gameObject == ObjWallDown)
             {
                 lastObjWall = ObjWallDown;
                 lastBlockWall = RedactorBlocksCTRL.blockData.wallDown;
+                lastSide = Side.down;
             }
             else
             {
                 lastObjWall = null;
                 lastBlockWall = null;
+                lastSide = Side.face;
             }
         }
     }
@@ -394,5 +417,7 @@ public class RedactorBlocksColiders : MonoBehaviour
         {
             ColidersWallUp = null;
         }
+
+        TestCreateColliders();
     }
 }

@@ -56,7 +56,15 @@ public class WindowRedactorBlockLoad : MonoBehaviour
             return;
         }
 
-        string[] blocks = Directory.GetDirectories(pathMod);
+        string pathblocks = pathMod + "/" + BlockData.Str.block;
+        if (!Directory.Exists(pathblocks))
+        {
+            pathBlock = "";
+            return;
+        }
+
+
+        string[] blocks = Directory.GetDirectories(pathblocks);
         sliderBlockName.slider.minValue = 0;
         sliderBlockName.slider.maxValue = blocks.Length - 1;
 
