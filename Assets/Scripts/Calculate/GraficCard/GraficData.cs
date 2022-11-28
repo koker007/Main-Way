@@ -368,4 +368,32 @@ public class GraficData : MonoBehaviour
 
 
     }
+
+    //Создает меш части 1/8 воксельного блока
+    public class BlockVoxelPart {
+
+        //Мesh
+        public Vector3[] vertices;
+        public int[] triangles;
+        public Vector2[] uv;
+
+        public int sectorX = 0;
+        public int sectorY = 0;
+        public int sectorZ = 0;
+
+        //Считаем количество вершин
+
+        //Количество 8*8*8
+        //3 количество сторон у вокселя (лицевая, право, вверх)
+        //2 количество треугольников на каждую сторону
+        //3 количество вершин у треугольника
+
+        const int verticesCount = (8 * 8 * 8 * 3) * 2 * 3;
+
+        public BlockVoxelPart() {
+            vertices = new Vector3[verticesCount];
+            triangles = new int[verticesCount / 3];
+            uv = new Vector2[verticesCount];
+        }
+    }
 }

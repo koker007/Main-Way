@@ -44,6 +44,8 @@ public class RedactorBlocksCTRL : MonoBehaviour
     SliderCTRL sliderVariationMaximum;
     [SerializeField]
     SliderCTRL sliderVariationSelected;
+    [SerializeField]
+    SliderCTRL sliderBlockType;
 
     // Start is called before the first frame update
     void Start()
@@ -259,6 +261,22 @@ public class RedactorBlocksCTRL : MonoBehaviour
         sliderVariationSelected.SetValueText();
     }
 
+    public void acceptType() {
+        //Принять новый тип блока
+        if (sliderBlockType.slider.value == (int)BlockData.Type.voxels)
+        {
+            blockDatas[(int)sliderVariationSelected.slider.value].type = BlockData.Type.voxels;
+        }
+        else if (sliderBlockType.slider.value == (int)BlockData.Type.liquid) {
+            blockDatas[(int)sliderVariationSelected.slider.value].type = BlockData.Type.liquid;
+        }
+        //По умолчанию блок
+        else //if (sliderBlockType.slider.value == (int)BlockData.Type.block)
+        {
+            blockDatas[(int)sliderVariationSelected.slider.value].type = BlockData.Type.block;
+        }
+    }
+
     //Применить груповые данные на все блоки
     void acceptGroupParameters() {
         for (int num = 1; num < blockDatas.Length; num++) {
@@ -332,35 +350,35 @@ public class RedactorBlocksCTRL : MonoBehaviour
     public void reDrawBlock() {
         BlockData blockDataLocal = blockData;
 
-        if (blockDataLocal.wallFace != null)
+        if (blockDataLocal.TBlock.wallFace != null)
         {
-            blockDataLocal.wallFace.calcVertices();
-            RedactorBlocksColiders.main.delCollidersWall(blockDataLocal.wallFace);
+            blockDataLocal.TBlock.wallFace.calcVertices();
+            RedactorBlocksColiders.main.delCollidersWall(blockDataLocal.TBlock.wallFace);
         }
-        if (blockDataLocal.wallBack != null)
+        if (blockDataLocal.TBlock.wallBack != null)
         {
-            blockDataLocal.wallBack.calcVertices();
-            RedactorBlocksColiders.main.delCollidersWall(blockDataLocal.wallBack);
+            blockDataLocal.TBlock.wallBack.calcVertices();
+            RedactorBlocksColiders.main.delCollidersWall(blockDataLocal.TBlock.wallBack);
         }
-        if (blockDataLocal.wallLeft != null)
+        if (blockDataLocal.TBlock.wallLeft != null)
         {
-            blockDataLocal.wallLeft.calcVertices();
-            RedactorBlocksColiders.main.delCollidersWall(blockDataLocal.wallLeft);
+            blockDataLocal.TBlock.wallLeft.calcVertices();
+            RedactorBlocksColiders.main.delCollidersWall(blockDataLocal.TBlock.wallLeft);
         }
-        if (blockDataLocal.wallRight != null)
+        if (blockDataLocal.TBlock.wallRight != null)
         {
-            blockDataLocal.wallRight.calcVertices();
-            RedactorBlocksColiders.main.delCollidersWall(blockDataLocal.wallRight);
+            blockDataLocal.TBlock.wallRight.calcVertices();
+            RedactorBlocksColiders.main.delCollidersWall(blockDataLocal.TBlock.wallRight);
         }
-        if (blockDataLocal.wallUp != null)
+        if (blockDataLocal.TBlock.wallUp != null)
         {
-            blockDataLocal.wallUp.calcVertices();
-            RedactorBlocksColiders.main.delCollidersWall(blockDataLocal.wallUp);
+            blockDataLocal.TBlock.wallUp.calcVertices();
+            RedactorBlocksColiders.main.delCollidersWall(blockDataLocal.TBlock.wallUp);
         }
-        if (blockDataLocal.wallDown != null)
+        if (blockDataLocal.TBlock.wallDown != null)
         {
-            blockDataLocal.wallDown.calcVertices();
-            RedactorBlocksColiders.main.delCollidersWall(blockDataLocal.wallDown);
+            blockDataLocal.TBlock.wallDown.calcVertices();
+            RedactorBlocksColiders.main.delCollidersWall(blockDataLocal.TBlock.wallDown);
         }
     }
 }

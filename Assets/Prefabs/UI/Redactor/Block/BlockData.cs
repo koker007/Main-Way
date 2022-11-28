@@ -23,14 +23,13 @@ public class BlockData
     //Светимость
     public int lighting = 0;
 
-    public BlockWall wallFace;
-    public BlockWall wallBack;
-    public BlockWall wallLeft;
-    public BlockWall wallRight;
-    public BlockWall wallUp;
-    public BlockWall wallDown;
+    public Type type;
 
     public BlockPhysics physics;
+
+    //Данные разных типов блоков
+    public TypeBlock TBlock;
+    public TypeVoxel TVoxels;
 
     public class Str
     {
@@ -55,16 +54,19 @@ public class BlockData
         public const string formatPNG = ".png";
     }
 
+    public enum Type {
+        block = 0,
+        voxels = 1,
+        liquid = 2
+    }
+
     //Получить меш куба на основе того какие стены нужно отрисовать
     public Mesh GetMesh(bool face, bool back, bool left, bool right, bool up, bool down) {
         Mesh meshResult = new Mesh();
 
-        //Есл нужно сделать лицевую сторону, создаем ее
-        int resultMax = 0;
-
-        meshResult.vertices = GraficCalc.main.mergeVector3(wallFace.forms.vertices, wallBack.forms.vertices, wallRight.forms.vertices, wallLeft.forms.vertices, wallUp.forms.vertices, wallDown.forms.vertices);
+        meshResult.vertices = GraficCalc.main.mergeVector3(TBlock.wallFace.forms.vertices, TBlock.wallBack.forms.vertices, TBlock.wallRight.forms.vertices, TBlock.wallLeft.forms.vertices, TBlock.wallUp.forms.vertices, TBlock.wallDown.forms.vertices);
         //meshResult.triangles = GraficCalc.main.mergeTriangleNum(wallFace.forms.triangles, wallBack.forms.triangles, wallRight.forms.triangles, wallLeft.forms.triangles, wallUp.forms.triangles, wallDown.forms.triangles);
-        meshResult.uv = GraficCalc.main.mergeVector2(wallFace.forms.uv, wallBack.forms.uv, wallRight.forms.uv, wallLeft.forms.uv, wallUp.forms.uv, wallDown.forms.uv);
+        meshResult.uv = GraficCalc.main.mergeVector2(TBlock.wallFace.forms.uv, TBlock.wallBack.forms.uv, TBlock.wallRight.forms.uv, TBlock.wallLeft.forms.uv, TBlock.wallUp.forms.uv, TBlock.wallDown.forms.uv);
 
 
         meshResult.subMeshCount = 6;
@@ -72,52 +74,49 @@ public class BlockData
         //Нужно в данных треугольников надо сдвигать счет примитивов
         /////////////////////////////////////////////////////////////
         int addNum = 0;
-        meshResult.SetTriangles(wallFace.forms.triangles, 0);
-        addNum += wallFace.forms.triangles.Length;
+        meshResult.SetTriangles(TBlock.wallFace.forms.triangles, 0);
+        addNum += TBlock.wallFace.forms.triangles.Length;
 
-        int[] trianglesBack = GraficCalc.main.addToInt(wallBack.forms.triangles, addNum);
+        int[] trianglesBack = GraficCalc.main.addToInt(TBlock.wallBack.forms.triangles, addNum);
         meshResult.SetTriangles(trianglesBack, 1);
-        addNum += wallBack.forms.triangles.Length;
+        addNum += TBlock.wallBack.forms.triangles.Length;
 
-        int[] trianglesRight = GraficCalc.main.addToInt(wallBack.forms.triangles, addNum);
+        int[] trianglesRight = GraficCalc.main.addToInt(TBlock.wallBack.forms.triangles, addNum);
         meshResult.SetTriangles(trianglesRight, 2);
-        addNum += wallRight.forms.triangles.Length;
+        addNum += TBlock.wallRight.forms.triangles.Length;
 
-        int[] trianglesLeft = GraficCalc.main.addToInt(wallBack.forms.triangles, addNum);
+        int[] trianglesLeft = GraficCalc.main.addToInt(TBlock.wallBack.forms.triangles, addNum);
         meshResult.SetTriangles(trianglesLeft, 3);
-        addNum += wallLeft.forms.triangles.Length;
+        addNum += TBlock.wallLeft.forms.triangles.Length;
 
-        int[] trianglesUp = GraficCalc.main.addToInt(wallBack.forms.triangles, addNum);
+        int[] trianglesUp = GraficCalc.main.addToInt(TBlock.wallBack.forms.triangles, addNum);
         meshResult.SetTriangles(trianglesUp, 4);
-        addNum += wallUp.forms.triangles.Length;
+        addNum += TBlock.wallUp.forms.triangles.Length;
 
-        int[] trianglesDown = GraficCalc.main.addToInt(wallBack.forms.triangles, addNum);
+        int[] trianglesDown = GraficCalc.main.addToInt(TBlock.wallBack.forms.triangles, addNum);
         meshResult.SetTriangles(trianglesDown, 5);
 
         return meshResult;
     }
 
+    public void TestCreateVoxel() {
+        if (TVoxels != null)
+            return;
+
+        TVoxels = new TypeVoxel();
+        TVoxels.RandomizeData();
+    }
+    public Mesh GetMeshVoxel() {
+        Mesh meshResult = new Mesh();
+
+        meshResult = TVoxels.GetMesh();
+
+        return meshResult;
+    }
+
     public BlockData() {
-        wallFace = new BlockWall(Side.face);
-        wallBack = new BlockWall(Side.back);
-        wallRight = new BlockWall(Side.right);
-        wallLeft = new BlockWall(Side.left);
-        wallUp = new BlockWall(Side.up);
-        wallDown = new BlockWall(Side.down);
-
-        wallFace.SetTextureTest();
-        wallBack.SetTextureTest();
-        wallRight.SetTextureTest();
-        wallLeft.SetTextureTest();
-        wallUp.SetTextureTest();
-        wallDown.SetTextureTest();
-
-        wallFace.calcVertices();
-        wallBack.calcVertices();
-        wallRight.calcVertices();
-        wallLeft.calcVertices();
-        wallUp.calcVertices();
-        wallDown.calcVertices();
+        //Создаем по умолчанию тип блока
+        TBlock = new TypeBlock();
 
         //Инициализация блока по умолчанию
         physics = new BlockPhysics();
@@ -134,16 +133,16 @@ public class BlockData
         //wallUp = new BlockWall(Side.up);
         //wallDown = new BlockWall(Side.down);
 
-        for (int x = 0; x < wallFace.forms.voxel.GetLength(0); x++)
+        for (int x = 0; x < TBlock.wallFace.forms.voxel.GetLength(0); x++)
         {
-            for (int y = 0; y < wallFace.forms.voxel.GetLength(1); y++)
+            for (int y = 0; y < TBlock.wallFace.forms.voxel.GetLength(1); y++)
             {
-                wallFace.forms.voxel[x, y] = Random.Range(0, 1.0f);
-                wallBack.forms.voxel[x, y] = Random.Range(0, 1.0f);
-                wallRight.forms.voxel[x, y] = Random.Range(0, 1.0f);
-                wallLeft.forms.voxel[x, y] = Random.Range(0, 1.0f);
-                wallUp.forms.voxel[x, y] = Random.Range(0, 1.0f);
-                wallDown.forms.voxel[x, y] = Random.Range(0, 1.0f);
+                TBlock.wallFace.forms.voxel[x, y] = Random.Range(0, 1.0f);
+                TBlock.wallBack.forms.voxel[x, y] = Random.Range(0, 1.0f);
+                TBlock.wallRight.forms.voxel[x, y] = Random.Range(0, 1.0f);
+                TBlock.wallLeft.forms.voxel[x, y] = Random.Range(0, 1.0f);
+                TBlock.wallUp.forms.voxel[x, y] = Random.Range(0, 1.0f);
+                TBlock.wallDown.forms.voxel[x, y] = Random.Range(0, 1.0f);
             }
         }
 
@@ -181,12 +180,12 @@ public class BlockData
         void saveBlockWall(string pathBlock) {
             string pathWalls = pathBlock + "/" + Str.wall;
 
-            blockData.wallFace.SaveTo(pathWalls);
-            blockData.wallBack.SaveTo(pathWalls);
-            blockData.wallLeft.SaveTo(pathWalls);
-            blockData.wallRight.SaveTo(pathWalls);
-            blockData.wallUp.SaveTo(pathWalls);
-            blockData.wallDown.SaveTo(pathWalls);
+            blockData.TBlock.wallFace.SaveTo(pathWalls);
+            blockData.TBlock.wallBack.SaveTo(pathWalls);
+            blockData.TBlock.wallLeft.SaveTo(pathWalls);
+            blockData.TBlock.wallRight.SaveTo(pathWalls);
+            blockData.TBlock.wallUp.SaveTo(pathWalls);
+            blockData.TBlock.wallDown.SaveTo(pathWalls);
         }       
         void saveBlockPhysics(string pathBlock) {
             string pathPhysics = pathBlock + "/" + Str.physics;
@@ -249,12 +248,12 @@ public class BlockData
         void loadBlockWall(string path) {
             string pathWalls = path + "/" + Str.wall;
 
-            resultData.wallFace.LoadFrom(pathWalls);
-            resultData.wallBack.LoadFrom(pathWalls);
-            resultData.wallLeft.LoadFrom(pathWalls);
-            resultData.wallRight.LoadFrom(pathWalls);
-            resultData.wallUp.LoadFrom(pathWalls);
-            resultData.wallDown.LoadFrom(pathWalls);
+            resultData.TBlock.wallFace.LoadFrom(pathWalls);
+            resultData.TBlock.wallBack.LoadFrom(pathWalls);
+            resultData.TBlock.wallLeft.LoadFrom(pathWalls);
+            resultData.TBlock.wallRight.LoadFrom(pathWalls);
+            resultData.TBlock.wallUp.LoadFrom(pathWalls);
+            resultData.TBlock.wallDown.LoadFrom(pathWalls);
         }
         void loadBlockPhysics(string path)
         {
@@ -296,218 +295,261 @@ public class BlockData
     }
 }
 
-/// <summary>
-/// Визуальная часть стены
-/// </summary>
-public class BlockWall
-{
-    public Texture2D texture;
-    public BlockForms forms;
+public class TypeBlock {
+    public Wall wallFace;
+    public Wall wallBack;
+    public Wall wallLeft;
+    public Wall wallRight;
+    public Wall wallUp;
+    public Wall wallDown;
 
-    Side side;
-
-    public BlockWall(Side side) {
-        this.side = side;
-
-        forms = new BlockForms();
-    }
-
-    public void LoadFrom(string path) {
-        if (!Directory.Exists(path)) {
-            Debug.Log(path + " Block wall not Exist");
-            return;
-        }
-
-        string pathWall = path + "/" + BlockData.Str.wall;
-        string pathTexture = path + "/" + BlockData.Str.texture;
-
-        if (side == Side.face)
-        {
-            pathWall += BlockData.Str.face;
-            pathTexture += BlockData.Str.face;
-        }
-        else if (side == Side.back)
-        {
-            pathWall += BlockData.Str.back;
-            pathTexture += BlockData.Str.back;
-        }
-        else if (side == Side.left)
-        {
-            pathWall += BlockData.Str.left;
-            pathTexture += BlockData.Str.left;
-        }
-        else if (side == Side.right)
-        {
-            pathWall += BlockData.Str.right;
-            pathTexture += BlockData.Str.right;
-        }
-        else if (side == Side.up)
-        {
-            pathWall += BlockData.Str.up;
-            pathTexture += BlockData.Str.up;
-        }
-        else {
-            pathWall += BlockData.Str.down;
-            pathTexture += BlockData.Str.down;
-        }
-        pathTexture += BlockData.Str.formatPNG;
-
-        Texture2D texture = new Texture2D(16,16);
-
-        if (File.Exists(pathTexture)) {
-            byte[] data = File.ReadAllBytes(pathTexture);
-            texture.LoadImage(data);
-        }
-
-        if (File.Exists(pathWall)) {
-
-            BinaryFormatter bf = new BinaryFormatter();
-            FileStream fileStream = File.Open(pathWall, FileMode.Open);
-            BlockForms.voxels voxs = (BlockForms.voxels)bf.Deserialize(fileStream);
-            fileStream.Close();
-
-
-            forms.voxel = voxs.height;
-        }
-
-        this.texture = texture;
-    }
-    public void SaveTo(string path) {
-        if (!Directory.Exists(path)) {
-            Directory.CreateDirectory(path);
-        }
-
-        string pathTexture = path + "/" + BlockData.Str.texture;
-        string pathWall = path + "/" + BlockData.Str.wall;
-
-        if (side == Side.face)
-        {
-            pathTexture += BlockData.Str.face;
-            pathWall += BlockData.Str.face;
-        }
-        else if (side == Side.back)
-        {
-            pathTexture += BlockData.Str.back;
-            pathWall += BlockData.Str.back;
-        }
-        else if (side == Side.left)
-        {
-            pathTexture += BlockData.Str.left;
-            pathWall += BlockData.Str.left;
-        }
-        else if (side == Side.right)
-        {
-            pathTexture += BlockData.Str.right;
-            pathWall += BlockData.Str.right;
-        }
-        else if (side == Side.up)
-        {
-            pathTexture += BlockData.Str.up;
-            pathWall += BlockData.Str.up;
-        }
-        else {
-            pathTexture += BlockData.Str.down;
-            pathWall += BlockData.Str.down;
-        }
-
-        pathTexture += BlockData.Str.formatPNG;
-
-        byte[] textureData = texture.EncodeToPNG();
-        FileStream textureStream = File.Open(pathTexture, FileMode.OpenOrCreate);
-        textureStream.Write(textureData);
-        textureStream.Close();
-
-        BlockForms.voxels voxels = new BlockForms.voxels();
-        voxels.height = forms.voxel;
-        BinaryFormatter bf = new BinaryFormatter();
-        FileStream voxStream = File.OpenWrite(pathWall);
-        bf.Serialize(voxStream, voxels);
-        voxStream.Close();
-    }
-
-    //Установить цвет тестовую текстуру
-    public void SetTextureTest() {
-        texture = new Texture2D(16, 16);
-
-        float one = 1.0f / 16.0f;
-
-        //x = red //y = green
-        if (side == Side.face) {
-            for (int x = 0; x < forms.voxel.GetLength(0); x++)
-            {
-                for (int y = 0; y < forms.voxel.GetLength(1); y++)
-                {
-                    texture.SetPixel(x, y, new Color(one * x, one * y, 0.0f));
-                }
-            }
-        }
-        else if (side == Side.back)
-        {
-            for (int x = 0; x < forms.voxel.GetLength(0); x++)
-            {
-                for (int y = 0; y < forms.voxel.GetLength(1); y++)
-                {
-                    texture.SetPixel(x, y, new Color(1 - (one * x), one * y, 1.0f));
-                }
-            }
-        }
-        //x = blue //y = green
-        else if (side == Side.left)
-        {
-            for (int x = 0; x < forms.voxel.GetLength(0); x++)
-            {
-                for (int y = 0; y < forms.voxel.GetLength(1); y++)
-                {
-                    texture.SetPixel(x, y, new Color( 0.0f, one * y, 1 - (one * x)));
-                }
-            }
-        }
-        else if (side == Side.right)
-        {
-            for (int x = 0; x < forms.voxel.GetLength(0); x++)
-            {
-                for (int y = 0; y < forms.voxel.GetLength(1); y++)
-                {
-                    texture.SetPixel(x, y, new Color( 1.0f , one * y, one * x));
-                }
-            }
-        }
-        //x = r // y = blue
-        else if (side == Side.up)
-        {
-            for (int x = 0; x < forms.voxel.GetLength(0); x++)
-            {
-                for (int y = 0; y < forms.voxel.GetLength(1); y++)
-                {
-                    texture.SetPixel(x, y, new Color(x * one, 1.0f , one * y));
-                }
-            }
-        }
-        //x = r // y = blue
-        else if (side == Side.down)
-        {
-            for (int x = 0; x < forms.voxel.GetLength(0); x++)
-            {
-                for (int y = 0; y < forms.voxel.GetLength(1); y++)
-                {
-                    texture.SetPixel(x, y, new Color((x * one), 0.0f, 1 - one * y));
-                }
-            }
-        }
-        else
-        {
-            Debug.LogError("Error cube wall side");
-        }
-
-        texture.Apply();
-        texture.filterMode = FilterMode.Point;
-    }
-
-    public void calcVertices()
+    /// <summary>
+    /// Визуальная часть стены
+    /// </summary>
+    public class Wall
     {
-        //создаем плоскость стены изходя из глубины вокселей
+        public Texture2D texture;
+        public BlockForms forms;
 
-        GraficBlockWall.main.calculate(new GraficData.BlockWall(forms, side));
+        Side side;
+
+        public Wall(Side side)
+        {
+            this.side = side;
+
+            forms = new BlockForms();
+        }
+
+        public void LoadFrom(string path)
+        {
+            if (!Directory.Exists(path))
+            {
+                Debug.Log(path + " Block wall not Exist");
+                return;
+            }
+
+            string pathWall = path + "/" + BlockData.Str.wall;
+            string pathTexture = path + "/" + BlockData.Str.texture;
+
+            if (side == Side.face)
+            {
+                pathWall += BlockData.Str.face;
+                pathTexture += BlockData.Str.face;
+            }
+            else if (side == Side.back)
+            {
+                pathWall += BlockData.Str.back;
+                pathTexture += BlockData.Str.back;
+            }
+            else if (side == Side.left)
+            {
+                pathWall += BlockData.Str.left;
+                pathTexture += BlockData.Str.left;
+            }
+            else if (side == Side.right)
+            {
+                pathWall += BlockData.Str.right;
+                pathTexture += BlockData.Str.right;
+            }
+            else if (side == Side.up)
+            {
+                pathWall += BlockData.Str.up;
+                pathTexture += BlockData.Str.up;
+            }
+            else
+            {
+                pathWall += BlockData.Str.down;
+                pathTexture += BlockData.Str.down;
+            }
+            pathTexture += BlockData.Str.formatPNG;
+
+            Texture2D texture = new Texture2D(16, 16);
+
+            if (File.Exists(pathTexture))
+            {
+                byte[] data = File.ReadAllBytes(pathTexture);
+                texture.LoadImage(data);
+            }
+
+            if (File.Exists(pathWall))
+            {
+
+                BinaryFormatter bf = new BinaryFormatter();
+                FileStream fileStream = File.Open(pathWall, FileMode.Open);
+                BlockForms.voxels voxs = (BlockForms.voxels)bf.Deserialize(fileStream);
+                fileStream.Close();
+
+
+                forms.voxel = voxs.height;
+            }
+
+            this.texture = texture;
+        }
+        public void SaveTo(string path)
+        {
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+
+            string pathTexture = path + "/" + BlockData.Str.texture;
+            string pathWall = path + "/" + BlockData.Str.wall;
+
+            if (side == Side.face)
+            {
+                pathTexture += BlockData.Str.face;
+                pathWall += BlockData.Str.face;
+            }
+            else if (side == Side.back)
+            {
+                pathTexture += BlockData.Str.back;
+                pathWall += BlockData.Str.back;
+            }
+            else if (side == Side.left)
+            {
+                pathTexture += BlockData.Str.left;
+                pathWall += BlockData.Str.left;
+            }
+            else if (side == Side.right)
+            {
+                pathTexture += BlockData.Str.right;
+                pathWall += BlockData.Str.right;
+            }
+            else if (side == Side.up)
+            {
+                pathTexture += BlockData.Str.up;
+                pathWall += BlockData.Str.up;
+            }
+            else
+            {
+                pathTexture += BlockData.Str.down;
+                pathWall += BlockData.Str.down;
+            }
+
+            pathTexture += BlockData.Str.formatPNG;
+
+            byte[] textureData = texture.EncodeToPNG();
+            FileStream textureStream = File.Open(pathTexture, FileMode.OpenOrCreate);
+            textureStream.Write(textureData);
+            textureStream.Close();
+
+            BlockForms.voxels voxels = new BlockForms.voxels();
+            voxels.height = forms.voxel;
+            BinaryFormatter bf = new BinaryFormatter();
+            FileStream voxStream = File.OpenWrite(pathWall);
+            bf.Serialize(voxStream, voxels);
+            voxStream.Close();
+        }
+
+        //Установить цвет тестовую текстуру
+        public void SetTextureTest()
+        {
+            texture = new Texture2D(16, 16);
+
+            float one = 1.0f / 16.0f;
+
+            //x = red //y = green
+            if (side == Side.face)
+            {
+                for (int x = 0; x < forms.voxel.GetLength(0); x++)
+                {
+                    for (int y = 0; y < forms.voxel.GetLength(1); y++)
+                    {
+                        texture.SetPixel(x, y, new Color(one * x, one * y, 0.0f));
+                    }
+                }
+            }
+            else if (side == Side.back)
+            {
+                for (int x = 0; x < forms.voxel.GetLength(0); x++)
+                {
+                    for (int y = 0; y < forms.voxel.GetLength(1); y++)
+                    {
+                        texture.SetPixel(x, y, new Color(1 - (one * x), one * y, 1.0f));
+                    }
+                }
+            }
+            //x = blue //y = green
+            else if (side == Side.left)
+            {
+                for (int x = 0; x < forms.voxel.GetLength(0); x++)
+                {
+                    for (int y = 0; y < forms.voxel.GetLength(1); y++)
+                    {
+                        texture.SetPixel(x, y, new Color(0.0f, one * y, 1 - (one * x)));
+                    }
+                }
+            }
+            else if (side == Side.right)
+            {
+                for (int x = 0; x < forms.voxel.GetLength(0); x++)
+                {
+                    for (int y = 0; y < forms.voxel.GetLength(1); y++)
+                    {
+                        texture.SetPixel(x, y, new Color(1.0f, one * y, one * x));
+                    }
+                }
+            }
+            //x = r // y = blue
+            else if (side == Side.up)
+            {
+                for (int x = 0; x < forms.voxel.GetLength(0); x++)
+                {
+                    for (int y = 0; y < forms.voxel.GetLength(1); y++)
+                    {
+                        texture.SetPixel(x, y, new Color(x * one, 1.0f, one * y));
+                    }
+                }
+            }
+            //x = r // y = blue
+            else if (side == Side.down)
+            {
+                for (int x = 0; x < forms.voxel.GetLength(0); x++)
+                {
+                    for (int y = 0; y < forms.voxel.GetLength(1); y++)
+                    {
+                        texture.SetPixel(x, y, new Color((x * one), 0.0f, 1 - one * y));
+                    }
+                }
+            }
+            else
+            {
+                Debug.LogError("Error cube wall side");
+            }
+
+            texture.Apply();
+            texture.filterMode = FilterMode.Point;
+        }
+
+        public void calcVertices()
+        {
+            //создаем плоскость стены изходя из глубины вокселей
+
+            GraficBlockWall.main.calculate(new GraficData.BlockWall(forms, side));
+        }
+    }
+
+    public TypeBlock() {
+        wallFace = new Wall(Side.face);
+        wallBack = new Wall(Side.back);
+        wallRight = new Wall(Side.right);
+        wallLeft = new Wall(Side.left);
+        wallUp = new Wall(Side.up);
+        wallDown = new Wall(Side.down);
+        
+        wallFace.SetTextureTest();
+        wallBack.SetTextureTest();
+        wallRight.SetTextureTest();
+        wallLeft.SetTextureTest();
+        wallUp.SetTextureTest();
+        wallDown.SetTextureTest();
+        
+        wallFace.calcVertices();
+        wallBack.calcVertices();
+        wallRight.calcVertices();
+        wallLeft.calcVertices();
+        wallUp.calcVertices();
+        wallDown.calcVertices();
     }
 }
 public class BlockForms {
@@ -520,6 +562,72 @@ public class BlockForms {
     [System.Serializable]
     public class voxels {
         public float[,] height = new float[16, 16];
+    }
+}
+
+public class TypeVoxel{
+
+    Mesh mesh;
+    Data data = new Data();
+
+    [System.Serializable]
+    public class Data {
+        public int[] exist = new int[16*16*16];
+        public float colorR;
+        public float colorG;
+        public float colorB;
+    }
+
+    public void RandomizeData() {
+        for (int num = 0; num < data.exist.Length; num++) {
+            if (Random.Range(0, 100) < 10)
+                data.exist[num] = 1;
+        }
+    }
+
+    Mesh GetMesh(Data data) {
+        this.data = data;
+
+        Mesh mesh = new Mesh();
+
+        //создаем 8 под мешей
+        //D - Down | U - Up
+        //F - face | B - back
+        //L - left | R - Right
+
+        GraficData.BlockVoxelPart DFL = new GraficData.BlockVoxelPart();
+        GraficData.BlockVoxelPart DFR = new GraficData.BlockVoxelPart();
+        GraficData.BlockVoxelPart DBL = new GraficData.BlockVoxelPart();
+        GraficData.BlockVoxelPart DBR = new GraficData.BlockVoxelPart();
+
+        GraficData.BlockVoxelPart UFL = new GraficData.BlockVoxelPart();
+        GraficData.BlockVoxelPart UFR = new GraficData.BlockVoxelPart();
+        GraficData.BlockVoxelPart UBL = new GraficData.BlockVoxelPart();
+        GraficData.BlockVoxelPart UBR = new GraficData.BlockVoxelPart();
+
+        GraficBlockTVoxel.main.calculate(DFL, data.exist);
+        GraficBlockTVoxel.main.calculate(DFR, data.exist);
+        GraficBlockTVoxel.main.calculate(DBL, data.exist);
+        GraficBlockTVoxel.main.calculate(DBR, data.exist);
+        GraficBlockTVoxel.main.calculate(UFL, data.exist);
+        GraficBlockTVoxel.main.calculate(UFR, data.exist);
+        GraficBlockTVoxel.main.calculate(UBL, data.exist);
+        GraficBlockTVoxel.main.calculate(UBR, data.exist);
+
+        Vector3[] vertices = DFL.vertices;
+        int[] triangles  = DFL.triangles;
+        Vector2[] uv = DFL.uv;
+
+        mesh.vertices = vertices;
+        mesh.triangles = triangles;
+        mesh.uv = uv;
+
+        this.mesh = mesh;
+
+        return mesh; 
+    }
+    public Mesh GetMesh() {
+        return GetMesh(this.data);
     }
 }
 

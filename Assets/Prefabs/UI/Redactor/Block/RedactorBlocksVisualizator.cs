@@ -70,7 +70,68 @@ public class RedactorBlocksVisualizator : MonoBehaviour, IPointerEnterHandler, I
         UpdateCameraRotate();
     }
 
-    void UpdateMesh()
+    void UpdateMesh() {
+        if (RedactorBlocksCTRL.main == null)
+            return;
+
+        //Удаляем старые данные
+        MeshFilter meshFilter = meshRenderer.GetComponent<MeshFilter>();
+        if (meshFilter.sharedMesh != null) {
+            meshFilter.sharedMesh.Clear(false);
+            Destroy(meshFilter.sharedMesh);
+
+            //Удаляем материалы
+            for (int num = 0; num < meshRenderer.materials.Length; num++) {
+                Destroy(meshRenderer.materials[num]);
+            }
+        }
+
+        //получаем блок
+        BlockData blockData = RedactorBlocksCTRL.blockData;
+
+        if (blockData.type == BlockData.Type.block)
+            MeshBlock();
+        else if (blockData.type == BlockData.Type.voxels)
+            MeshVoxel();
+        else if (blockData.type == BlockData.Type.liquid)
+            MeshLiquid();
+
+
+        ///////////////////////////////////////////
+        ////
+        void MeshBlock() {
+            meshFilter.sharedMesh = blockData.GetMesh(true, true, true, true, true, true);
+            meshFilter.sharedMesh.Optimize();
+
+            //применяем материалы к мешу
+            meshRenderer.materials = new Material[6]{
+                material,
+                material,
+                material,
+                material,
+                material,
+                material,
+            };
+
+
+            meshRenderer.materials[0].mainTexture = RedactorBlocksCTRL.blockData.TBlock.wallFace.texture;
+            meshRenderer.materials[1].mainTexture = RedactorBlocksCTRL.blockData.TBlock.wallBack.texture;
+            meshRenderer.materials[2].mainTexture = RedactorBlocksCTRL.blockData.TBlock.wallRight.texture;
+            meshRenderer.materials[3].mainTexture = RedactorBlocksCTRL.blockData.TBlock.wallLeft.texture;
+            meshRenderer.materials[4].mainTexture = RedactorBlocksCTRL.blockData.TBlock.wallUp.texture;
+            meshRenderer.materials[5].mainTexture = RedactorBlocksCTRL.blockData.TBlock.wallDown.texture;
+        }
+        void MeshVoxel() {
+            blockData.TestCreateVoxel();
+
+            meshFilter.sharedMesh = blockData.GetMeshVoxel();
+            meshFilter.sharedMesh.Optimize();
+        }
+        void MeshLiquid() {
+            
+        }
+    }
+    void UpdateMeshOld()
     {
         if (RedactorBlocksCTRL.main == null)
             return;
@@ -107,12 +168,12 @@ public class RedactorBlocksVisualizator : MonoBehaviour, IPointerEnterHandler, I
         };
 
 
-        meshRenderer.materials[0].mainTexture = RedactorBlocksCTRL.blockData.wallFace.texture;
-        meshRenderer.materials[1].mainTexture = RedactorBlocksCTRL.blockData.wallBack.texture;
-        meshRenderer.materials[2].mainTexture = RedactorBlocksCTRL.blockData.wallRight.texture;
-        meshRenderer.materials[3].mainTexture = RedactorBlocksCTRL.blockData.wallLeft.texture;
-        meshRenderer.materials[4].mainTexture = RedactorBlocksCTRL.blockData.wallUp.texture;
-        meshRenderer.materials[5].mainTexture = RedactorBlocksCTRL.blockData.wallDown.texture;
+        meshRenderer.materials[0].mainTexture = RedactorBlocksCTRL.blockData.TBlock.wallFace.texture;
+        meshRenderer.materials[1].mainTexture = RedactorBlocksCTRL.blockData.TBlock.wallBack.texture;
+        meshRenderer.materials[2].mainTexture = RedactorBlocksCTRL.blockData.TBlock.wallRight.texture;
+        meshRenderer.materials[3].mainTexture = RedactorBlocksCTRL.blockData.TBlock.wallLeft.texture;
+        meshRenderer.materials[4].mainTexture = RedactorBlocksCTRL.blockData.TBlock.wallUp.texture;
+        meshRenderer.materials[5].mainTexture = RedactorBlocksCTRL.blockData.TBlock.wallDown.texture;
     }
 
     //отрендерить то что видят камеры

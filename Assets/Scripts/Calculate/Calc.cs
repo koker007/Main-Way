@@ -337,3 +337,8 @@ public class Line {
         return resultLine;
     }
 }
+
+public class Boolean
+{
+    public bool value;
+}

@@ -31,7 +31,7 @@ public class RedactorBlocksVoxColor : MonoBehaviour
     [SerializeField]
     SliderCTRL sliderColorVRand;
 
-    BlockWall wall = null;
+    TypeBlock.Wall wall = null;
     Vector2Int voxelPos = new Vector2Int();
 
     static public Color getColor()
@@ -256,7 +256,7 @@ public class RedactorBlocksVoxColor : MonoBehaviour
         //Изменяем цвет на палитре
         reDrawCursor();
         //применяем изменения
-        BlockWall wall = RedactorBlocksColiders.main.selectBlockWall;
+        TypeBlock.Wall wall = RedactorBlocksColiders.main.selectBlockWall;
 
         //Если стена есть - если стена есть применяем
         if (wall == null)
