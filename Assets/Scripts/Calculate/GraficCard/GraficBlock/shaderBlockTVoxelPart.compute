@@ -53,7 +53,7 @@ void CSMain (uint3 id : SV_DispatchThreadID)
 {
     // TODO: insert actual code here!
     int voxIDlocal =id.x + 8*id.y + 8*8*id.z;
-    int voxIDGlobal = id.x + (_sectorX * 8) + id.y * 16 + (_sectorY * 16*8) + id.z * 16 * 16 + (_sectorZ * 16 * 16 * 8);
+    int voxIDGlobal = (id.x) + (id.y * 16) + (id.z * 16 * 16) + (_sectorX * 8) + (_sectorY * 16*8) + (_sectorZ * 16 * 16 * 8);
 
     //3 = side
     //2 = triangles
@@ -64,7 +64,7 @@ void CSMain (uint3 id : SV_DispatchThreadID)
 
     testFace(voxIDGlobal, vertStart, id);
     testLeft(voxIDGlobal, vertStart, id);
-    //testDown(voxID, vertStart, id);
+    testDown(voxIDGlobal, vertStart, id);
 
 }
 
@@ -118,6 +118,8 @@ void testFace(int voxID, int vert, uint3 id){
     float posY = (_sectorY * 8 + id.y) * sizeVoxel;
     float posZ = (_sectorZ * 8 + id.z) * sizeVoxel;
 
+    //if(id.z == 1 && id.x == 0 && id.y == 0 && voxID == 256)
+    //isExistVoxel(voxID) && !isExistVoxFace(voxID, id)
 
     if(isExistVoxel(voxID) && !isExistVoxFace(voxID, id)){
         for(int num = 0; num < vertCount; num++){
@@ -151,34 +153,39 @@ void testFace(int voxID, int vert, uint3 id){
         _vertices[vert + 5].x = posX + sizeVoxel;
         _vertices[vert + 5].y = posY;
         _vertices[vert + 5].z = posZ;
-
-
     }
     else if(!isExistVoxel(voxID) && isExistVoxFace(voxID, id)){
+        for(int num = 0; num < vertCount; num++){
+            _uv[vert + num].u = id.x * sizeTexelU + sizeTexelU/2 + (id.z * sizeTexelU * 16);
+            _uv[vert + num].v = id.y * sizeTexelV + sizeTexelV/2;
+
+            _triangles[vert + num].num = vert + num;
+        }
+
         //Face
         _vertices[vert + 0].x = posX;
         _vertices[vert + 0].y = posY;
-        _vertices[vert + 0].z = posZ + sizeVoxel;
+        _vertices[vert + 0].z = posZ;
 
         _vertices[vert + 1].x = posX + sizeVoxel;
         _vertices[vert + 1].y = posY + sizeVoxel;
-        _vertices[vert + 1].z = posZ + sizeVoxel;
+        _vertices[vert + 1].z = posZ;
 
         _vertices[vert + 2].x = posX;
         _vertices[vert + 2].y = posY + sizeVoxel;
-        _vertices[vert + 2].z = posZ + sizeVoxel;
+        _vertices[vert + 2].z = posZ;
 
         _vertices[vert + 3].x = posX;
         _vertices[vert + 3].y = posY;
-        _vertices[vert + 3].z = posZ + sizeVoxel;
+        _vertices[vert + 3].z = posZ;
 
         _vertices[vert + 4].x = posX + sizeVoxel;
         _vertices[vert + 4].y = posY;
-        _vertices[vert + 4].z = posZ + sizeVoxel;
+        _vertices[vert + 4].z = posZ;
 
         _vertices[vert + 5].x = posX + sizeVoxel;
         _vertices[vert + 5].y = posY + sizeVoxel;
-        _vertices[vert + 5].z = posZ + sizeVoxel;
+        _vertices[vert + 5].z = posZ;
     }
     else{
 
@@ -222,7 +229,7 @@ void testLeft(int voxID, int vert, uint3 id){
 
         _vertices[vert + 1*6 + 2].x = posX;
         _vertices[vert + 1*6 + 2].y = posY + sizeVoxel;
-        _vertices[vert + 1*6 + 2].z = posZ * -1;
+        _vertices[vert + 1*6 + 2].z = posZ;
 
         _vertices[vert + 1*6 + 3].x = posX;
         _vertices[vert + 1*6 + 3].y = posY;
@@ -237,6 +244,13 @@ void testLeft(int voxID, int vert, uint3 id){
         _vertices[vert + 1*6 + 5].z = posZ + sizeVoxel;
     }
     else if(!isExistVoxel(voxID) && isExistVoxLeft(voxID, id)){
+        for(int num = 0; num < vertCount; num++){
+            _uv[vert + num].u = id.x * sizeTexelU + sizeTexelU/2 + (id.z * sizeTexelU * 16);
+            _uv[vert + num].v = id.y * sizeTexelV + sizeTexelV/2;
+
+            _triangles[vert + num].num = vert + num;
+        }
+
         //right
         _vertices[vert + 1*6 + 0].x = posX;
         _vertices[vert + 1*6 + 0].y = posY;
@@ -244,7 +258,7 @@ void testLeft(int voxID, int vert, uint3 id){
 
         _vertices[vert + 1*6 + 1].x = posX;
         _vertices[vert + 1*6 + 1].y = posY + sizeVoxel;
-        _vertices[vert + 1*6 + 1].z = posZ * -1;
+        _vertices[vert + 1*6 + 1].z = posZ;
 
         _vertices[vert + 1*6 + 2].x = posX;
         _vertices[vert + 1*6 + 2].y = posY + sizeVoxel;
@@ -300,11 +314,11 @@ void testDown(int voxID, int vert, uint3 id){
 
         _vertices[vert + 2*6 + 1].x = posX + sizeVoxel;
         _vertices[vert + 2*6 + 1].y = posY;
-        _vertices[vert + 2*6 + 1].z = (posZ + sizeVoxel) * -1;
+        _vertices[vert + 2*6 + 1].z = posZ + sizeVoxel;
 
         _vertices[vert + 2*6 + 2].x = posX;
         _vertices[vert + 2*6 + 2].y = posY;
-        _vertices[vert + 2*6 + 2].z = (posZ + sizeVoxel) * -1;
+        _vertices[vert + 2*6 + 2].z = posZ + sizeVoxel;
 
         _vertices[vert + 2*6 + 3].x = posX;
         _vertices[vert + 2*6 + 3].y = posY;
@@ -312,13 +326,20 @@ void testDown(int voxID, int vert, uint3 id){
 
         _vertices[vert + 2*6 + 4].x = posX + sizeVoxel;
         _vertices[vert + 2*6 + 4].y = posY;
-        _vertices[vert + 2*6 + 4].z = posZ * -1;
+        _vertices[vert + 2*6 + 4].z = posZ;
 
         _vertices[vert + 2*6 + 5].x = posX + sizeVoxel;
         _vertices[vert + 2*6 + 5].y = posY;
-        _vertices[vert + 2*6 + 5].z = (posZ + sizeVoxel) * -1;
+        _vertices[vert + 2*6 + 5].z = posZ + sizeVoxel;
     }
     else if(!isExistVoxel(voxID) && isExistVoxDown(voxID, id)){
+        for(int num = 0; num < vertCount; num++){
+            _uv[vert + num].u = id.x * sizeTexelU + sizeTexelU/2 + (id.z * sizeTexelU * 16);
+            _uv[vert + num].v = id.y * sizeTexelV + sizeTexelV/2;
+
+            _triangles[vert + num].num = vert + num;
+        }
+
         //up
         _vertices[vert + 2*6 + 0].x = posX;
         _vertices[vert + 2*6 + 0].y = posY;
@@ -326,11 +347,11 @@ void testDown(int voxID, int vert, uint3 id){
 
         _vertices[vert + 2*6 + 1].x = posX;
         _vertices[vert + 2*6 + 1].y = posY;
-        _vertices[vert + 2*6 + 1].z = (posZ + sizeVoxel) * -1;
+        _vertices[vert + 2*6 + 1].z = posZ + sizeVoxel;
 
         _vertices[vert + 2*6 + 2].x = posX + sizeVoxel;
         _vertices[vert + 2*6 + 2].y = posY;
-        _vertices[vert + 2*6 + 2].z = (posZ + sizeVoxel) * -1;
+        _vertices[vert + 2*6 + 2].z = posZ + sizeVoxel;
 
         _vertices[vert + 2*6 + 3].x = posX;
         _vertices[vert + 2*6 + 3].y = posY;
@@ -338,11 +359,11 @@ void testDown(int voxID, int vert, uint3 id){
 
         _vertices[vert + 2*6 + 4].x = posX + sizeVoxel;
         _vertices[vert + 2*6 + 4].y = posY;
-        _vertices[vert + 2*6 + 4].z = (posZ + sizeVoxel) * -1;
+        _vertices[vert + 2*6 + 4].z = posZ + sizeVoxel;
 
         _vertices[vert + 2*6 + 5].x = posX + sizeVoxel;
         _vertices[vert + 2*6 + 5].y = posY;
-        _vertices[vert + 2*6 + 5].z = (posZ) * -1;
+        _vertices[vert + 2*6 + 5].z = posZ;
     }
     else{
 

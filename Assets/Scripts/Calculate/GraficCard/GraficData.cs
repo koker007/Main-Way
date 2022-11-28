@@ -392,7 +392,7 @@ public class GraficData : MonoBehaviour
 
         public BlockVoxelPart() {
             vertices = new Vector3[verticesCount];
-            triangles = new int[verticesCount / 3];
+            triangles = new int[verticesCount];
             uv = new Vector2[verticesCount];
         }
     }

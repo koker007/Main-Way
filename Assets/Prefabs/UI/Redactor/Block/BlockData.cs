@@ -582,6 +582,9 @@ public class TypeVoxel{
         for (int num = 0; num < data.exist.Length; num++) {
             if (Random.Range(0, 100) < 10)
                 data.exist[num] = 1;
+
+            if(num == 0)
+                data.exist[num] = 1;
         }
     }
 
