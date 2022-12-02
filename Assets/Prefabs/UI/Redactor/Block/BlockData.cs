@@ -107,11 +107,7 @@ public class BlockData
         TVoxels.RandomizeData();
     }
     public Mesh GetMeshVoxel() {
-        Mesh meshResult = new Mesh();
-
-        meshResult = TVoxels.GetMesh();
-
-        return meshResult;
+        return TVoxels.GetMesh();
     }
 
     public BlockData() {
@@ -565,17 +561,22 @@ public class BlockForms {
     }
 }
 
-public class TypeVoxel{
+public class TypeVoxel {
 
-    Mesh mesh;
+    Visual visual;
     Data data = new Data();
 
     [System.Serializable]
     public class Data {
-        public int[] exist = new int[16*16*16];
+        public int[] exist = new int[16 * 16 * 16];
         public float colorR;
         public float colorG;
         public float colorB;
+    }
+    public class Visual{
+        public int[] triangles;
+        public Vector3[] vert;
+        public Vector2[] uv;
     }
 
     public void RandomizeData() {
@@ -598,15 +599,15 @@ public class TypeVoxel{
         //F - face | B - back
         //L - left | R - Right
 
-        GraficData.BlockVoxelPart DFL = new GraficData.BlockVoxelPart();
-        GraficData.BlockVoxelPart DFR = new GraficData.BlockVoxelPart();
-        GraficData.BlockVoxelPart DBL = new GraficData.BlockVoxelPart();
-        GraficData.BlockVoxelPart DBR = new GraficData.BlockVoxelPart();
+        GraficData.BlockVoxelPart DFL = new GraficData.BlockVoxelPart(0, 0, 0);
+        GraficData.BlockVoxelPart DFR = new GraficData.BlockVoxelPart(1, 0, 0);
+        GraficData.BlockVoxelPart DBL = new GraficData.BlockVoxelPart(0, 0, 1);
+        GraficData.BlockVoxelPart DBR = new GraficData.BlockVoxelPart(1, 0, 1);
 
-        GraficData.BlockVoxelPart UFL = new GraficData.BlockVoxelPart();
-        GraficData.BlockVoxelPart UFR = new GraficData.BlockVoxelPart();
-        GraficData.BlockVoxelPart UBL = new GraficData.BlockVoxelPart();
-        GraficData.BlockVoxelPart UBR = new GraficData.BlockVoxelPart();
+        GraficData.BlockVoxelPart UFL = new GraficData.BlockVoxelPart(0, 1, 0);
+        GraficData.BlockVoxelPart UFR = new GraficData.BlockVoxelPart(1, 1, 0);
+        GraficData.BlockVoxelPart UBL = new GraficData.BlockVoxelPart(0, 1, 1);
+        GraficData.BlockVoxelPart UBR = new GraficData.BlockVoxelPart(1, 1, 1);
 
         GraficBlockTVoxel.main.calculate(DFL, data.exist);
         GraficBlockTVoxel.main.calculate(DFR, data.exist);
@@ -617,15 +618,40 @@ public class TypeVoxel{
         GraficBlockTVoxel.main.calculate(UBL, data.exist);
         GraficBlockTVoxel.main.calculate(UBR, data.exist);
 
-        Vector3[] vertices = DFL.vertices;
-        int[] triangles  = DFL.triangles;
-        Vector2[] uv = DFL.uv;
+        int[] intm01234567 = Calc.Mesh.MergeTriangles(
+            DFL.triangles, DFL.vertices.Length,
+            DFR.triangles, DFR.vertices.Length,
+            UFL.triangles, UFL.vertices.Length,
+            UFR.triangles, UFR.vertices.Length,
+            DBL.triangles, DBL.vertices.Length,
+            DBR.triangles, DBR.vertices.Length,
+            UBL.triangles, UBL.vertices.Length,
+            UBR.triangles, UBR.vertices.Length);
+
+        int[] intm = Calc.Mesh.DelZeroTriangles(intm01234567);
+
+        Vector2[] uv = Calc.Mesh.MergeVec2(DFL.uv, DFR.uv, UFL.uv, UFR.uv, DBL.uv, DBR.uv, UBL.uv, UBR.uv);
+        Vector3[] vertices = Calc.Mesh.MergeVec3(DFL.vertices, DFR.vertices, UFL.vertices, UFR.vertices, DBL.vertices, DBR.vertices, UBL.vertices, UBR.vertices);
+        int[] triangles = intm;
+
+        for (int x = 0; x < triangles.Length; x++)
+        {
+            if (triangles[x] >= vertices.Length)
+            {
+                Debug.Log("bad " + x + " " + triangles[x]);
+
+            }
+        }
 
         mesh.vertices = vertices;
-        mesh.triangles = triangles;
         mesh.uv = uv;
+        mesh.triangles = triangles;
 
-        this.mesh = mesh;
+        mesh.Optimize();
+        visual = new Visual();
+        visual.vert = mesh.vertices;
+        visual.triangles = mesh.triangles;
+        visual.uv = mesh.uv;
 
         return mesh; 
     }

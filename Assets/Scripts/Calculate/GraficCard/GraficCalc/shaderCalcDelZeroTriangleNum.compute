@@ -1,0 +1,57 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+
+
+struct Integer{
+    int num;
+};
+
+RWStructuredBuffer<Integer> _buffResult;
+
+RWStructuredBuffer<Integer> _buffTest;
+
+int _countResult;
+
+int _countTest;
+
+//Functions
+bool SaveNotZeroTriangle(uint3 id, int IterResultNow, int IterResultMax, int IterTestNow);
+
+[numthreads(999,1,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    uint IterTestMax = _countTest / (999*3) + 1; //82944 / (999*3) = 27,675675
+
+    uint IterResultMax = _countResult/(999*3); //27648 / (999*3) + 1 = 9,225225
+    uint IterResultNow = 0;
+
+    for(uint IterTestNow = 0; IterTestNow < IterTestMax; IterTestNow++ ){
+        //IF over array
+        if(IterResultNow >= IterResultMax){
+            //Need exit shader
+        }
+
+
+
+        bool isAdded = SaveNotZeroTriangle(id, IterResultNow, IterResultMax, IterTestNow);
+        if(isAdded){
+            IterResultNow++;
+        }
+    }
+}
+
+bool SaveNotZeroTriangle(uint3 id, int IterResultNow, int IterResultMax, int IterTestNow){
+
+    int vertIDTest = (IterTestNow * 999 + id.x) * 3;  //(IterResultNow * 999 + id.x) * 3;
+    int vertIDResult = (IterResultNow + IterResultMax * id.x) * 3;//IterTestMax*id.x + IterTestNow;
+
+    if(_buffTest[vertIDTest + 0].num == _buffTest[vertIDTest + 1].num || _buffTest[vertIDTest + 1].num == _buffTest[vertIDTest + 2].num || _buffTest[vertIDTest + 2].num == _buffTest[vertIDTest + 0].num){
+        return false;
+    }
+
+    _buffResult[vertIDResult + 0] = _buffTest[vertIDTest + 0];
+    _buffResult[vertIDResult + 1] = _buffTest[vertIDTest + 1];
+    _buffResult[vertIDResult + 2] = _buffTest[vertIDTest + 2];
+
+    return true;
+}

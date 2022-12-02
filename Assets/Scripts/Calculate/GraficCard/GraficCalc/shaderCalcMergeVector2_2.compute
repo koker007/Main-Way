@@ -1,0 +1,44 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+
+
+struct Vec2{
+    float x;
+    float y;
+};
+
+RWStructuredBuffer<Vec2> _buffResult;
+
+RWStructuredBuffer<Vec2> _buffVec0;
+RWStructuredBuffer<Vec2> _buffVec1;
+
+int _countResult;
+
+int _countVec0;
+int _countVec1;
+
+//Functions
+void calcVec2(uint3 id, int iteration);
+
+[numthreads(1000,1,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    uint countResultUint = _countResult;
+    uint iterationMax = countResultUint/1000 + 1;
+    for(uint iteration = 0; iteration < iterationMax; iteration++){
+        calcVec2(id, iteration);
+    }
+}
+
+void calcVec2(uint3 id, int iteration){
+    int resultID = iteration * 1000 + id.x;
+
+    if(resultID < _countVec0){
+        int meshID = resultID;
+        _buffResult[resultID] = _buffVec0[meshID];
+    }
+    else if(resultID < _countVec0 + _countVec1){
+        int meshID = resultID - _countVec0;
+        _buffResult[resultID] = _buffVec1[meshID];
+    }
+}

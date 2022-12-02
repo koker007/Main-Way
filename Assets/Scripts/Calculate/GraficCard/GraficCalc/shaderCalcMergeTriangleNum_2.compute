@@ -1,0 +1,48 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+
+
+struct Integer{
+    int num;
+};
+
+RWStructuredBuffer<Integer> _buffResult;
+
+RWStructuredBuffer<Integer> _buffTri0;
+RWStructuredBuffer<Integer> _buffTri1;
+
+int _countResult;
+
+int _countTria0;
+int _countTria1;
+
+int _countVert0;
+
+//Functions
+void calcTria(uint3 id, int iteration);
+
+[numthreads(1000,1,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    uint countResultUint = _countResult;
+    uint iterationMax = countResultUint/1000 + 1;
+
+    for(uint iteration = 0; iteration < iterationMax; iteration++){
+        calcTria(id, iteration);
+    }
+}
+
+void calcTria(uint3 id, int iteration){
+    int resultID = iteration * 1000 + id.x;
+
+    if(resultID < _countTria0){
+        int meshID = resultID;
+        _buffResult[resultID].num = _buffTri0[meshID].num;
+    }
+    else if(resultID < _countTria0 + _countTria1){
+        int trianglePreviously = _countTria0;
+        int vertPreviously = _countVert0;
+        int meshID = resultID - trianglePreviously;
+        _buffResult[resultID].num = _buffTri1[meshID].num + vertPreviously;
+    }
+}

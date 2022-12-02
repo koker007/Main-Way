@@ -79,7 +79,27 @@ public class GraficBlockTVoxel : MonoBehaviour
     }
 
     public void mergeVectors3(Vector3[] vec1, Vector3[] vec2, Vector3[] vec3, Vector3[] vec4, Vector3[] vec5, Vector3[] vec6, Vector3[] vec7, Vector3[] vec8) {
-    
+
+        int vec3Size = sizeof(float) * 3;
+
+        ComputeBuffer bufferVertices1 = new ComputeBuffer(vec1.Length, vec3Size);
+        bufferVertices1.SetData(vec1);
+        ComputeBuffer bufferVertices2 = new ComputeBuffer(vec2.Length, vec3Size);
+        bufferVertices2.SetData(vec1);
+        ComputeBuffer bufferVertices3 = new ComputeBuffer(vec3.Length, vec3Size);
+        bufferVertices3.SetData(vec1);
+        ComputeBuffer bufferVertices4 = new ComputeBuffer(vec4.Length, vec3Size);
+        bufferVertices4.SetData(vec1);
+        ComputeBuffer bufferVertices5 = new ComputeBuffer(vec5.Length, vec3Size);
+        bufferVertices5.SetData(vec1);
+        ComputeBuffer bufferVertices6 = new ComputeBuffer(vec6.Length, vec3Size);
+        bufferVertices6.SetData(vec1);
+        ComputeBuffer bufferVertices7 = new ComputeBuffer(vec7.Length, vec3Size);
+        bufferVertices7.SetData(vec1);
+        ComputeBuffer bufferVertices8 = new ComputeBuffer(vec8.Length, vec3Size);
+        bufferVertices8.SetData(vec1);
+
+        shaderBlockTVoxels.SetBuffer(_kernelIndex, "_vertices", bufferVertices1);
     }
 }
 

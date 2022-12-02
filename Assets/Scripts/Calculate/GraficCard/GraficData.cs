@@ -388,12 +388,20 @@ public class GraficData : MonoBehaviour
         //2 количество треугольников на каждую сторону
         //3 количество вершин у треугольника
 
-        const int verticesCount = (8 * 8 * 8 * 3) * 2 * 3;
+        // оличество вершин
+        const int verticesCount = 8 * 8 * 8 * 8; //8 вершин на каждый воксель
 
-        public BlockVoxelPart() {
+        // оличество вершин треугольников (основной массив 8*8*8 + закрывающа€ плоскость 8*8) * (3 стороны * 2 треугольника * 3 вершины у треугольника)
+        const int trianglesCount = (8 * 8 * 8 + 8*8) * (3 * 2 * 3);
+
+        public BlockVoxelPart(int sectorX, int sectorY, int sectorZ) {
+            this.sectorX = sectorX;
+            this.sectorY = sectorY;
+            this.sectorZ = sectorZ;
+
             vertices = new Vector3[verticesCount];
-            triangles = new int[verticesCount];
             uv = new Vector2[verticesCount];
+            triangles = new int[trianglesCount];
         }
     }
 }

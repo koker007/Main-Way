@@ -54,6 +54,201 @@ public class Calc
         }
     }
 
+    public class Mesh {
+        public static int[] DelZeroTriangles(int[] trianglesTest) {
+            List<int> resultList = new List<int>();
+
+            for (int id = 0; id < trianglesTest.Length; id += 3) {
+                if (trianglesTest[id + 0] == trianglesTest[id + 1] ||
+                    trianglesTest[id + 1] == trianglesTest[id + 2] ||
+                    trianglesTest[id + 2] == trianglesTest[id + 0]) {
+                    continue;
+                }
+
+                resultList.Add(trianglesTest[id + 0]);
+                resultList.Add(trianglesTest[id + 1]);
+                resultList.Add(trianglesTest[id + 2]);
+
+            }
+
+            return resultList.ToArray();
+        }
+
+        public static Vector2[] MergeVec2(Vector2[] vec2_0, Vector2[] vec2_1, Vector2[] vec2_2, Vector2[] vec2_3, Vector2[] vec2_4, Vector2[] vec2_5, Vector2[] vec2_6, Vector2[] vec2_7) {
+            List<Vector2> resultList = new List<Vector2>();
+
+            if (vec2_0 != null) {
+                for (int x = 0; x < vec2_0.Length; x++)
+                    resultList.Add(vec2_0[x]);
+            }
+            if (vec2_1 != null)
+            {
+                for (int x = 0; x < vec2_1.Length; x++)
+                    resultList.Add(vec2_1[x]);
+            }
+            if (vec2_2 != null)
+            {
+                for (int x = 0; x < vec2_2.Length; x++)
+                    resultList.Add(vec2_2[x]);
+            }
+            if (vec2_3 != null)
+            {
+                for (int x = 0; x < vec2_3.Length; x++)
+                    resultList.Add(vec2_3[x]);
+            }
+            if (vec2_4 != null)
+            {
+                for (int x = 0; x < vec2_4.Length; x++)
+                    resultList.Add(vec2_4[x]);
+            }
+            if (vec2_5 != null)
+            {
+                for (int x = 0; x < vec2_5.Length; x++)
+                    resultList.Add(vec2_5[x]);
+            }
+            if (vec2_6 != null)
+            {
+                for (int x = 0; x < vec2_6.Length; x++)
+                    resultList.Add(vec2_6[x]);
+            }
+            if (vec2_7 != null)
+            {
+                for (int x = 0; x < vec2_7.Length; x++)
+                    resultList.Add(vec2_7[x]);
+            }
+
+            return resultList.ToArray();
+        }
+        public static Vector3[] MergeVec3(Vector3[] vec3_0, Vector3[] vec3_1, Vector3[] vec3_2, Vector3[] vec3_3, Vector3[] vec3_4, Vector3[] vec3_5, Vector3[] vec3_6, Vector3[] vec3_7) {
+            List<Vector3> resultList = new List<Vector3>();
+
+            if (vec3_0 != null)
+            {
+                for (int x = 0; x < vec3_0.Length; x++)
+                    resultList.Add(vec3_0[x]);
+            }
+            if (vec3_1 != null)
+            {
+                for (int x = 0; x < vec3_1.Length; x++)
+                    resultList.Add(vec3_1[x]);
+            }
+            if (vec3_2 != null)
+            {
+                for (int x = 0; x < vec3_2.Length; x++)
+                    resultList.Add(vec3_2[x]);
+            }
+            if (vec3_3 != null)
+            {
+                for (int x = 0; x < vec3_3.Length; x++)
+                    resultList.Add(vec3_3[x]);
+            }
+            if (vec3_4 != null)
+            {
+                for (int x = 0; x < vec3_4.Length; x++)
+                    resultList.Add(vec3_4[x]);
+            }
+            if (vec3_5 != null)
+            {
+                for (int x = 0; x < vec3_5.Length; x++)
+                    resultList.Add(vec3_5[x]);
+            }
+            if (vec3_6 != null)
+            {
+                for (int x = 0; x < vec3_6.Length; x++)
+                    resultList.Add(vec3_6[x]);
+            }
+            if (vec3_7 != null)
+            {
+                for (int x = 0; x < vec3_7.Length; x++)
+                    resultList.Add(vec3_7[x]);
+            }
+
+            return resultList.ToArray();
+        }
+
+        public static int[] MergeTriangles(
+            int[] tri0, int vertCount0,
+            int[] tri1, int vertCount1, 
+            int[] tri2, int vertCount2, 
+            int[] tri3, int vertCount3, 
+            int[] tri4, int vertCount4, 
+            int[] tri5, int vertCount5, 
+            int[] tri6, int vertCount6, 
+            int[] tri7, int vertCount7) {
+            List<int> resultList = new List<int>();
+
+            int olderCount = 0;
+            if (tri0 != null) {
+                for (int x = 0; x < tri0.Length; x++)
+                {
+                    resultList.Add(tri0[x] + olderCount);
+                }
+                olderCount += vertCount0;
+            }
+            if (tri1 != null) {
+                for (int x = 0; x < tri1.Length; x++) {
+                    resultList.Add(tri1[x] + olderCount);
+                }
+                olderCount += vertCount1;
+            }
+
+            if (tri2 != null)
+            {
+                for (int x = 0; x < tri2.Length; x++)
+                {
+                    resultList.Add(tri2[x] + olderCount);
+                }
+                olderCount += vertCount2;
+            }
+
+            if (tri3 != null)
+            {
+                for (int x = 0; x < tri3.Length; x++)
+                {
+                    resultList.Add(tri3[x] + olderCount);
+                }
+                olderCount += vertCount3;
+            }
+
+            if (tri4 != null)
+            {
+                for (int x = 0; x < tri4.Length; x++)
+                {
+                    resultList.Add(tri4[x] + olderCount);
+                }
+                olderCount += vertCount4;
+            }
+
+            if (tri5 != null)
+            {
+                for (int x = 0; x < tri5.Length; x++)
+                {
+                    resultList.Add(tri5[x] + olderCount);
+                }
+                olderCount += vertCount5;
+            }
+
+            if (tri6 != null)
+            {
+                for (int x = 0; x < tri6.Length; x++)
+                {
+                    resultList.Add(tri6[x] + olderCount);
+                }
+                olderCount += vertCount6;
+            }
+
+            if (tri7 != null)
+            {
+                for (int x = 0; x < tri7.Length; x++)
+                {
+                    resultList.Add(tri7[x] + olderCount);
+                }
+                olderCount += vertCount7;
+            }
+
+            return resultList.ToArray();
+        }
+    }
 
     public static int Nolmalize(float value) {
         int ret = 0;

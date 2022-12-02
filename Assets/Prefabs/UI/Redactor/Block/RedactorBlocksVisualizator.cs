@@ -77,7 +77,7 @@ public class RedactorBlocksVisualizator : MonoBehaviour, IPointerEnterHandler, I
         //Удаляем старые данные
         MeshFilter meshFilter = meshRenderer.GetComponent<MeshFilter>();
         if (meshFilter.sharedMesh != null) {
-            meshFilter.sharedMesh.Clear(false);
+            //meshFilter.sharedMesh.Clear(false);
             Destroy(meshFilter.sharedMesh);
 
             //Удаляем материалы
@@ -125,7 +125,6 @@ public class RedactorBlocksVisualizator : MonoBehaviour, IPointerEnterHandler, I
             blockData.TestCreateVoxel();
 
             meshFilter.sharedMesh = blockData.GetMeshVoxel();
-            meshFilter.sharedMesh.Optimize();
         }
         void MeshLiquid() {
             
