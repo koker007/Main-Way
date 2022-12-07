@@ -377,6 +377,17 @@ public class RedactorBlocksVoxel : MonoBehaviour
             }
         }
     }
+    public void acceptVoxColor(Vector3Int TVoxelPos, Color color) {
+        BlockData blockData = RedactorBlocksCTRL.blockData;
+
+        Texture2D texture2D = blockData.TVoxels.GetTexture();
+
+        int TexU = TVoxelPos.x + 16 * TVoxelPos.z;
+        int TexV = TVoxelPos.y;
+
+        texture2D.SetPixel(TexU, TexV, color);
+        texture2D.Apply();
+    }
     public void acceptVoxColorArray(TypeBlock.Wall wall, Vector2Int pos, Color color, Vector3 plusRand) {
 
         float H = 0;
@@ -413,6 +424,53 @@ public class RedactorBlocksVoxel : MonoBehaviour
                 Color colorNow = Color.HSVToRGB(Hnow, Snow, Vnow);
 
                 acceptVoxColor(wall, new Vector2Int(nowX, nowY), colorNow);
+            }
+        }
+    }
+    public void acceptVoxColorArray(Vector3Int ZoneTVoxelPos, Vector3Int ZoneTVoxelSize, Color color, Vector3 plusRand) {
+
+        float H = 0;
+        float S = 0;
+        float V = 0;
+        Color.RGBToHSV(color, out H, out S, out V);
+
+        float Hmax = H + plusRand.x;
+        float Smax = S + plusRand.y;
+        float Vmax = V + plusRand.z;
+
+        if (Hmax > 1)
+            Hmax = 1;
+        if (Smax > 1)
+            Smax = 1;
+        if (Vmax > 1)
+            Vmax = 1;
+
+        for (int selectX = 0; selectX < ZoneTVoxelSize.x; selectX++)
+        {
+            int nowX = ZoneTVoxelPos.x + selectX;
+            if (nowX >= 16)
+                break;
+
+            for (int selectY = 0; selectY < ZoneTVoxelSize.y; selectY++)
+            {
+                int nowY = ZoneTVoxelPos.y + selectY;
+                if (nowY >= 16)
+                    break;
+
+                for (int selectZ = 0; selectZ < ZoneTVoxelSize.z; selectZ++) {
+                    int nowZ = ZoneTVoxelPos.z + selectZ;
+                    if (nowZ >= 16)
+                        break;
+
+                    //Рандомизируем цвет
+                    float Hnow = Random.Range(H, Hmax);
+                    float Snow = Random.Range(S, Smax);
+                    float Vnow = Random.Range(V, Vmax);
+
+                    Color colorNow = Color.HSVToRGB(Hnow, Snow, Vnow);
+
+                    acceptVoxColor(new Vector3Int(nowX, nowY, nowZ), colorNow);
+                }
             }
         }
     }

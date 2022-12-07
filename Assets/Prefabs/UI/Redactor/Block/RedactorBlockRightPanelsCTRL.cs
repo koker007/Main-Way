@@ -22,14 +22,54 @@ public class RedactorBlockRightPanelsCTRL : MonoBehaviour
     //Ќадо получить все панели из списка и определить границы сладера
     void iniPanels()
     {
+        //—перва определ€емс€ какое количество панелей следует показывать в зависимости от типа блока
+        int maxPanels = 0;
+
+        foreach (GameObject panel in Panels) {
+            if (IsCorrectPanelType(panel))
+                maxPanels++;
+        }
+
         sliderPanels.slider.minValue = 0;
-        sliderPanels.slider.maxValue = Panels.Length - 1;
+        sliderPanels.slider.maxValue = maxPanels - 1;
+    }
+
+    //ѕринимает тип панели и в зависимости от типа
+    bool IsCorrectPanelType(GameObject panel) {
+        bool result = false;
+
+        if (RedactorBlocksCTRL.blockData.type == BlockData.Type.block) {
+            if (panel.GetComponent<RedactorBlocksVoxel>() != null ||
+                panel.GetComponent<RedactorBlocksPhysics>() != null ||
+                panel.GetComponent<RedactorBlocksVisual>() != null)
+                return true;
+        }
+        else if (RedactorBlocksCTRL.blockData.type == BlockData.Type.voxels) {
+            if (panel.GetComponent<RedactorBlocksFormTVoxel>() != null)
+                return true;
+        }
+
+        return result;
+    }
+
+    GameObject GetSelectPanel() {
+        int SelectNum = 0;
+        for (int x = 0; x < Panels.Length; x++) {
+            if (IsCorrectPanelType(Panels[x])) {
+                if (sliderPanels.slider.value == SelectNum) {
+                    return Panels[x];
+                }
+                SelectNum++;
+            }
+        }
+
+        return null;
     }
 
     // Update is called once per frame
     void Update()
     {
-
+        iniPanels();
     }
 
     void CloseAllPanels()
@@ -46,12 +86,13 @@ public class RedactorBlockRightPanelsCTRL : MonoBehaviour
         CloseAllPanels();
 
         //¬ключаем только выбранную слайдером
-        GameObject panelSelect = Panels[(int)sliderPanels.slider.value];
+        GameObject panelSelect = GetSelectPanel();
         panelSelect.SetActive(true);
 
         string strVoxel = "Voxel";
         string strPhysics = "Physics";
         string strVisual = "Visual";
+        string strFormTVoxel = "Form Voxels";
 
         //”знаем какого рода эта панель
         if (panelSelect.GetComponent<RedactorBlocksVoxel>() != null)
@@ -62,8 +103,12 @@ public class RedactorBlockRightPanelsCTRL : MonoBehaviour
         {
             sliderPanels.SetValueText(strPhysics);
         }
-        else if (panelSelect.GetComponent<RedactorBlocksVisual>() != null) {
+        else if (panelSelect.GetComponent<RedactorBlocksVisual>() != null)
+        {
             sliderPanels.SetValueText(strVisual);
+        }
+        else if (panelSelect.GetComponent<RedactorBlocksFormTVoxel>() != null) {
+            sliderPanels.SetValueText(strFormTVoxel);
         }
 
 

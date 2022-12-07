@@ -125,6 +125,12 @@ public class RedactorBlocksVisualizator : MonoBehaviour, IPointerEnterHandler, I
             blockData.TestCreateVoxel();
 
             meshFilter.sharedMesh = blockData.GetMeshVoxel();
+
+            meshRenderer.materials = new Material[1] { 
+                material
+            };
+
+            meshRenderer.materials[0].mainTexture = blockData.TVoxels.GetTexture();
         }
         void MeshLiquid() {
             

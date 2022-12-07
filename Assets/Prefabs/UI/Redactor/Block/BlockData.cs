@@ -122,13 +122,6 @@ public class BlockData
 
     public void SetRandomVoxel()
     {
-        //wallFace = new BlockWall(Side.face);
-        //wallBack = new BlockWall(Side.back);
-        //wallRight = new BlockWall(Side.right);
-        //wallLeft = new BlockWall(Side.left);
-        //wallUp = new BlockWall(Side.up);
-        //wallDown = new BlockWall(Side.down);
-
         for (int x = 0; x < TBlock.wallFace.forms.voxel.GetLength(0); x++)
         {
             for (int y = 0; y < TBlock.wallFace.forms.voxel.GetLength(1); y++)
@@ -141,21 +134,6 @@ public class BlockData
                 TBlock.wallDown.forms.voxel[x, y] = Random.Range(0, 1.0f);
             }
         }
-
-        //Установить тестовую текстуру
-        //wallFace.SetTextureTest();
-        //wallBack.SetTextureTest();
-        //wallRight.SetTextureTest();
-        //wallLeft.SetTextureTest();
-        //wallUp.SetTextureTest();
-        //wallDown.SetTextureTest();
-
-        //wallFace.calcVertices();
-        //wallBack.calcVertices();
-        //wallRight.calcVertices();
-        //wallLeft.calcVertices();
-        //wallUp.calcVertices();
-        //wallDown.calcVertices();
     }
 
     //Сохранить все данные блока который отправляется
@@ -565,13 +543,11 @@ public class TypeVoxel {
 
     Visual visual;
     Data data = new Data();
+    Texture2D texture = new Texture2D(16*16, 16);
 
     [System.Serializable]
     public class Data {
         public int[] exist = new int[16 * 16 * 16];
-        public float colorR;
-        public float colorG;
-        public float colorB;
     }
     public class Visual{
         public int[] triangles;
@@ -584,9 +560,24 @@ public class TypeVoxel {
             if (Random.Range(0, 100) < 10)
                 data.exist[num] = 1;
 
-            if(num == 0)
+            if (num == 0)
                 data.exist[num] = 1;
+
+            else if (num == data.exist.Length - 1) {
+                data.exist[num] = 1;
+            }
         }
+
+        for (int x = 0; x < 16; x++){
+            for (int z = 0; z < 16; z++){
+                int posX = 16 * z + x;
+                for (int y = 0; y < 16; y++){
+                    texture.SetPixel(posX, y, new Color(x/16.0f, y/16.0f, z/16.0f));
+                }
+            }
+        }
+        texture.filterMode = FilterMode.Point;
+        texture.Apply();
     }
 
     Mesh GetMesh(Data data) {
@@ -657,6 +648,10 @@ public class TypeVoxel {
     }
     public Mesh GetMesh() {
         return GetMesh(this.data);
+    }
+
+    public Texture2D GetTexture() {
+        return texture;
     }
 }
 

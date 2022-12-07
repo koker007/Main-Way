@@ -65,9 +65,10 @@ void CSMain (uint3 id : SV_DispatchThreadID)
     int trianStart = trianCount * voxIDlocal;
 
     calcVertex(vertStart, id);
-    testFace(voxIDGlobal, vertStart, trianStart, id);
+
     testLeft(voxIDGlobal, vertStart, trianStart, id);
     testDown(voxIDGlobal, vertStart, trianStart, id);
+    testFace(voxIDGlobal, vertStart, trianStart, id);
 
 }
 
@@ -152,8 +153,8 @@ void calcVertex(int vert, uint3 id){
     _vertices[vert + 7].z = posZ + sizeVoxel;
 
     for(int num = 0; num < 8; num++){
-        _uv[vert + num].u = id.x * sizeTexelU + sizeTexelU/2 + (id.z * sizeTexelU * 16);
-        _uv[vert + num].v = id.y * sizeTexelV + sizeTexelV/2;
+        _uv[vert + num].u = id.x * sizeTexelU + sizeTexelU/2 + (id.z * 16 + _sectorX * 8 + _sectorZ * 8 * 16) * sizeTexelU;
+        _uv[vert + num].v = id.y * sizeTexelV + sizeTexelV/2 + (_sectorY * 8) * sizeTexelV;
     }
 }
 
@@ -170,15 +171,17 @@ void testFace(int voxID, int vert, int triangleStart, uint3 id){
         _triangles[triangleStart + 5].num = vert + 1;
 
     }
-    else if(!isExistVoxel(voxID) && isExistVoxFace(voxID, id)){
-        //back
-        _triangles[triangleStart + 0].num = vert + 0;
-        _triangles[triangleStart + 1].num = vert + 1;
-        _triangles[triangleStart + 2].num = vert + 2;
+    else if(!isExistVoxel(voxID) && isExistVoxFace(voxID, id) && id.z != 0){
+        int vertFace = vert - 8*8*8;
 
-        _triangles[triangleStart + 3].num = vert + 1;
-        _triangles[triangleStart + 4].num = vert + 3;
-        _triangles[triangleStart + 5].num = vert + 2;
+        //back
+        _triangles[triangleStart + 0].num = vertFace + 4;
+        _triangles[triangleStart + 1].num = vertFace + 5;
+        _triangles[triangleStart + 2].num = vertFace + 6;
+
+        _triangles[triangleStart + 3].num = vertFace + 5;
+        _triangles[triangleStart + 4].num = vertFace + 7;
+        _triangles[triangleStart + 5].num = vertFace + 6;
     }
     else{
         for(int num = 0; num < 6; num++){
@@ -216,15 +219,16 @@ void testLeft(int voxID, int vert, int triangleStart, uint3 id){
         _triangles[triangleStart + 4 + 6*1].num = vert + 2;
         _triangles[triangleStart + 5 + 6*1].num = vert + 0;
     }
-    else if(!isExistVoxel(voxID) && isExistVoxLeft(voxID, id)){
+    else if(!isExistVoxel(voxID) && isExistVoxLeft(voxID, id) && id.x != 0){
+        int vertLeft = vert - 8;
 
-        _triangles[triangleStart + 0 + 6*1].num = vert + 4;
-        _triangles[triangleStart + 1 + 6*1].num = vert + 0;
-        _triangles[triangleStart + 2 + 6*1].num = vert + 6;
+        _triangles[triangleStart + 0 + 6*1].num = vertLeft + 5;
+        _triangles[triangleStart + 1 + 6*1].num = vertLeft + 1;
+        _triangles[triangleStart + 2 + 6*1].num = vertLeft + 7;
 
-        _triangles[triangleStart + 3 + 6*1].num = vert + 6;
-        _triangles[triangleStart + 4 + 6*1].num = vert + 0;
-        _triangles[triangleStart + 5 + 6*1].num = vert + 2;
+        _triangles[triangleStart + 3 + 6*1].num = vertLeft + 7;
+        _triangles[triangleStart + 4 + 6*1].num = vertLeft + 1;
+        _triangles[triangleStart + 5 + 6*1].num = vertLeft + 3;
     }
     else{
         for(int num = 0; num < 6; num++){
@@ -260,15 +264,17 @@ void testDown(int voxID, int vert, int triangleStart, uint3 id){
         _triangles[triangleStart + 4 + 6*2].num = vert + 5;
         _triangles[triangleStart + 5 + 6*2].num = vert + 4;
     }
-    else if(!isExistVoxel(voxID) && isExistVoxDown(voxID, id)){
-        //up
-        _triangles[triangleStart + 0 + 6*2].num = vert + 0;
-        _triangles[triangleStart + 1 + 6*2].num = vert + 4;
-        _triangles[triangleStart + 2 + 6*2].num = vert + 1;
+    else if(!isExistVoxel(voxID) && isExistVoxDown(voxID, id) && id.y != 0){
+        int vertDown = vert - 8*8;
 
-        _triangles[triangleStart + 3 + 6*2].num = vert + 1;
-        _triangles[triangleStart + 4 + 6*2].num = vert + 4;
-        _triangles[triangleStart + 5 + 6*2].num = vert + 5;
+        //up
+        _triangles[triangleStart + 0 + 6*2].num = vertDown + 2;
+        _triangles[triangleStart + 1 + 6*2].num = vertDown + 6;
+        _triangles[triangleStart + 2 + 6*2].num = vertDown + 3;
+
+        _triangles[triangleStart + 3 + 6*2].num = vertDown + 3;
+        _triangles[triangleStart + 4 + 6*2].num = vertDown + 6;
+        _triangles[triangleStart + 5 + 6*2].num = vertDown + 7;
     }
     else{
         for(int num = 0; num < 6; num++){
