@@ -56,7 +56,7 @@ public class WindowRedactorBlockLoad : MonoBehaviour
             return;
         }
 
-        string pathblocks = pathMod + "/" + BlockData.Str.block;
+        string pathblocks = pathMod + "/" + BlockData.Str.blocks;
         if (!Directory.Exists(pathblocks))
         {
             pathBlock = "";

@@ -33,9 +33,14 @@ public class BlockData
 
     public class Str
     {
+        public const string SEPARATOR = ":=";
+
         public const string mod = "mod";
-        public const string block = "blocks";
+        public const string blocks = "blocks";
+        public const string voxels = "voxels";
+        public const string liquid = "liquid";
         public const string name = "name";
+        public const string main = "main";
 
         public const string wall = "Wall";
 
@@ -49,9 +54,16 @@ public class BlockData
         public const string physics = "physics";
         public const string collidersZone = "collidersZone";
 
+        public const string form = "form";
         public const string texture = "texture";
         public const string height = "height";
         public const string formatPNG = ".png";
+        public const string formatTXT = ".txt";
+
+        public const string type = "type";
+        public const string TBlock = "TBlock";
+        public const string TVoxels = "TVoxels";
+        public const string TLiquid = "Liquid";
     }
 
     public enum Type {
@@ -139,18 +151,61 @@ public class BlockData
     //Сохранить все данные блока который отправляется
     static public void SaveData(BlockData blockData) {
         //Создаем путь к папке блоке
-        string path = GameData.pathMod + "/" + blockData.mod + "/" + Str.block + "/" + blockData.name + "/" + blockData.variant;
+        string path = GameData.pathMod + "/" + blockData.mod + "/" + Str.blocks + "/" + blockData.name + "/" + blockData.variant;
          
         //Проверяем есть ли папка
         if (!Directory.Exists(path)) {
             Directory.CreateDirectory(path);
         }
 
-        //Сохраняем стены
-        saveBlockWall(path);
+        //Сохраняем главные данные блока
+        saveBlockMain(path);
+
+        //Сохраняем в зависимости от типа блока
+        if (blockData.type == Type.block) {
+            //Сохраняем стены
+            saveBlockWall(path);
+        }
+        //Сохраняем воксельную форму
+        else if (blockData.type == Type.voxels) {
+            saveTVoxelForm(path);
+        }
+        else if (blockData.type == Type.liquid) {
+            
+        }
+
         //Сохраняем физику
         saveBlockPhysics(path);
 
+        void saveBlockMain(string path) {
+            string pathMainStr = path + "/" + Str.main + Str.formatTXT;
+
+            //Сохранить надо в текстовый файл
+            //создаем список того что надо запомнить
+            List<string> dataList = new List<string>();
+
+            string dataOne = "";
+            //Запоминаем тип
+            dataOne = Str.type + Str.SEPARATOR;
+            if (blockData.type == Type.block)
+                dataOne += Str.TBlock;
+            else if (blockData.type == Type.voxels)
+                dataOne += Str.TVoxels;
+            else if (blockData.type == Type.liquid)
+                dataOne += Str.TLiquid;
+
+            dataList.Add(dataOne);
+
+            //Сохраняем в файл
+            FileStream fileStream;
+            //Если файла нет - создаем
+            if (!File.Exists(pathMainStr))
+            {
+                fileStream = File.Create(pathMainStr);
+                fileStream.Close();
+            }
+            File.WriteAllLines(pathMainStr, dataList.ToArray());
+        }
         void saveBlockWall(string pathBlock) {
             string pathWalls = pathBlock + "/" + Str.wall;
 
@@ -166,6 +221,11 @@ public class BlockData
 
             blockData.physics.saveColliderZone(pathPhysics);
         }
+
+        void saveTVoxelForm(string pathBlock) {
+            string pathTVoxelForm = pathBlock + "/" + Str.TVoxels;
+            blockData.TVoxels.SaveTo(pathTVoxelForm);
+        }
     }
     static public BlockData LoadData(string pathBlockVariant) {
         //Если пипки блока нет - выходим
@@ -180,7 +240,14 @@ public class BlockData
         //Загрузка основных данных блока
         loadBlockMain(pathBlockVariant);
 
-        loadBlockWall(pathBlockVariant);
+        if (resultData.type == Type.block)
+        {
+            loadBlockWall(pathBlockVariant);
+        }
+        else if (resultData.type == Type.voxels) {
+            loadTVoxelsForm(pathBlockVariant);
+        }
+
         loadBlockPhysics(pathBlockVariant);
 
         return resultData;
@@ -218,6 +285,53 @@ public class BlockData
             resultData.mod = pathMass[pathMass.Length - 3];
             resultData.name = pathMass[pathMass.Length - 2];
             resultData.variant = System.Convert.ToInt32(pathMass[pathMass.Length - 1]);
+
+            //Нужно загрузить файл с основными данными
+            loadMainTXT();
+
+            void loadMainTXT() {
+                string pathMainStr = path + "/" + Str.main + Str.formatTXT;
+
+                //проверяем существование файла
+                if (!File.Exists(pathMainStr)) {
+                    //Файла нет, ошибка
+                    Debug.LogError("File main.txt not exist " + pathMainStr);
+                    return;
+                }
+
+                //Вытаскиваем данные файла
+                string[] datasStr = File.ReadAllLines(pathMainStr);
+
+                //Проверяем все строки на данные
+                foreach (string dataStr in datasStr) {
+                    string[] data = dataStr.Split(Str.SEPARATOR);
+
+                    if (data.Length > 2)
+                    {
+                        Debug.LogError("Bad parametr: " + dataStr + " in " + pathMainStr);
+                        continue;
+                    }
+
+                    testParametr(data[0], data[1]);
+                }
+                //////////////////////////////////////////////////////////////////////////////////////
+                ///
+
+                void testParametr(string name, string value) {
+                    if (name == Str.type)
+                    {
+                        if (value == Str.TBlock)
+                            resultData.type = Type.block;
+                        else if (value == Str.TVoxels)
+                            resultData.type = Type.voxels;
+                        else if (value == Str.TLiquid)
+                            resultData.type = Type.liquid;
+                        else
+                            Debug.LogError("Bad parametr of " + name + ": " + value);
+
+                    }
+                }
+            }
         }
         void loadBlockWall(string path) {
             string pathWalls = path + "/" + Str.wall;
@@ -229,10 +343,15 @@ public class BlockData
             resultData.TBlock.wallUp.LoadFrom(pathWalls);
             resultData.TBlock.wallDown.LoadFrom(pathWalls);
         }
+        void loadTVoxelsForm(string path) {
+            string pathTVoxelForm = path + "/" + Str.TVoxels;
+
+            resultData.TVoxels = new TypeVoxel();
+            resultData.TVoxels.LoadFrom(pathTVoxelForm);
+        }
         void loadBlockPhysics(string path)
         {
             string pathPhysics = path + "/" + Str.physics;
-
             resultData.physics.loadColliderZone(pathPhysics);
         }
     }
@@ -290,7 +409,6 @@ public class TypeBlock {
         public Wall(Side side)
         {
             this.side = side;
-
             forms = new BlockForms();
         }
 
@@ -555,6 +673,40 @@ public class TypeVoxel {
         public Vector2[] uv;
     }
 
+    void existsToAlphaTexture() {
+        //Запихнуть существование вокселя в альфу текстуры
+        for (int x = 0; x < 16; x++) {
+            for (int y = 0; y < 16; y++) {
+                for (int z = 0; z < 16; z++) {
+                    int textureX = x + z * 16;
+                    int idVoxel = x + y * 16 + z * 16 * 16;
+
+                    if (data.exist[idVoxel] == 0)
+                        texture.SetPixel(textureX, y, new Color(1,1,1,0));
+                }
+            }
+        }
+
+        texture.Apply();
+    }
+    void existFromAlphaTexture() {
+        //Узнать существование вокселя на основе текстуры
+        for (int x = 0; x < 16; x++)
+        {
+            for (int y = 0; y < 16; y++)
+            {
+                for (int z = 0; z < 16; z++)
+                {
+                    int textureX = x + z * 16;
+                    int idVoxel = x + y * 16 + z * 16 * 16;
+
+                    if (texture.GetPixel(textureX, y).a != 0)
+                        data.exist[idVoxel] = 1;
+                    else data.exist[idVoxel] = 0;
+                }
+            }
+        }
+    }
     public void RandomizeData() {
         for (int num = 0; num < data.exist.Length; num++) {
             if (Random.Range(0, 100) < 10)
@@ -649,9 +801,56 @@ public class TypeVoxel {
     public Mesh GetMesh() {
         return GetMesh(this.data);
     }
-
     public Texture2D GetTexture() {
         return texture;
+    }
+    public Data GetData() {
+        return data;
+    }
+
+    public void SaveTo(string path) {
+        if (!Directory.Exists(path))
+        {
+            Directory.CreateDirectory(path);
+        }
+
+        string pathTexture = path + "/" + BlockData.Str.texture;
+        //string pathForm = path + "/" + BlockData.Str.form;
+
+        pathTexture += BlockData.Str.formatPNG;
+
+        //Подготавливаем текстуру
+        existsToAlphaTexture();
+
+        byte[] textureData = texture.EncodeToPNG();
+        FileStream textureStream = File.Open(pathTexture, FileMode.OpenOrCreate);
+        textureStream.Write(textureData);
+        textureStream.Close();
+
+        //Data voxels = new Data();
+        //voxels = data;
+        //BinaryFormatter bf = new BinaryFormatter();
+        //FileStream voxStream = File.OpenWrite(pathForm);
+        //bf.Serialize(voxStream, voxels);
+        //voxStream.Close();
+    }
+    public void LoadFrom(string path) {
+        if (!Directory.Exists(path)) {
+            Debug.LogError("Path not exixt " + path);
+            return;
+        }
+
+        string pathTexture = path + "/" + BlockData.Str.texture + BlockData.Str.formatPNG;
+        if (!File.Exists(pathTexture)) {
+            Debug.LogError("File not exist: " + pathTexture);
+            return;
+        }
+
+
+        byte[] textureData = File.ReadAllBytes(pathTexture);
+        texture.LoadImage(textureData);
+        existFromAlphaTexture();
+
     }
 }
 

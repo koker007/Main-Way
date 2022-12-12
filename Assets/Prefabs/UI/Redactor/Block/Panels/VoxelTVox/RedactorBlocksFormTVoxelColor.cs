@@ -253,9 +253,11 @@ public class RedactorBlocksFormTVoxelColor : MonoBehaviour
         HSVrand.y = sliderColorSRand.slider.value / sliderColorSRand.slider.maxValue;
         HSVrand.z = sliderColorVRand.slider.value / sliderColorVRand.slider.maxValue;
 
+        Vector3Int zonePos = RedactorBlocksFormTVoxelSelectZone.GetZonePos();
+        Vector3Int zoneSize = RedactorBlocksFormTVoxelSelectZone.GetZoneSize();
+
         //ѕримен€ем изменени€ на выбранную область
-        RedactorBlocksVoxel.main.acceptVoxColorArray(
-            RedactorBlocksFormTVoxelSelectZone.GetZonePos(), 
-            RedactorBlocksFormTVoxelSelectZone.GetZoneSize(), color, HSVrand);
+        RedactorBlocksFormTVoxel.main.acceptVoxColorArray(zonePos, zoneSize, color, HSVrand);
     }
+
 }

@@ -54,7 +54,8 @@ public class RedactorBlocksCTRL : MonoBehaviour
 
         iniBlockDatas();
 
-        variationRedraw();
+        redrawVariation();
+        redrawType();
     }
 
     void iniBlockDatas() {
@@ -112,7 +113,8 @@ public class RedactorBlocksCTRL : MonoBehaviour
         getModName();
         getBlockName();
 
-        variationRedraw();
+        redrawVariation();
+        redrawType();
 
         void getModName() {
             if (blockDatas[0].mod == null ||
@@ -254,7 +256,7 @@ public class RedactorBlocksCTRL : MonoBehaviour
 
         acceptGroupParameters();
 
-        variationRedraw();
+        redrawVariation();
     }
     public void acceptVariationSelect()
     {
@@ -275,6 +277,8 @@ public class RedactorBlocksCTRL : MonoBehaviour
         {
             blockDatas[(int)sliderVariationSelected.slider.value].type = BlockData.Type.block;
         }
+
+        redrawType();
     }
 
     //Применить груповые данные на все блоки
@@ -286,8 +290,8 @@ public class RedactorBlocksCTRL : MonoBehaviour
         }
     }
 
-    // перерисовать ползунки вариаций
-    void variationRedraw() {
+    // перерисовать ползунки
+    void redrawVariation() {
         //Обновляем слайдер максимума
         sliderVariationMaximum.slider.minValue = 1;
         sliderVariationMaximum.slider.maxValue = 10;
@@ -298,6 +302,27 @@ public class RedactorBlocksCTRL : MonoBehaviour
         sliderVariationSelected.slider.minValue = 0;
         sliderVariationSelected.slider.maxValue = sliderVariationMaximum.slider.value - 1;
         sliderVariationSelected.SetValueText();
+    }
+    void redrawType() {
+        BlockData data = blockData;
+
+        int maximum = (int)BlockData.Type.block;
+        if (maximum < (int)BlockData.Type.liquid)
+            maximum = (int)BlockData.Type.liquid;
+        else if (maximum < (int)BlockData.Type.voxels)
+            maximum = (int)BlockData.Type.voxels;
+
+        sliderBlockType.slider.minValue = 0;
+        sliderBlockType.slider.maxValue = maximum;
+
+        sliderBlockType.slider.value = (int)data.type;
+
+        if (sliderBlockType.slider.value == (int)BlockData.Type.block)
+            sliderBlockType.SetValueText(BlockData.Str.blocks);
+        else if(sliderBlockType.slider.value == (int)BlockData.Type.voxels)
+            sliderBlockType.SetValueText(BlockData.Str.voxels);
+        else if(sliderBlockType.slider.value == (int)BlockData.Type.liquid)
+            sliderBlockType.SetValueText(BlockData.Str.liquid);
     }
 
     public void clickButtonSave() {
