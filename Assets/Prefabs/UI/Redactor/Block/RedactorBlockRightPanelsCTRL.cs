@@ -45,7 +45,8 @@ public class RedactorBlockRightPanelsCTRL : MonoBehaviour
                 return true;
         }
         else if (RedactorBlocksCTRL.blockData.type == BlockData.Type.voxels) {
-            if (panel.GetComponent<RedactorBlocksFormTVoxel>() != null)
+            if (panel.GetComponent<RedactorBlocksFormTVoxel>() != null ||
+                panel.GetComponent<RedactorBlocksPhysics>() != null)
                 return true;
         }
 
