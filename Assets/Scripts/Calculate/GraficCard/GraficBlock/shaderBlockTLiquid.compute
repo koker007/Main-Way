@@ -1,0 +1,300 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+
+
+// Create a RenderTexture with enableRandomWrite flag and set it
+// with cs.SetTexture
+
+struct Voxel{
+    float height;
+};
+struct Vec3{
+    float x;
+    float y;
+    float z;
+};
+
+struct Integer{
+    int num;
+};
+
+struct TexUV{
+    float u;
+    float v;
+};
+
+
+
+RWStructuredBuffer<Vec3> _vertices;
+RWStructuredBuffer<Integer> _triangles;
+RWStructuredBuffer<TexUV> _uv;
+
+int _face;
+int _back;
+int _left;
+int _right;
+int _up;
+int _down;
+
+//float _offsetX;
+
+//Functions
+bool isExistVoxel(int VoxID, uint3 id);
+bool isExistVoxFace(int voxID, uint3 id);
+bool isExistVoxLeft(int voxID, uint3 id);
+bool isExistVoxDown(int voxID, uint3 id);
+
+void calcVertex(int vertStart, uint3 id);
+void testFace(int voxID, int vert, int triangleStart, uint3 id);
+void testLeft(int VoxID, int vert, int triangleStart, uint3 id);
+void testDown(int VoxID, int vert, int triangleStart, uint3 id);
+
+[numthreads(8,8,8)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    // TODO: insert actual code here!
+    int voxIDlocal =id.x + 8*id.y + 8*8*id.z;
+    int voxIDGlobal = (id.x) + (id.y * 16) + (id.z * 16 * 16) + (_sectorX * 8) + (_sectorY * 16*8) + (_sectorZ * 16 * 16 * 8);
+
+    //3 = side
+    //2 = triangles
+    //3 = points
+    int vertCount = 8;
+    int trianCount = 3 * 2 * 3; //3 point on triangle, 2 triangles on side, 3 side
+
+    int vertStart = vertCount * voxIDlocal;
+    int trianStart = trianCount * voxIDlocal;
+
+    calcVertex(vertStart, id);
+
+    testLeft(voxIDGlobal, vertStart, trianStart, id);
+    testDown(voxIDGlobal, vertStart, trianStart, id);
+    testFace(voxIDGlobal, vertStart, trianStart, id);
+
+}
+
+bool isExistVoxel(int voxID){
+    int voxIDMax = 16*16*16;
+
+    if(voxID >= 0 && voxID < voxIDMax && _exist[voxID].num == 1){
+        return true;
+    }
+
+    return false;
+}
+
+bool isExistVoxFace(int voxID, uint3 id){
+    if(id.z == 0 && _sectorZ == 0){
+        return false;    
+    }
+
+    int voxIDf = voxID - 256;
+
+    return isExistVoxel(voxIDf);
+}
+bool isExistVoxLeft(int voxID, uint3 id){
+    if(id.x == 0 && _sectorX == 0){
+        return false;    
+    }
+
+    int voxIDl = voxID - 1;
+
+    return isExistVoxel(voxIDl);
+}
+bool isExistVoxDown(int voxID, uint3 id){
+    if(id.y == 0 && _sectorY == 0){
+        return false;    
+    }
+
+    int voxIDd = voxID - 16;
+
+    return isExistVoxel(voxIDd);
+}
+
+void calcVertex(int vert, uint3 id){
+    float sizeVoxel = 1/16.0f;
+
+    float sizeTexelU = 1/(16.0f*16.0f);
+    float sizeTexelV = 1/16.0f;
+
+    float posX = (_sectorX * 8 + id.x) * sizeVoxel;
+    float posY = (_sectorY * 8 + id.y) * sizeVoxel;
+    float posZ = (_sectorZ * 8 + id.z) * sizeVoxel;
+
+    _vertices[vert + 0].x = posX;
+    _vertices[vert + 0].y = posY;
+    _vertices[vert + 0].z = posZ;
+
+    _vertices[vert + 1].x = posX + sizeVoxel;
+    _vertices[vert + 1].y = posY;
+    _vertices[vert + 1].z = posZ;
+
+    _vertices[vert + 2].x = posX;
+    _vertices[vert + 2].y = posY + sizeVoxel;
+    _vertices[vert + 2].z = posZ;
+
+    _vertices[vert + 3].x = posX + sizeVoxel;
+    _vertices[vert + 3].y = posY + sizeVoxel;
+    _vertices[vert + 3].z = posZ;
+
+    _vertices[vert + 4].x = posX;
+    _vertices[vert + 4].y = posY;
+    _vertices[vert + 4].z = posZ + sizeVoxel;
+
+    _vertices[vert + 5].x = posX + sizeVoxel;
+    _vertices[vert + 5].y = posY;
+    _vertices[vert + 5].z = posZ + sizeVoxel;
+
+    _vertices[vert + 6].x = posX;
+    _vertices[vert + 6].y = posY + sizeVoxel;
+    _vertices[vert + 6].z = posZ + sizeVoxel;
+
+    _vertices[vert + 7].x = posX + sizeVoxel;
+    _vertices[vert + 7].y = posY + sizeVoxel;
+    _vertices[vert + 7].z = posZ + sizeVoxel;
+
+    for(int num = 0; num < 8; num++){
+        _uv[vert + num].u = id.x * sizeTexelU + sizeTexelU/2 + (id.z * 16 + _sectorX * 8 + _sectorZ * 8 * 16) * sizeTexelU;
+        _uv[vert + num].v = id.y * sizeTexelV + sizeTexelV/2 + (_sectorY * 8) * sizeTexelV;
+    }
+}
+
+void testFace(int voxID, int vert, int triangleStart, uint3 id){
+
+    if(isExistVoxel(voxID) && !isExistVoxFace(voxID, id)){
+        //face
+        _triangles[triangleStart + 0].num = vert + 0;
+        _triangles[triangleStart + 1].num = vert + 2;
+        _triangles[triangleStart + 2].num = vert + 3;
+
+        _triangles[triangleStart + 3].num = vert + 0;
+        _triangles[triangleStart + 4].num = vert + 3;
+        _triangles[triangleStart + 5].num = vert + 1;
+
+    }
+    else if(!isExistVoxel(voxID) && isExistVoxFace(voxID, id) && id.z != 0){
+        int vertFace = vert - 8*8*8;
+
+        //back
+        _triangles[triangleStart + 0].num = vertFace + 4;
+        _triangles[triangleStart + 1].num = vertFace + 5;
+        _triangles[triangleStart + 2].num = vertFace + 6;
+
+        _triangles[triangleStart + 3].num = vertFace + 5;
+        _triangles[triangleStart + 4].num = vertFace + 7;
+        _triangles[triangleStart + 5].num = vertFace + 6;
+    }
+    else{
+        for(int num = 0; num < 6; num++){
+            _triangles[triangleStart + num].num = 0;
+        }
+    }
+
+
+    //Last back side
+    int triangleLast = (8*8*8*3 + 8*8*0 + id.x + id.y*8)*2*3;
+    if(id.z != 7 || !isExistVoxel(voxID)){
+        return;
+    }
+    else{
+        _triangles[triangleLast + 0].num = vert + 4;
+        _triangles[triangleLast + 1].num = vert + 5;
+        _triangles[triangleLast + 2].num = vert + 6;
+
+        _triangles[triangleLast + 3].num = vert + 5;
+        _triangles[triangleLast + 4].num = vert + 7;
+        _triangles[triangleLast + 5].num = vert + 6;
+    }
+    
+}
+
+void testLeft(int voxID, int vert, int triangleStart, uint3 id){
+
+    if(isExistVoxel(voxID) && !isExistVoxLeft(voxID, id)){
+
+        _triangles[triangleStart + 0 + 6*1].num = vert + 4;
+        _triangles[triangleStart + 1 + 6*1].num = vert + 6;
+        _triangles[triangleStart + 2 + 6*1].num = vert + 0;
+
+        _triangles[triangleStart + 3 + 6*1].num = vert + 6;
+        _triangles[triangleStart + 4 + 6*1].num = vert + 2;
+        _triangles[triangleStart + 5 + 6*1].num = vert + 0;
+    }
+    else if(!isExistVoxel(voxID) && isExistVoxLeft(voxID, id) && id.x != 0){
+        int vertLeft = vert - 8;
+
+        _triangles[triangleStart + 0 + 6*1].num = vertLeft + 5;
+        _triangles[triangleStart + 1 + 6*1].num = vertLeft + 1;
+        _triangles[triangleStart + 2 + 6*1].num = vertLeft + 7;
+
+        _triangles[triangleStart + 3 + 6*1].num = vertLeft + 7;
+        _triangles[triangleStart + 4 + 6*1].num = vertLeft + 1;
+        _triangles[triangleStart + 5 + 6*1].num = vertLeft + 3;
+    }
+    else{
+        for(int num = 0; num < 6; num++){
+            _triangles[triangleStart + num + 6*1].num = 0;
+        }
+    }
+
+        //Last right side
+    int triangleLast = (8*8*8*3 + 8*8*1 + id.z + id.y*8)*2*3;
+    if(id.x != 7 || !isExistVoxel(voxID)){
+        return;
+    }
+    else{
+        _triangles[triangleLast + 0 + 6*1].num = vert + 5;
+        _triangles[triangleLast + 1 + 6*1].num = vert + 1;
+        _triangles[triangleLast + 2 + 6*1].num = vert + 7;
+
+        _triangles[triangleLast + 3 + 6*1].num = vert + 7;
+        _triangles[triangleLast + 4 + 6*1].num = vert + 1;
+        _triangles[triangleLast + 5 + 6*1].num = vert + 3;
+    }
+}
+
+void testDown(int voxID, int vert, int triangleStart, uint3 id){
+
+    if(isExistVoxel(voxID) && !isExistVoxDown(voxID, id)){
+        //Down
+        _triangles[triangleStart + 0 + 6*2].num = vert + 0;
+        _triangles[triangleStart + 1 + 6*2].num = vert + 1;
+        _triangles[triangleStart + 2 + 6*2].num = vert + 4;
+
+        _triangles[triangleStart + 3 + 6*2].num = vert + 1;
+        _triangles[triangleStart + 4 + 6*2].num = vert + 5;
+        _triangles[triangleStart + 5 + 6*2].num = vert + 4;
+    }
+    else if(!isExistVoxel(voxID) && isExistVoxDown(voxID, id) && id.y != 0){
+        int vertDown = vert - 8*8;
+
+        //up
+        _triangles[triangleStart + 0 + 6*2].num = vertDown + 2;
+        _triangles[triangleStart + 1 + 6*2].num = vertDown + 6;
+        _triangles[triangleStart + 2 + 6*2].num = vertDown + 3;
+
+        _triangles[triangleStart + 3 + 6*2].num = vertDown + 3;
+        _triangles[triangleStart + 4 + 6*2].num = vertDown + 6;
+        _triangles[triangleStart + 5 + 6*2].num = vertDown + 7;
+    }
+    else{
+        for(int num = 0; num < 6; num++){
+            _triangles[triangleStart + num + 6*2].num = 0;
+        }
+    }
+
+    //Last up side
+    int triangleLast = (8*8*8*3 + 8*8*2 + id.x + id.z*8)*2*3;
+    if(id.y != 7 || !isExistVoxel(voxID)){
+        return;
+    }
+    else{
+        _triangles[triangleLast + 0 + 6*2].num = vert + 2;
+        _triangles[triangleLast + 1 + 6*2].num = vert + 6;
+        _triangles[triangleLast + 2 + 6*2].num = vert + 3;
+
+        _triangles[triangleLast + 3 + 6*2].num = vert + 3;
+        _triangles[triangleLast + 4 + 6*2].num = vert + 6;
+        _triangles[triangleLast + 5 + 6*2].num = vert + 7;
+    }
+}

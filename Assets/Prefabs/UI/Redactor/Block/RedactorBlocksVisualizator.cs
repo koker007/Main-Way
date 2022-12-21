@@ -133,7 +133,9 @@ public class RedactorBlocksVisualizator : MonoBehaviour, IPointerEnterHandler, I
             meshRenderer.materials[0].mainTexture = blockData.TVoxels.GetTexture();
         }
         void MeshLiquid() {
-            
+            blockData.TestCreateLiquid();
+
+            meshFilter.sharedMesh = blockData.GetMeshLiquid(true, true, true, true, true, true, 16, 0);
         }
     }
     void UpdateMeshOld()

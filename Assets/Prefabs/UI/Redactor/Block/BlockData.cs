@@ -30,6 +30,7 @@ public class BlockData
     //Данные разных типов блоков
     public TypeBlock TBlock;
     public TypeVoxel TVoxels;
+    public TypeLiquid TLiquid;
 
     public class Str
     {
@@ -118,8 +119,21 @@ public class BlockData
         TVoxels = new TypeVoxel();
         TVoxels.RandomizeData();
     }
+    public void TestCreateLiquid() {
+        if (TLiquid != null)
+            return;
+
+        TLiquid = new TypeLiquid();
+    }
     public Mesh GetMeshVoxel() {
         return TVoxels.GetMesh();
+    }
+    public Mesh GetMeshLiquid(bool face, bool back, bool left, bool right, bool up, bool down, int lvlUp, int lvlDown) {
+        Mesh mesh = new Mesh();
+
+        mesh = TLiquid.GetMesh(face, back, left, right, up, down, lvlUp, lvlDown);
+
+        return mesh;
     }
 
     public BlockData() {
@@ -171,7 +185,7 @@ public class BlockData
             saveTVoxelForm(path);
         }
         else if (blockData.type == Type.liquid) {
-            
+            saveTLiquidVisual(path);
         }
 
         //Сохраняем физику
@@ -225,6 +239,10 @@ public class BlockData
         void saveTVoxelForm(string pathBlock) {
             string pathTVoxelForm = pathBlock + "/" + Str.TVoxels;
             blockData.TVoxels.SaveTo(pathTVoxelForm);
+        }
+        void saveTLiquidVisual(string pathBlock) {
+            string pathTLiquidVisual = pathBlock + "/" + Str.TLiquid;
+            //blockData
         }
     }
     static public BlockData LoadData(string pathBlockVariant) {
@@ -851,6 +869,282 @@ public class TypeVoxel {
         texture.LoadImage(textureData);
         existFromAlphaTexture();
 
+    }
+}
+public class TypeLiquid {
+
+    static public Mesh[,,] meshs;
+
+    Data data = new Data();
+
+    public class Data {
+        //Базовый цвет объекта
+        public float colorHue = 0.0f;
+        public float colorSaturation = 0.0f;
+        public float colorValue = 0.0f;
+        public float colorHueRand = 0.0f;
+        public float colorSaturationRand = 0.0f;
+        public float colorValueRand = 0.0f;
+    }
+
+    public TypeLiquid() {
+        iniMeshs();
+
+        void iniMeshs() {
+            //Если уже проинициализированно
+            if (meshs != null)
+                return;
+
+            //Up //Down //Side
+            meshs = new Mesh[16, 16, 6];
+
+            for (int up = 1; up < 16; up++) {
+                float voxUp = (up+1) / 16.0f;
+                for (int down = 0; down < 16; down++) {
+                    if (down >= up)
+                        continue;
+
+                    float voxDown = down / 16.0f;
+
+                    meshs[up, down, 0] = getFace(voxUp, voxDown);
+                    meshs[up, down, 1] = getBack(voxUp, voxDown);
+                    meshs[up, down, 2] = getLeft(voxUp, voxDown);
+                    meshs[up, down, 3] = getRight(voxUp, voxDown);
+                    meshs[up, down, 4] = getUp(voxUp);
+                    meshs[up, down, 5] = getDown(voxDown);
+                }
+            }
+
+            Mesh getFace(float voxUp, float voxDown) {
+                Mesh mesh = new Mesh();
+
+                Vector3[] vertices = new Vector3[4];
+                Vector2[] uv = new Vector2[4];
+                int[] triangles = new int[6];
+
+                vertices[0] = new Vector3(0.0f, voxDown, 0.0f);
+                vertices[1] = new Vector3(0.0f, voxUp, 0.0f);
+                vertices[2] = new Vector3(1.0f, voxUp, 0.0f);
+                vertices[3] = new Vector3(1.0f, voxDown, 0.0f);
+
+                uv[0] = new Vector2(0.0f, 0.0f);
+                uv[1] = new Vector2(0.0f, 1.0f);
+                uv[2] = new Vector2(1.0f, 1.0f);
+                uv[3] = new Vector2(1.0f, 0.0f);
+
+                triangles[0] = 0;
+                triangles[1] = 1;
+                triangles[2] = 2;
+                triangles[3] = 2;
+                triangles[4] = 3;
+                triangles[5] = 0;
+
+                mesh.vertices = vertices;
+                mesh.uv = uv;
+                mesh.triangles = triangles;
+
+                return mesh;
+            }
+            Mesh getBack(float voxUp, float voxDown) {
+                Mesh mesh = new Mesh();
+
+                Vector3[] vertices = new Vector3[4];
+                Vector2[] uv = new Vector2[4];
+                int[] triangles = new int[6];
+
+                vertices[0] = new Vector3(1.0f, voxDown, 1.0f);
+                vertices[1] = new Vector3(1.0f, voxUp, 1.0f);
+                vertices[2] = new Vector3(0.0f, voxUp, 1.0f);
+                vertices[3] = new Vector3(0.0f, voxDown, 1.0f);
+
+                uv[0] = new Vector2(0.0f, 0.0f);
+                uv[1] = new Vector2(0.0f, 1.0f);
+                uv[2] = new Vector2(1.0f, 1.0f);
+                uv[3] = new Vector2(1.0f, 0.0f);
+
+                triangles[0] = 0;
+                triangles[1] = 1;
+                triangles[2] = 2;
+                triangles[3] = 2;
+                triangles[4] = 3;
+                triangles[5] = 0;
+
+                mesh.vertices = vertices;
+                mesh.uv = uv;
+                mesh.triangles = triangles;
+
+                return mesh;
+            }
+            Mesh getLeft(float voxUp, float voxDown)
+            {
+                Mesh mesh = new Mesh();
+
+                Vector3[] vertices = new Vector3[4];
+                Vector2[] uv = new Vector2[4];
+                int[] triangles = new int[6];
+
+                vertices[0] = new Vector3(0.0f, voxDown, 1.0f);
+                vertices[1] = new Vector3(0.0f, voxUp, 1.0f);
+                vertices[2] = new Vector3(0.0f, voxUp, 0.0f);
+                vertices[3] = new Vector3(0.0f, voxDown, 0.0f);
+
+                uv[0] = new Vector2(0.0f, 0.0f);
+                uv[1] = new Vector2(0.0f, 1.0f);
+                uv[2] = new Vector2(1.0f, 1.0f);
+                uv[3] = new Vector2(1.0f, 0.0f);
+
+                triangles[0] = 0;
+                triangles[1] = 1;
+                triangles[2] = 2;
+                triangles[3] = 2;
+                triangles[4] = 3;
+                triangles[5] = 0;
+
+                mesh.vertices = vertices;
+                mesh.uv = uv;
+                mesh.triangles = triangles;
+
+                return mesh;
+            }
+            Mesh getRight(float voxUp, float voxDown)
+            {
+                Mesh mesh = new Mesh();
+
+                Vector3[] vertices = new Vector3[4];
+                Vector2[] uv = new Vector2[4];
+                int[] triangles = new int[6];
+
+                vertices[0] = new Vector3(1.0f, voxDown, 0.0f);
+                vertices[1] = new Vector3(1.0f, voxUp, 0.0f);
+                vertices[2] = new Vector3(1.0f, voxUp, 1.0f);
+                vertices[3] = new Vector3(1.0f, voxDown, 1.0f);
+
+                uv[0] = new Vector2(0.0f, 0.0f);
+                uv[1] = new Vector2(0.0f, 1.0f);
+                uv[2] = new Vector2(1.0f, 1.0f);
+                uv[3] = new Vector2(1.0f, 0.0f);
+
+                triangles[0] = 0;
+                triangles[1] = 1;
+                triangles[2] = 2;
+                triangles[3] = 2;
+                triangles[4] = 3;
+                triangles[5] = 0;
+
+                mesh.vertices = vertices;
+                mesh.uv = uv;
+                mesh.triangles = triangles;
+
+                return mesh;
+            }
+            Mesh getUp(float voxUp)
+            {
+                Mesh mesh = new Mesh();
+
+                Vector3[] vertices = new Vector3[4];
+                Vector2[] uv = new Vector2[4];
+                int[] triangles = new int[6];
+
+                vertices[0] = new Vector3(0.0f, voxUp, 0.0f);
+                vertices[1] = new Vector3(0.0f, voxUp, 1.0f);
+                vertices[2] = new Vector3(1.0f, voxUp, 1.0f);
+                vertices[3] = new Vector3(1.0f, voxUp, 0.0f);
+
+                uv[0] = new Vector2(0.0f, 0.0f);
+                uv[1] = new Vector2(0.0f, 1.0f);
+                uv[2] = new Vector2(1.0f, 1.0f);
+                uv[3] = new Vector2(1.0f, 0.0f);
+
+                triangles[0] = 0;
+                triangles[1] = 1;
+                triangles[2] = 2;
+                triangles[3] = 2;
+                triangles[4] = 3;
+                triangles[5] = 0;
+
+                mesh.vertices = vertices;
+                mesh.uv = uv;
+                mesh.triangles = triangles;
+
+                return mesh;
+            }
+            Mesh getDown(float voxDown)
+            {
+                Mesh mesh = new Mesh();
+
+                Vector3[] vertices = new Vector3[4];
+                Vector2[] uv = new Vector2[4];
+                int[] triangles = new int[6];
+
+                vertices[0] = new Vector3(1.0f, voxDown, 0.0f);
+                vertices[1] = new Vector3(1.0f, voxDown, 1.0f);
+                vertices[2] = new Vector3(0.0f, voxDown, 1.0f);
+                vertices[3] = new Vector3(0.0f, voxDown, 0.0f);
+
+                uv[0] = new Vector2(0.0f, 0.0f);
+                uv[1] = new Vector2(0.0f, 1.0f);
+                uv[2] = new Vector2(1.0f, 1.0f);
+                uv[3] = new Vector2(1.0f, 0.0f);
+
+                triangles[0] = 0;
+                triangles[1] = 1;
+                triangles[2] = 2;
+                triangles[3] = 2;
+                triangles[4] = 3;
+                triangles[5] = 0;
+
+                mesh.vertices = vertices;
+                mesh.uv = uv;
+                mesh.triangles = triangles;
+
+                return mesh;
+            }
+        }
+    }
+    public Mesh GetMesh(Data data, bool face, bool back, bool left, bool right, bool up, bool down, int lvlUp, int lvlDown) {
+        this.data = data;
+
+        Mesh meshResult = new Mesh();
+        lvlUp = lvlUp - 1;
+
+        meshResult.vertices = GraficCalc.main.mergeVector3(meshs[lvlUp, lvlDown, 0].vertices, meshs[lvlUp, lvlDown, 1].vertices, meshs[lvlUp, lvlDown, 2].vertices, meshs[lvlUp, lvlDown, 3].vertices, meshs[lvlUp, lvlDown, 4].vertices, meshs[lvlUp, lvlDown, 5].vertices);
+        //meshResult.triangles = GraficCalc.main.mergeTriangleNum(wallFace.forms.triangles, wallBack.forms.triangles, wallRight.forms.triangles, wallLeft.forms.triangles, wallUp.forms.triangles, wallDown.forms.triangles);
+        meshResult.uv = GraficCalc.main.mergeVector2(meshs[lvlUp, lvlDown, 0].uv, meshs[lvlUp, lvlDown, 1].uv, meshs[lvlUp, lvlDown, 2].uv, meshs[lvlUp, lvlDown, 3].uv, meshs[lvlUp, lvlDown, 4].uv, meshs[lvlUp, lvlDown, 5].uv);
+
+
+        meshResult.subMeshCount = 6;
+        /////////////////////////////////////////////////////////////
+        //Нужно в данных треугольников надо сдвигать счет примитивов
+        /////////////////////////////////////////////////////////////
+        int addNum = 0;
+        meshResult.SetTriangles(meshs[lvlUp, lvlDown, 0].triangles, 0);
+        addNum += meshs[lvlUp, lvlDown, 0].vertices.Length;
+
+        int[] trianglesBack = GraficCalc.main.addToInt(meshs[lvlUp, lvlDown, 1].triangles, addNum);
+        meshResult.SetTriangles(trianglesBack, 1);
+        addNum += meshs[lvlUp, lvlDown, 1].vertices.Length;
+
+        int[] trianglesRight = GraficCalc.main.addToInt(meshs[lvlUp, lvlDown, 2].triangles, addNum);
+        meshResult.SetTriangles(trianglesRight, 2);
+        addNum += meshs[lvlUp, lvlDown, 2].vertices.Length;
+
+        int[] trianglesLeft = GraficCalc.main.addToInt(meshs[lvlUp, lvlDown, 3].triangles, addNum);
+        meshResult.SetTriangles(trianglesLeft, 3);
+        addNum += meshs[lvlUp, lvlDown, 3].vertices.Length;
+
+        int[] trianglesUp = GraficCalc.main.addToInt(meshs[lvlUp, lvlDown, 4].triangles, addNum);
+        meshResult.SetTriangles(trianglesUp, 4);
+        addNum += meshs[lvlUp, lvlDown, 4].vertices.Length;
+
+        int[] trianglesDown = GraficCalc.main.addToInt(meshs[lvlUp, lvlDown, 5].triangles, addNum);
+        meshResult.SetTriangles(trianglesDown, 5);
+
+        return meshResult;
+
+    }
+
+    public Mesh GetMesh(bool face, bool back, bool left, bool right, bool up, bool down, int lvlUp, int lvlDown) {
+        return GetMesh(this.data, face, back, left, right, up, down, lvlUp, lvlDown);
     }
 }
 
