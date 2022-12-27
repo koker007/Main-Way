@@ -35,6 +35,13 @@ public class RedactorBlocksColiders : MonoBehaviour
     [SerializeField]
     GameObject ObjWallDown;
 
+    private void Awake()
+    {
+        main = this;
+        TestCreateColliders();
+        SelectWall(lastSide);
+    }
+
     // Start is called before the first frame update
     void Start()
     {

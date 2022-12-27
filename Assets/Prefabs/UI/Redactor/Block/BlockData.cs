@@ -1,8 +1,7 @@
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
+using UnityEngine;
 
 public class BlockData
 {
@@ -64,7 +63,7 @@ public class BlockData
         public const string type = "type";
         public const string TBlock = "TBlock";
         public const string TVoxels = "TVoxels";
-        public const string TLiquid = "Liquid";
+        public const string TLiquid = "TLiquid";
     }
 
     public enum Type {
@@ -875,16 +874,33 @@ public class TypeLiquid {
 
     static public Mesh[,,] meshs;
 
-    Data data = new Data();
+    public Data data = new Data();
+    List<Texture2D[]> textures;
 
     public class Data {
         //Базовый цвет объекта
         public float colorHue = 0.0f;
         public float colorSaturation = 0.0f;
         public float colorValue = 0.0f;
-        public float colorHueRand = 0.0f;
-        public float colorSaturationRand = 0.0f;
-        public float colorValueRand = 0.0f;
+        public float colorHueEnd = 0.0f;
+        public float colorSaturationEnd = 0.0f;
+        public float colorValueEnd = 0.0f;
+        
+        public float perlinScale = 1;
+        public int perlinOctaves = 1;
+        public float perlinScaleX = 1;
+        public float perlinScaleY = 1;
+        public float perlinScaleZ = 1;
+        public int texturesMax = 10;
+        public float animSpeed = 30;
+        public float animSpeedX = 1;
+        public float animSpeedY = 1;
+        public float animSpeedZ = 4;
+        public float animSizeX = 0.1f;
+        public float animSizeY = 0.1f;
+        public float animSizeZ = 0.1f;
+
+
     }
 
     public TypeLiquid() {
@@ -898,10 +914,10 @@ public class TypeLiquid {
             //Up //Down //Side
             meshs = new Mesh[16, 16, 6];
 
-            for (int up = 1; up < 16; up++) {
+            for (int up = 0; up < 16; up++) {
                 float voxUp = (up+1) / 16.0f;
                 for (int down = 0; down < 16; down++) {
-                    if (down >= up)
+                    if (down > up)
                         continue;
 
                     float voxDown = down / 16.0f;
@@ -927,10 +943,10 @@ public class TypeLiquid {
                 vertices[2] = new Vector3(1.0f, voxUp, 0.0f);
                 vertices[3] = new Vector3(1.0f, voxDown, 0.0f);
 
-                uv[0] = new Vector2(0.0f, 0.0f);
-                uv[1] = new Vector2(0.0f, 1.0f);
-                uv[2] = new Vector2(1.0f, 1.0f);
-                uv[3] = new Vector2(1.0f, 0.0f);
+                uv[0] = new Vector2(0.0f, voxDown);
+                uv[1] = new Vector2(0.0f, voxUp);
+                uv[2] = new Vector2(1.0f, voxUp);
+                uv[3] = new Vector2(1.0f, voxDown);
 
                 triangles[0] = 0;
                 triangles[1] = 1;
@@ -957,10 +973,10 @@ public class TypeLiquid {
                 vertices[2] = new Vector3(0.0f, voxUp, 1.0f);
                 vertices[3] = new Vector3(0.0f, voxDown, 1.0f);
 
-                uv[0] = new Vector2(0.0f, 0.0f);
-                uv[1] = new Vector2(0.0f, 1.0f);
-                uv[2] = new Vector2(1.0f, 1.0f);
-                uv[3] = new Vector2(1.0f, 0.0f);
+                uv[0] = new Vector2(0.0f, voxDown);
+                uv[1] = new Vector2(0.0f, voxUp);
+                uv[2] = new Vector2(1.0f, voxUp);
+                uv[3] = new Vector2(1.0f, voxDown);
 
                 triangles[0] = 0;
                 triangles[1] = 1;
@@ -988,10 +1004,10 @@ public class TypeLiquid {
                 vertices[2] = new Vector3(0.0f, voxUp, 0.0f);
                 vertices[3] = new Vector3(0.0f, voxDown, 0.0f);
 
-                uv[0] = new Vector2(0.0f, 0.0f);
-                uv[1] = new Vector2(0.0f, 1.0f);
-                uv[2] = new Vector2(1.0f, 1.0f);
-                uv[3] = new Vector2(1.0f, 0.0f);
+                uv[0] = new Vector2(0.0f, voxDown);
+                uv[1] = new Vector2(0.0f, voxUp);
+                uv[2] = new Vector2(1.0f, voxUp);
+                uv[3] = new Vector2(1.0f, voxDown);
 
                 triangles[0] = 0;
                 triangles[1] = 1;
@@ -1019,10 +1035,10 @@ public class TypeLiquid {
                 vertices[2] = new Vector3(1.0f, voxUp, 1.0f);
                 vertices[3] = new Vector3(1.0f, voxDown, 1.0f);
 
-                uv[0] = new Vector2(0.0f, 0.0f);
-                uv[1] = new Vector2(0.0f, 1.0f);
-                uv[2] = new Vector2(1.0f, 1.0f);
-                uv[3] = new Vector2(1.0f, 0.0f);
+                uv[0] = new Vector2(0.0f, voxDown);
+                uv[1] = new Vector2(0.0f, voxUp);
+                uv[2] = new Vector2(1.0f, voxUp);
+                uv[3] = new Vector2(1.0f, voxDown);
 
                 triangles[0] = 0;
                 triangles[1] = 1;
@@ -1101,11 +1117,169 @@ public class TypeLiquid {
             }
         }
     }
+
+    public Texture2D GetTexture(int tick, Side side) {
+        IniTextures();
+
+        //Высчитываем нужный тик
+        int numTick = tick % textures.Count;
+        if (side == Side.face)
+            return textures[numTick][0];
+        else if (side == Side.back)
+            return textures[numTick][1];
+        else if (side == Side.left)
+            return textures[numTick][2];
+        else if (side == Side.right)
+            return textures[numTick][3];
+        else if (side == Side.up)
+            return textures[numTick][4];
+        else
+            return textures[numTick][5];
+
+
+        void IniTextures() {
+            if (textures != null)
+                return;
+
+
+            textures = new List<Texture2D[]>();
+
+            Color colorStart = Color.HSVToRGB(data.colorHue, data.colorSaturation, data.colorValue);
+            Color colorEnd = Color.HSVToRGB(data.colorHueEnd, data.colorSaturationEnd, data.colorValueEnd);
+
+            float offsetXStart = Random.Range(-999999, 999999);
+            float offsetYStart = Random.Range(-999999, 999999);
+            float offsetZStart = Random.Range(-999999, 999999);
+
+            //Узнаем разницу во времени между 2-мя кадрами
+            float timeOneFrame = data.animSpeed / data.texturesMax;
+
+            float scaleX = data.perlinScale * data.perlinScaleX;
+            float scaleY = data.perlinScale * data.perlinScaleY;
+            float scaleZ = data.perlinScale * data.perlinScaleZ;
+
+            //Перебираем все кадры цикла
+            for (int frameNum = 0; frameNum < data.texturesMax; frameNum++) {
+                float timeFrameNow = timeOneFrame * frameNum;
+
+                float offSetX = Mathf.Sin(timeFrameNow * data.animSpeedX) / data.animSizeX + offsetXStart;
+                float offSetY = Mathf.Cos(timeFrameNow * data.animSpeedY) / data.animSizeY + offsetYStart;
+                float offSetZ = Mathf.Cos(timeFrameNow * data.animSpeedZ) / data.animSizeZ + offsetZStart;
+
+                //Получаем 3д шум
+                float[,,] map = GraficData.PerlinCube.GetArrayMap(scaleX, scaleY, scaleZ, 3.0f, offSetX, offSetY, offSetZ, data.perlinOctaves);
+
+                textures.Add(CreateTextures(map));
+            }
+
+
+            Texture2D[] CreateTextures(float[,,] perlin)
+            {
+                Texture2D[] textures = new Texture2D[6];
+
+                textures[0] = new Texture2D(16, 16);
+                textures[1] = new Texture2D(16, 16);
+                textures[2] = new Texture2D(16, 16);
+                textures[3] = new Texture2D(16, 16);
+                textures[4] = new Texture2D(16, 16);
+                textures[5] = new Texture2D(16, 16);
+
+                //Face
+                for (int x = 0; x < perlin.GetLength(0); x++)
+                {
+                    for (int y = 0; y < perlin.GetLength(1); y++)
+                    {
+                        float perl = perlin[x, y, 0];
+                        Color color = Color.Lerp(colorStart, colorEnd, perl);
+                        textures[0].SetPixel(x, y, color);
+                    }
+                }
+                //back
+                for (int x = 0; x < perlin.GetLength(0); x++)
+                {
+                    for (int y = 0; y < perlin.GetLength(1); y++)
+                    {
+                        float perl = perlin[15 - x, y, 15];
+                        Color color = Color.Lerp(colorStart, colorEnd, perl);
+                        textures[1].SetPixel(x, y, color);
+                    }
+                }
+                //left
+                for (int z = 0; z < perlin.GetLength(0); z++)
+                {
+                    for (int y = 0; y < perlin.GetLength(1); y++)
+                    {
+                        float perl = perlin[0, y, 15 - z];
+                        Color color = Color.Lerp(colorStart, colorEnd, perl);
+                        textures[2].SetPixel(z, y, color);
+                    }
+                }
+                //right
+                for (int z = 0; z < perlin.GetLength(0); z++)
+                {
+                    for (int y = 0; y < perlin.GetLength(1); y++)
+                    {
+                        float perl = perlin[15, y, z];
+                        Color color = Color.Lerp(colorStart, colorEnd, perl);
+                        textures[3].SetPixel(z, y, color);
+                    }
+                }
+                //down
+                for (int x = 0; x < perlin.GetLength(0); x++)
+                {
+                    for (int z = 0; z < perlin.GetLength(1); z++)
+                    {
+                        float perl = perlin[x, 0, 15 - z];
+                        Color color = Color.Lerp(colorStart, colorEnd, perl);
+                        textures[4].SetPixel(x, z, color);
+                    }
+                }
+                //up
+                for (int x = 0; x < perlin.GetLength(0); x++)
+                {
+                    for (int z = 0; z < perlin.GetLength(1); z++)
+                    {
+                        float perl = perlin[x, 15, z];
+                        Color color = Color.Lerp(colorStart, colorEnd, perl);
+                        textures[5].SetPixel(x, z, color);
+                    }
+                }
+
+                //Применение изменений
+                for (int num = 0; num < textures.Length; num++) {
+                    textures[num].filterMode = FilterMode.Point;
+                    textures[num].Apply();
+                }
+
+                return textures;
+            }
+
+            /*
+            Texture2D[] CreateTextures() {
+                Texture2D[] textures = new Texture2D[6];
+                for (int num = 0; num < 6; num++) {
+                    textures[num] = new Texture2D(16,16);
+
+                    for (int x = 0; x < 16; x++) {
+                        for (int y = 0; y < 16; y++) {
+                            textures[num].SetPixel(x, y, Color.Lerp(colorStart, colorMax, Random.Range(0.0f, 1.0f)));
+                        }
+                    }
+                    textures[num].filterMode = FilterMode.Point;
+                    textures[num].Apply();
+                }
+                return textures;
+            }
+            */
+        }
+    }
+    public void ClearTextures() {
+        textures = null;
+    }
     public Mesh GetMesh(Data data, bool face, bool back, bool left, bool right, bool up, bool down, int lvlUp, int lvlDown) {
         this.data = data;
 
         Mesh meshResult = new Mesh();
-        lvlUp = lvlUp - 1;
 
         meshResult.vertices = GraficCalc.main.mergeVector3(meshs[lvlUp, lvlDown, 0].vertices, meshs[lvlUp, lvlDown, 1].vertices, meshs[lvlUp, lvlDown, 2].vertices, meshs[lvlUp, lvlDown, 3].vertices, meshs[lvlUp, lvlDown, 4].vertices, meshs[lvlUp, lvlDown, 5].vertices);
         //meshResult.triangles = GraficCalc.main.mergeTriangleNum(wallFace.forms.triangles, wallBack.forms.triangles, wallRight.forms.triangles, wallLeft.forms.triangles, wallUp.forms.triangles, wallDown.forms.triangles);

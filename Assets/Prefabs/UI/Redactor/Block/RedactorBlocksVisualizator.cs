@@ -113,7 +113,6 @@ public class RedactorBlocksVisualizator : MonoBehaviour, IPointerEnterHandler, I
                 material,
             };
 
-
             meshRenderer.materials[0].mainTexture = RedactorBlocksCTRL.blockData.TBlock.wallFace.texture;
             meshRenderer.materials[1].mainTexture = RedactorBlocksCTRL.blockData.TBlock.wallBack.texture;
             meshRenderer.materials[2].mainTexture = RedactorBlocksCTRL.blockData.TBlock.wallRight.texture;
@@ -135,7 +134,26 @@ public class RedactorBlocksVisualizator : MonoBehaviour, IPointerEnterHandler, I
         void MeshLiquid() {
             blockData.TestCreateLiquid();
 
-            meshFilter.sharedMesh = blockData.GetMeshLiquid(true, true, true, true, true, true, 16, 0);
+            meshFilter.sharedMesh = blockData.GetMeshLiquid(true, true, true, true, true, true, (int)RedactorBlocksFormTLiquid.main.sliderExampleVolumeMax.slider.value, (int)RedactorBlocksFormTLiquid.main.sliderExampleVolumeMin.slider.value);
+            meshRenderer.materials = new Material[6] {
+                material,
+                material,
+                material,
+                material,
+                material,
+                material
+            };
+
+            long textureNum = (long)(Time.time / (1.0f/blockData.TLiquid.data.animSpeed));
+
+            int tickNum = (int)(textureNum % blockData.TLiquid.data.texturesMax);
+
+            meshRenderer.materials[0].mainTexture = blockData.TLiquid.GetTexture(tickNum, Side.face);
+            meshRenderer.materials[1].mainTexture = blockData.TLiquid.GetTexture(tickNum, Side.back);
+            meshRenderer.materials[2].mainTexture = blockData.TLiquid.GetTexture(tickNum, Side.left);
+            meshRenderer.materials[3].mainTexture = blockData.TLiquid.GetTexture(tickNum, Side.right);
+            meshRenderer.materials[4].mainTexture = blockData.TLiquid.GetTexture(tickNum, Side.down);
+            meshRenderer.materials[5].mainTexture = blockData.TLiquid.GetTexture(tickNum, Side.up);
         }
     }
     void UpdateMeshOld()

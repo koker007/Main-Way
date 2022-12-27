@@ -7,11 +7,12 @@ public class GraficData : MonoBehaviour
 {
     static int LastPerlinID = 0;
     static int LastPerlin2DID = 0;
-    static int LastVector3ID = 0;
+    static int LastPerlinCubeID = 0;
 
     const int IDMax = 1000;
     static public Perlin[] dataPerlin = new Perlin[IDMax];
     static public Perlin2D[] dataPerlin2D = new Perlin2D[IDMax];
+    static public PerlinCube[] dataPerlinCube = new PerlinCube[IDMax];
 
     //информация типа перлина
     public class Perlin{
@@ -194,6 +195,76 @@ public class GraficData : MonoBehaviour
                 }
             }
             return arrayMap;
+        }
+    }
+
+    public class PerlinCube {
+        public const float factor = 0.875170906246f;
+
+        public int id = 0;
+        public bool calculated = false;
+
+        public float[,,] result = new float[16, 16, 16];
+
+
+        public float scale = 1;
+        public float scaleX = 1;
+        public float scaleY = 1;
+        public float scaleZ = 1;
+
+        public float frequency = 1;
+
+        public float offsetX = 0;
+        public float offsetY = 0;
+        public float offsetZ = 0;
+
+        public int octaves = 1;
+
+        public PerlinCube(float scaleX, float scaleY, float scaleZ, float frequency, float offsetX, float offsetY, float offsetZ, int octaves)
+        {
+            id = LastPerlinCubeID;
+            LastPerlinCubeID++;
+
+            //Если id стало больше 1000 то заполняем данные заного
+            if (LastPerlinCubeID >= IDMax)
+                LastPerlinCubeID = 0;
+
+            this.scaleX = scaleX;
+            this.scaleY = scaleY;
+            this.scaleZ = scaleZ;
+            this.frequency = frequency;
+
+            this.offsetX = offsetX;
+            this.offsetY = offsetY;
+            this.offsetZ = offsetZ;
+
+            this.octaves = octaves;
+
+            dataPerlinCube[id] = this;
+        }
+        //Вычислить перлина
+        public bool Calculate()
+        {
+            if (calculated) return calculated;
+
+            GraficBlockTLiquid.main.calculate(this);
+
+            return calculated;
+        }
+
+        static public float[,,] GetArrayMap(float ScaleX, float ScaleY, float ScaleZ, float Freq, float OffSetX, float OffSetY, float OffSetZ, int Octaves)
+        {
+            //Создаем новый массив
+            float[,,] arrayMap = new float[16, 16, 16];
+
+            float offSetX = OffSetX;
+            float offSetY = OffSetY;
+            float offSetZ = OffSetZ;
+
+            PerlinCube dataPerlinCube = new PerlinCube(ScaleX, ScaleY, ScaleZ, Freq, offSetX, offSetY, offSetZ, Octaves);
+            dataPerlinCube.Calculate();
+
+            return dataPerlinCube.result;
         }
     }
 

@@ -1,0 +1,142 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+
+int sizeShader;
+
+
+// Create a RenderTexture with enableRandomWrite flag and set it
+// with cs.SetTexture
+
+struct Data{
+    float result;
+};
+
+RWStructuredBuffer<Data> datas;
+
+float _offsetX;
+float _offsetY;
+float _offsetZ;
+float _factorX;
+float _factorY;
+float _factorZ;
+float _frequency;
+float _octaves;
+
+float _value;
+
+float perlin3D(float3 posTex, float factorX, float factorY, float factorZ, float offsetX, float offsetY, float offsetZ, float frequency);
+float perlin(float3 p, float frequency);
+
+
+[numthreads(16,16,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    for(int texZ = 0; texZ < 16; texZ++){
+        float dataID = id.x*16*16 + id.y*16 + texZ;
+
+        float sectorSize = _factorX * 16.0f;
+        float perlinNormal = perlin3D(float3(id.x, id.y, texZ), _factorX, _factorY, _factorZ, _offsetX, _offsetY, _offsetZ, _frequency);
+        float perlinMinusZ = perlin3D(float3(id.x, id.y, texZ), _factorX, _factorY, _factorZ, _offsetX, _offsetY, _offsetZ - 1.0f, _frequency);
+
+        float regionZNow = texZ / 16.0f;
+        float perlinBlendALL = (perlinNormal *  (1 - regionZNow)) + (perlinMinusZ * regionZNow);
+
+        datas[dataID].result = perlinBlendALL;
+
+    }
+
+}
+
+float perlin3D(float3 posTex, float factorX, float factorY, float factorZ, float offsetX, float offsetY, float offsetZ, float frequency){
+    float sectorSizeX = factorX * 16.0f;
+    float sectorSizeY = factorY * 16.0f;
+    float sectorSizeZ = factorZ * 16.0f;
+
+    float regionXNow = posTex.x / 16.0f;
+    float regionYNow = posTex.y / 16.0f;
+
+    float x = factorX * posTex.x + (offsetX * sectorSizeX);
+    float y = factorY * posTex.y + (offsetY * sectorSizeY);
+    float z = factorZ * posTex.z + (offsetZ * sectorSizeZ);
+
+    float3 posNormal = float3(x, y, z);
+    float3 posMinusX = float3(x - sectorSizeX, y, z);
+
+    float perlinNormal = perlin(posNormal, frequency);
+    float perlinMinusX = perlin(posMinusX, frequency);
+
+    float perlinBlendX = (perlinNormal *  (1 - regionXNow)) + (perlinMinusX * regionXNow);
+
+    float3 posMinusY = float3(x, y - sectorSizeY, z);
+    float3 posMinusXY = float3(x - sectorSizeX, y - sectorSizeY, z);
+    float perlinMinusY = perlin(posMinusY, frequency);
+    float perlinMinusXY = perlin(posMinusXY, frequency);
+
+    float perlinBlendMinusXY = (perlinMinusY *  (1 - regionXNow)) + (perlinMinusXY * regionXNow);
+
+    float perlinBlendALL = (perlinBlendX *  (1 - regionYNow)) + (perlinBlendMinusXY * regionYNow);
+
+    return perlinBlendALL;
+}
+
+float perlin(float3 p, float frequency)
+{
+
+    float freq = frequency;
+    float result = 0;
+
+    for (int _octNum = 0; _octNum < _octaves; _octNum++)
+    {
+
+        float3 i = floor(p * freq);
+        float3 f = frac(p * freq);
+        float3 t = f * f * f * (f * (f * 6.0 - 15.0) + 10.0);
+        //plant of UP
+        float3 a = i + float3(0.0, 0.0, 0.0);
+        float3 b = i + float3(1.0, 0.0, 0.0);
+        float3 c = i + float3(0.0, 1.0, 0.0);
+        float3 d = i + float3(1.0, 1.0, 0.0);
+
+        float3 az = i + float3(0.0, 0.0, 1.0);
+        float3 bz = i + float3(1.0, 0.0, 1.0);
+        float3 cz = i + float3(0.0, 1.0, 1.0);
+        float3 dz = i + float3(1.0, 1.0, 1.0);
+
+        a = -1.0 + 2.0 * frac(sin( float3(dot(a, float3(127.1, 311.7, 233.5)), dot(a, float3(269.5, 183.3, 351.9)), dot(a, float3(111.1, 346.7, 59.1)))) *43758.5453123);
+        b = -1.0 + 2.0 * frac(sin( float3(dot(b, float3(127.1, 311.7, 233.5)), dot(b, float3(269.5, 183.3, 351.9)), dot(b, float3(111.1, 346.7, 59.1)))) *43758.5453123);
+        c = -1.0 + 2.0 * frac(sin( float3(dot(c, float3(127.1, 311.7, 233.5)), dot(c, float3(269.5, 183.3, 351.9)), dot(c, float3(111.1, 346.7, 59.1)))) *43758.5453123);
+        d = -1.0 + 2.0 * frac(sin( float3(dot(d, float3(127.1, 311.7, 233.5)), dot(d, float3(269.5, 183.3, 351.9)), dot(d, float3(111.1, 346.7, 59.1)))) *43758.5453123);
+
+        az = -1.0 + 2.0 * frac(sin(float3(dot(az, float3(127.1, 311.7, 233.5)), dot(az, float3(269.5, 183.3, 351.9)), dot(az, float3(111.1, 346.7, 59.1)))) * 43758.5453123);
+        bz = -1.0 + 2.0 * frac(sin(float3(dot(bz, float3(127.1, 311.7, 233.5)), dot(bz, float3(269.5, 183.3, 351.9)), dot(bz, float3(111.1, 346.7, 59.1)))) * 43758.5453123);
+        cz = -1.0 + 2.0 * frac(sin(float3(dot(cz, float3(127.1, 311.7, 233.5)), dot(cz, float3(269.5, 183.3, 351.9)), dot(cz, float3(111.1, 346.7, 59.1)))) * 43758.5453123);
+        dz = -1.0 + 2.0 * frac(sin(float3(dot(dz, float3(127.1, 311.7, 233.5)), dot(dz, float3(269.5, 183.3, 351.9)), dot(dz, float3(111.1, 346.7, 59.1)))) * 43758.5453123);
+
+        float A = dot(a, f - float3(0.0, 0.0, 0.0));
+        float B = dot(b, f - float3(1.0, 0.0, 0.0));
+        float C = dot(c, f - float3(0.0, 1.0, 0.0));
+        float D = dot(d, f - float3(1.0, 1.0, 0.0));
+
+        float Az = dot(az, f - float3(0.0, 0.0, 1.0));
+        float Bz = dot(bz, f - float3(1.0, 0.0, 1.0));
+        float Cz = dot(cz, f - float3(0.0, 1.0, 1.0));
+        float Dz = dot(dz, f - float3(1.0, 1.0, 1.0));
+
+        float noiseXY =lerp(lerp(A, B, t.x), lerp(C, D, t.x), t.y);
+        float noiseZ = lerp(lerp(Az, Bz, t.x), lerp(Cz, Dz, t.x), t.y);
+
+        float noise = lerp(noiseXY, noiseZ, t.z);
+
+        noise /= (_octNum + 1.0f);
+
+        result += noise;
+
+        freq *= 2.0f;
+
+    }
+    result = result / 2 + 0.5f;
+
+    result = clamp(result, 0, 1.0);
+
+    return result;
+}
