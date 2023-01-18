@@ -434,7 +434,8 @@ public class GraficData : MonoBehaviour
             this.blockForms.triangles = new int[verticesCount];
 
             //Создаем тексель на каждый воксель
-            this.blockForms.uv = new Vector2[verticesCount]; 
+            this.blockForms.uv = new Vector2[verticesCount];
+            this.blockForms.uvShadow = new Vector2[verticesCount];
         }
 
 
@@ -446,6 +447,7 @@ public class GraficData : MonoBehaviour
         //Мesh
         public Vector3[] vertices;
         public int[] triangles;
+        public Vector3[] normals;
         public Vector2[] uv;
 
         public int sectorX = 0;
@@ -460,7 +462,7 @@ public class GraficData : MonoBehaviour
         //3 количество вершин у треугольника
 
         //Количество вершин
-        const int verticesCount = 8 * 8 * 8 * 8; //8 вершин на каждый воксель
+        const int verticesCount = 8 * 8 * 8 * 4 * 6; //4 * 6 вершин на каждый воксель
 
         //Количество вершин треугольников (основной массив 8*8*8 + закрывающая плоскость 8*8) * (3 стороны * 2 треугольника * 3 вершины у треугольника)
         const int trianglesCount = (8 * 8 * 8 + 8 * 8 + 1) * (3 * 2 * 3);
@@ -473,6 +475,38 @@ public class GraficData : MonoBehaviour
             vertices = new Vector3[verticesCount];
             uv = new Vector2[verticesCount];
             triangles = new int[trianglesCount];
+            normals = new Vector3[verticesCount];
+        }
+    }
+
+    public class BlockVoxel
+    {
+
+        //Мesh
+        public Vector3[] vertices;
+        public int[] triangles;
+        public Vector3[] normals;
+        public Vector2[] uv;
+
+        //Считаем количество вершин
+
+        //Количество 16*16*16
+        //3 количество сторон у вокселя (лицевая, право, вверх)
+        //2 количество треугольников на каждую сторону
+        //3 количество вершин у треугольника
+
+        //Количество вершин
+        const int verticesCount = 16 * 16 * 16 * 4 * 6; //4 * 6 вершин на каждый воксель
+
+        //Количество вершин треугольников (основной массив 8*8*8 + закрывающая плоскость 8*8) * (3 стороны * 2 треугольника * 3 вершины у треугольника)
+        const int trianglesCount = ((16 * 16 * 16) + (16 * 16) + 1) * (3 * 2 * 3);
+
+        public BlockVoxel()
+        {
+            vertices = new Vector3[verticesCount];
+            uv = new Vector2[verticesCount];
+            triangles = new int[trianglesCount];
+            normals = new Vector3[verticesCount];
         }
     }
 }

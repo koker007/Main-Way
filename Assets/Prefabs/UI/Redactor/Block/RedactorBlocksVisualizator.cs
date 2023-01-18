@@ -9,7 +9,11 @@ public class RedactorBlocksVisualizator : MonoBehaviour, IPointerEnterHandler, I
     static public RedactorBlocksVisualizator main;
 
     [SerializeField]
-    Material material;
+    Material materialBlock;
+    [SerializeField]
+    Material materialVoxels;
+    [SerializeField]
+    Material materialLiquid;
     [SerializeField]
     MeshRenderer meshRenderer;
 
@@ -105,12 +109,12 @@ public class RedactorBlocksVisualizator : MonoBehaviour, IPointerEnterHandler, I
 
             //применяем материалы к мешу
             meshRenderer.materials = new Material[6]{
-                material,
-                material,
-                material,
-                material,
-                material,
-                material,
+                materialBlock,
+                materialBlock,
+                materialBlock,
+                materialBlock,
+                materialBlock,
+                materialBlock,
             };
 
             meshRenderer.materials[0].mainTexture = RedactorBlocksCTRL.blockData.TBlock.wallFace.texture;
@@ -126,7 +130,7 @@ public class RedactorBlocksVisualizator : MonoBehaviour, IPointerEnterHandler, I
             meshFilter.sharedMesh = blockData.GetMeshVoxel();
 
             meshRenderer.materials = new Material[1] { 
-                material
+                materialVoxels
             };
 
             meshRenderer.materials[0].mainTexture = blockData.TVoxels.GetTexture();
@@ -136,12 +140,12 @@ public class RedactorBlocksVisualizator : MonoBehaviour, IPointerEnterHandler, I
 
             meshFilter.sharedMesh = blockData.GetMeshLiquid(true, true, true, true, true, true, (int)RedactorBlocksFormTLiquid.main.sliderExampleVolumeMax.slider.value, (int)RedactorBlocksFormTLiquid.main.sliderExampleVolumeMin.slider.value);
             meshRenderer.materials = new Material[6] {
-                material,
-                material,
-                material,
-                material,
-                material,
-                material
+                materialBlock,
+                materialBlock,
+                materialBlock,
+                materialBlock,
+                materialBlock,
+                materialBlock
             };
 
             long textureNum = (long)(Time.time / (1.0f/blockData.TLiquid.data.animSpeed));
@@ -184,12 +188,12 @@ public class RedactorBlocksVisualizator : MonoBehaviour, IPointerEnterHandler, I
 
         //применяем материалы к мешу
         meshRenderer.materials = new Material[6]{
-             material,
-             material,
-             material,
-             material,
-             material,
-             material,
+             materialBlock,
+             materialBlock,
+             materialBlock,
+             materialBlock,
+             materialBlock,
+             materialBlock,
         };
 
 

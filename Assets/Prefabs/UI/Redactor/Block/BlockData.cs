@@ -79,7 +79,7 @@ public class BlockData
         meshResult.vertices = GraficCalc.main.mergeVector3(TBlock.wallFace.forms.vertices, TBlock.wallBack.forms.vertices, TBlock.wallRight.forms.vertices, TBlock.wallLeft.forms.vertices, TBlock.wallUp.forms.vertices, TBlock.wallDown.forms.vertices);
         //meshResult.triangles = GraficCalc.main.mergeTriangleNum(wallFace.forms.triangles, wallBack.forms.triangles, wallRight.forms.triangles, wallLeft.forms.triangles, wallUp.forms.triangles, wallDown.forms.triangles);
         meshResult.uv = GraficCalc.main.mergeVector2(TBlock.wallFace.forms.uv, TBlock.wallBack.forms.uv, TBlock.wallRight.forms.uv, TBlock.wallLeft.forms.uv, TBlock.wallUp.forms.uv, TBlock.wallDown.forms.uv);
-
+        meshResult.uv2 = GraficCalc.main.mergeVector2(TBlock.wallFace.forms.uvShadow, TBlock.wallBack.forms.uvShadow, TBlock.wallRight.forms.uvShadow, TBlock.wallLeft.forms.uvShadow, TBlock.wallUp.forms.uvShadow, TBlock.wallDown.forms.uvShadow);
 
         meshResult.subMeshCount = 6;
         /////////////////////////////////////////////////////////////
@@ -473,6 +473,7 @@ public class TypeBlock {
             pathTexture += BlockData.Str.formatPNG;
 
             Texture2D texture = new Texture2D(16, 16);
+            texture.filterMode = FilterMode.Point;
 
             if (File.Exists(pathTexture))
             {
@@ -667,6 +668,7 @@ public class BlockForms {
     public Vector3[] vertices;
     public int[] triangles;
     public Vector2[] uv;
+    public Vector2[] uvShadow;
 
     [System.Serializable]
     public class voxels {
@@ -759,6 +761,50 @@ public class TypeVoxel {
         //F - face | B - back
         //L - left | R - Right
 
+        GraficData.BlockVoxel blockVoxelData = new GraficData.BlockVoxel();
+
+        GraficBlockTVoxel.main.calculate(blockVoxelData, data.exist);
+
+        int[] intm = Calc.Mesh.DelZeroTriangles(blockVoxelData.triangles);
+
+        int[] triangles = intm;
+
+        /*
+        for (int x = 0; x < triangles.Length; x++)
+        {
+            if (triangles[x] >= vertices.Length)
+            {
+                Debug.Log("bad " + x + " " + triangles[x]);
+
+            }
+        }
+        */
+
+        mesh.vertices = blockVoxelData.vertices;
+        mesh.uv = blockVoxelData.uv;
+        mesh.triangles = blockVoxelData.triangles;
+        //mesh.RecalculateNormals();
+        mesh.normals = blockVoxelData.normals;
+
+        //mesh.Optimize();
+        visual = new Visual();
+        visual.vert = mesh.vertices;
+        visual.triangles = mesh.triangles;
+        visual.uv = mesh.uv;
+
+        return mesh; 
+    }
+    Mesh GetMeshOld(Data data)
+    {
+        this.data = data;
+
+        Mesh mesh = new Mesh();
+
+        //создаем 8 под мешей
+        //D - Down | U - Up
+        //F - face | B - back
+        //L - left | R - Right
+
         GraficData.BlockVoxelPart DFL = new GraficData.BlockVoxelPart(0, 0, 0);
         GraficData.BlockVoxelPart DFR = new GraficData.BlockVoxelPart(1, 0, 0);
         GraficData.BlockVoxelPart DBL = new GraficData.BlockVoxelPart(0, 0, 1);
@@ -792,6 +838,7 @@ public class TypeVoxel {
 
         Vector2[] uv = Calc.Mesh.MergeVec2(DFL.uv, DFR.uv, UFL.uv, UFR.uv, DBL.uv, DBR.uv, UBL.uv, UBR.uv);
         Vector3[] vertices = Calc.Mesh.MergeVec3(DFL.vertices, DFR.vertices, UFL.vertices, UFR.vertices, DBL.vertices, DBR.vertices, UBL.vertices, UBR.vertices);
+        Vector3[] normals = Calc.Mesh.MergeVec3(DFL.normals, DFR.normals, UFL.normals, UFR.normals, DBL.normals, DBR.normals, UBL.normals, UBR.normals);
         int[] triangles = intm;
 
         for (int x = 0; x < triangles.Length; x++)
@@ -806,6 +853,8 @@ public class TypeVoxel {
         mesh.vertices = vertices;
         mesh.uv = uv;
         mesh.triangles = triangles;
+        //mesh.RecalculateNormals();
+        mesh.normals = normals;
 
         mesh.Optimize();
         visual = new Visual();
@@ -813,8 +862,9 @@ public class TypeVoxel {
         visual.triangles = mesh.triangles;
         visual.uv = mesh.uv;
 
-        return mesh; 
+        return mesh;
     }
+
     public Mesh GetMesh() {
         return GetMesh(this.data);
     }
@@ -1092,10 +1142,10 @@ public class TypeLiquid {
                 Vector2[] uv = new Vector2[4];
                 int[] triangles = new int[6];
 
-                vertices[0] = new Vector3(1.0f, voxDown, 0.0f);
-                vertices[1] = new Vector3(1.0f, voxDown, 1.0f);
-                vertices[2] = new Vector3(0.0f, voxDown, 1.0f);
-                vertices[3] = new Vector3(0.0f, voxDown, 0.0f);
+                vertices[0] = new Vector3(0.0f, voxDown, 1.0f);
+                vertices[1] = new Vector3(0.0f, voxDown, 0.0f);
+                vertices[2] = new Vector3(1.0f, voxDown, 0.0f);
+                vertices[3] = new Vector3(1.0f, voxDown, 1.0f);
 
                 uv[0] = new Vector2(0.0f, 0.0f);
                 uv[1] = new Vector2(0.0f, 1.0f);
@@ -1151,8 +1201,19 @@ public class TypeLiquid {
             float offsetYStart = Random.Range(-999999, 999999);
             float offsetZStart = Random.Range(-999999, 999999);
 
+            //Ищем минимальную скорость
+            float minSpeed = 1;
+            if (data.animSpeedX != 0)
+                minSpeed = 1;
+            else if (minSpeed > data.animSpeedY && data.animSpeedY != 0)
+                minSpeed = data.animSpeedY;
+            else if (minSpeed > data.animSpeedZ && data.animSpeedZ != 0);
+                minSpeed = data.animSpeedZ;
+            //Ищем минимальное время анимации
+            float minTime = 1 / minSpeed;
+
             //Узнаем разницу во времени между 2-мя кадрами
-            float timeOneFrame = data.animSpeed / data.texturesMax;
+            float timeOneFrame = minTime / data.texturesMax;
 
             float scaleX = data.perlinScale * data.perlinScaleX;
             float scaleY = data.perlinScale * data.perlinScaleY;
@@ -1162,9 +1223,9 @@ public class TypeLiquid {
             for (int frameNum = 0; frameNum < data.texturesMax; frameNum++) {
                 float timeFrameNow = timeOneFrame * frameNum;
 
-                float offSetX = Mathf.Sin(timeFrameNow * data.animSpeedX) / data.animSizeX + offsetXStart;
-                float offSetY = Mathf.Cos(timeFrameNow * data.animSpeedY) / data.animSizeY + offsetYStart;
-                float offSetZ = Mathf.Cos(timeFrameNow * data.animSpeedZ) / data.animSizeZ + offsetZStart;
+                float offSetX = Mathf.Sin(timeFrameNow * data.animSpeedX * Mathf.PI * 2) / data.animSizeX + offsetXStart;
+                float offSetY = Mathf.Cos(timeFrameNow * data.animSpeedY * Mathf.PI * 2) / data.animSizeY + offsetYStart;
+                float offSetZ = Mathf.Cos(timeFrameNow * data.animSpeedZ * Mathf.PI * 2) / data.animSizeZ + offsetZStart;
 
                 //Получаем 3д шум
                 float[,,] map = GraficData.PerlinCube.GetArrayMap(scaleX, scaleY, scaleZ, 3.0f, offSetX, offSetY, offSetZ, data.perlinOctaves);

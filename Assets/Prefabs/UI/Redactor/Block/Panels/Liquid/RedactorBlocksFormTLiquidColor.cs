@@ -15,6 +15,10 @@ public class RedactorBlocksFormTLiquidColor : MonoBehaviour
     RawImage ImageCursor;
     [SerializeField]
     RawImage ImageCursorObvodka;
+    [SerializeField]
+    RawImage ImageCursor2;
+    [SerializeField]
+    RawImage ImageCursorObvodka2;
 
     [SerializeField]
     SliderCTRL sliderColorH;
@@ -70,15 +74,15 @@ public class RedactorBlocksFormTLiquidColor : MonoBehaviour
         sliderPerlinOctaves.slider.minValue = 1;
         sliderPerlinOctaves.slider.maxValue = 5;
         sliderPerlinOctaves.slider.value = 2;
-        sliderPerlinScaleX.slider.minValue = 0;
-        sliderPerlinScaleY.slider.minValue = 0;
-        sliderPerlinScaleZ.slider.minValue = 0;
-        sliderPerlinScaleX.slider.maxValue = 10;
-        sliderPerlinScaleY.slider.maxValue = 10;
-        sliderPerlinScaleZ.slider.maxValue = 10;
-        sliderPerlinScaleX.slider.value = 1;
-        sliderPerlinScaleY.slider.value = 1;
-        sliderPerlinScaleZ.slider.value = 1;
+        sliderPerlinScaleX.slider.minValue = 1;
+        sliderPerlinScaleY.slider.minValue = 1;
+        sliderPerlinScaleZ.slider.minValue = 1;
+        sliderPerlinScaleX.slider.maxValue = 100;
+        sliderPerlinScaleY.slider.maxValue = 100;
+        sliderPerlinScaleZ.slider.maxValue = 100;
+        sliderPerlinScaleX.slider.value = 50;
+        sliderPerlinScaleY.slider.value = 50;
+        sliderPerlinScaleZ.slider.value = 50;
         sliderAnimationLenght.slider.minValue = 1;
         sliderAnimationLenght.slider.maxValue = 64;
         sliderAnimationLenght.slider.value = 64;
@@ -190,6 +194,8 @@ public class RedactorBlocksFormTLiquidColor : MonoBehaviour
         {
             Texture2D texture = new Texture2D(ImagePallite.texture.width, ImagePallite.texture.height);
             Texture2D textureObvodka = new Texture2D(ImagePallite.texture.width, ImagePallite.texture.height);
+            Texture2D texture2 = new Texture2D(ImagePallite.texture.width, ImagePallite.texture.height);
+            Texture2D textureObvodka2 = new Texture2D(ImagePallite.texture.width, ImagePallite.texture.height);
 
             //Сперва делаем всю текстуру прозрачной
             for (int x = 0; x < texture.width; x++)
@@ -198,6 +204,8 @@ public class RedactorBlocksFormTLiquidColor : MonoBehaviour
                 {
                     texture.SetPixel(x, y, Color.clear);
                     textureObvodka.SetPixel(x, y, Color.clear);
+                    texture2.SetPixel(x, y, Color.clear);
+                    textureObvodka2.SetPixel(x, y, Color.clear);
                 }
             }
 
@@ -214,16 +222,19 @@ public class RedactorBlocksFormTLiquidColor : MonoBehaviour
                         Mathf.Abs(x) == Mathf.Abs(y))
                     {
                         texture.SetPixel(centerX + x, centerY + y, new Color(1, 1, 1));
+                        texture2.SetPixel(centerX + x, centerY + y, new Color(1, 1, 1));
                     }
                     else
                     {
                         texture.SetPixel(centerX + x, centerY + y, new Color(0, 0, 0));
+                        texture2.SetPixel(centerX + x, centerY + y, new Color(0, 0, 0));
                     }
 
                     //Обводка белая
                     if (Mathf.Abs(x) == cursorSizePix / 2 || Mathf.Abs(y) == cursorSizePix / 2)
                     {
                         textureObvodka.SetPixel(centerX + x, centerY + y, new Color(1, 1, 1));
+                        textureObvodka2.SetPixel(centerX + x, centerY + y, new Color(1, 1, 1));
                     }
                 }
             }
@@ -231,23 +242,36 @@ public class RedactorBlocksFormTLiquidColor : MonoBehaviour
             texture.filterMode = FilterMode.Point;
             texture.wrapMode = TextureWrapMode.Clamp;
             texture.Apply();
+            texture2.filterMode = FilterMode.Point;
+            texture2.wrapMode = TextureWrapMode.Clamp;
+            texture2.Apply();
 
             textureObvodka.filterMode = FilterMode.Point;
             textureObvodka.wrapMode = TextureWrapMode.Clamp;
             textureObvodka.Apply();
+            textureObvodka2.filterMode = FilterMode.Point;
+            textureObvodka2.wrapMode = TextureWrapMode.Clamp;
+            textureObvodka2.Apply();
 
             ImageCursor.texture = texture;
             ImageCursorObvodka.texture = textureObvodka;
+            ImageCursor2.texture = texture2;
+            ImageCursorObvodka2.texture = textureObvodka2;
         }
 
         //Меняем цвет курсора
         float colorPosX = GetFloatFromSlider(sliderColorH);
         float colorPosY = GetFloatFromSlider(sliderColorS);
         ImageCursor.color = getColor(colorPosX, colorPosY);
+        float colorPosX2 = GetFloatFromSlider(sliderColorHRand);
+        float colorPosY2 = GetFloatFromSlider(sliderColorSRand);
+        ImageCursor2.color = getColor(colorPosX2, colorPosY2);
 
         ImageCursor.uvRect = new Rect(new Vector2(0.5f - colorPosX, 0.5f - colorPosY), new Vector2(1, 1));
         ImageCursorObvodka.uvRect = new Rect(new Vector2(0.5f - colorPosX, 0.5f - colorPosY), new Vector2(1, 1));
         ImagePalliteVelosity.color = new Color(0, 0, 0, 1 - GetFloatFromSlider(sliderColorV));
+        ImageCursor2.uvRect = new Rect(new Vector2(0.5f - colorPosX2, 0.5f - colorPosY2), new Vector2(1, 1));
+        ImageCursorObvodka2.uvRect = new Rect(new Vector2(0.5f - colorPosX2, 0.5f - colorPosY2), new Vector2(1, 1));
     }
 
     Color getColor(float valueX, float valueY)

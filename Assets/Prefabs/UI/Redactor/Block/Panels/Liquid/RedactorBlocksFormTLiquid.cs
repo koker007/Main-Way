@@ -70,11 +70,11 @@ public class RedactorBlocksFormTLiquid : MonoBehaviour
 
         blockData.TLiquid.data.perlinOctaves = perlinOctaves;
         blockData.TLiquid.data.perlinScale = scaleALL;
-        blockData.TLiquid.data.perlinScaleX = scaleXYZ.x;
-        blockData.TLiquid.data.perlinScaleY = scaleXYZ.y;
-        blockData.TLiquid.data.perlinScaleZ = scaleXYZ.z;
+        blockData.TLiquid.data.perlinScaleX = 50/scaleXYZ.x;
+        blockData.TLiquid.data.perlinScaleY = 50/scaleXYZ.y;
+        blockData.TLiquid.data.perlinScaleZ = 50/scaleXYZ.z;
         blockData.TLiquid.data.texturesMax = animLenght;
-        blockData.TLiquid.data.animSpeed = animSpeedALL/8;
+        blockData.TLiquid.data.animSpeed = animSpeedALL;
         blockData.TLiquid.data.animSpeedX = animSpeedXYZ.x/8;
         blockData.TLiquid.data.animSpeedY = animSpeedXYZ.y/8;
         blockData.TLiquid.data.animSpeedZ = animSpeedXYZ.z/8;

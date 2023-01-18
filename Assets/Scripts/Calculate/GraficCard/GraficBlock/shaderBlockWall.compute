@@ -27,6 +27,7 @@ RWStructuredBuffer<Voxel> _voxel;
 RWStructuredBuffer<Vec3> _vertices;
 RWStructuredBuffer<Integer> _triangles;
 RWStructuredBuffer<TexUV> _uv;
+RWStructuredBuffer<TexUV> _uvShadow;
 
 int _typeWall;
 
@@ -67,10 +68,8 @@ void CSMain (uint3 id : SV_DispatchThreadID)
     float sizeVoxel = 1/16.0f;
 
     for(int num = 0; num < vertCount; num++){
-        _uv[vertStart + num].u = id.x * sizeVoxel + sizeVoxel/2;
-        _uv[vertStart + num].v = id.y * sizeVoxel + sizeVoxel/2;
-
         _triangles[vertStart + num].num = vertStart + num;
+
     }
 
     //Face
@@ -98,9 +97,41 @@ void CSMain (uint3 id : SV_DispatchThreadID)
     _vertices[vertStart + 5].y = id.y * sizeVoxel;
     _vertices[vertStart + 5].z = _voxel[dataID].height/16.0f * -1;
 
+    _uv[vertStart + 0].u = id.x * sizeVoxel;
+    _uv[vertStart + 0].v = id.y * sizeVoxel;
+    _uv[vertStart + 1].u = id.x * sizeVoxel;
+    _uv[vertStart + 1].v = id.y * sizeVoxel + sizeVoxel;
+    _uv[vertStart + 2].u = id.x * sizeVoxel + sizeVoxel;
+    _uv[vertStart + 2].v = id.y * sizeVoxel + sizeVoxel;
+    _uv[vertStart + 3].u = id.x * sizeVoxel;
+    _uv[vertStart + 3].v = id.y * sizeVoxel;
+    _uv[vertStart + 4].u = id.x * sizeVoxel + sizeVoxel;
+    _uv[vertStart + 4].v = id.y * sizeVoxel + sizeVoxel;
+    _uv[vertStart + 5].u = id.x * sizeVoxel + sizeVoxel;
+    _uv[vertStart + 5].v = id.y * sizeVoxel;
+
+    _uvShadow[vertStart + 0].u = id.x * sizeVoxel;
+    _uvShadow[vertStart + 0].v = id.y * sizeVoxel;
+    _uvShadow[vertStart + 1].u = id.x * sizeVoxel;
+    _uvShadow[vertStart + 1].v = id.y * sizeVoxel + sizeVoxel;
+    _uvShadow[vertStart + 2].u = id.x * sizeVoxel + sizeVoxel;
+    _uvShadow[vertStart + 2].v = id.y * sizeVoxel + sizeVoxel;
+    _uvShadow[vertStart + 3].u = id.x * sizeVoxel;
+    _uvShadow[vertStart + 3].v = id.y * sizeVoxel;
+    _uvShadow[vertStart + 4].u = id.x * sizeVoxel + sizeVoxel;
+    _uvShadow[vertStart + 4].v = id.y * sizeVoxel + sizeVoxel;
+    _uvShadow[vertStart + 5].u = id.x * sizeVoxel + sizeVoxel;
+    _uvShadow[vertStart + 5].v = id.y * sizeVoxel;
+
 
     //right
     float rightHeight = 0.0f;
+    for(int num = 0; num < 2*3; num++){
+        _uv[vertStart + 6*1 + num].u = id.x * sizeVoxel + sizeVoxel/2;
+        _uv[vertStart + 6*1 + num].v = id.y * sizeVoxel + sizeVoxel/2;
+        _uvShadow[vertStart + 6*1 + num].u = id.x * sizeVoxel + sizeVoxel/2 + sizeVoxel*8;
+        _uvShadow[vertStart + 6*1 + num].v = id.y * sizeVoxel + sizeVoxel/2;
+    }
     if(id.x < 15){
         rightHeight = _voxel[voxIDr].height/16.0f * -1;
 
@@ -108,6 +139,8 @@ void CSMain (uint3 id : SV_DispatchThreadID)
            for(int num = 0; num < 2*3; num++){
                _uv[vertStart + 6*1 + num].u = id.x * sizeVoxel + sizeVoxel/2 + sizeVoxel;
                _uv[vertStart + 6*1 + num].v = id.y * sizeVoxel + sizeVoxel/2;
+               _uvShadow[vertStart + 6*1 + num].u = id.x * sizeVoxel + sizeVoxel/2 - sizeVoxel*8;
+               _uvShadow[vertStart + 6*1 + num].v = id.y * sizeVoxel + sizeVoxel/2;
            }
         }
     }
@@ -141,13 +174,21 @@ void CSMain (uint3 id : SV_DispatchThreadID)
 
     //up
     float upHeight = 0.0f;
+    for(int num = 0; num < 2*3; num++){
+        _uv[vertStart + 6*2 + num].u = id.x * sizeVoxel + sizeVoxel/2;
+        _uv[vertStart + 6*2 + num].v = id.y * sizeVoxel + sizeVoxel/2;
+        _uvShadow[vertStart + 6*2 + num].u = id.x * sizeVoxel + sizeVoxel/2;
+        _uvShadow[vertStart + 6*2 + num].v = id.y * sizeVoxel + sizeVoxel/2 + sizeVoxel*8;
+    }
     if(id.y < 15){
         upHeight = _voxel[voxIDu].height/16.0f * -1;
 
         if(_voxel[dataID].height < _voxel[voxIDu].height){
            for(int num = 0; num < 2*3; num++){
                _uv[vertStart + 6*2 + num].u = id.x * sizeVoxel + sizeVoxel/2;
-               _uv[vertStart + 6*2 + num].v = id.y * sizeVoxel + sizeVoxel/2 + + sizeVoxel;
+               _uv[vertStart + 6*2 + num].v = id.y * sizeVoxel + sizeVoxel/2 + sizeVoxel;
+               _uvShadow[vertStart + 6*2 + num].u = id.x * sizeVoxel + sizeVoxel/2;
+               _uvShadow[vertStart + 6*2 + num].v = id.y * sizeVoxel + sizeVoxel/2 - sizeVoxel*8;
            }
         }
     }
@@ -213,6 +254,8 @@ void CSMain (uint3 id : SV_DispatchThreadID)
         for(int num = 0; num < 2*3; num++){
             _uv[vertStartLeft + num].u = id.x * sizeVoxel + sizeVoxel/2;
             _uv[vertStartLeft + num].v = id.y * sizeVoxel + sizeVoxel/2;
+            _uvShadow[vertStartLeft + num].u = id.x * sizeVoxel + sizeVoxel/2 - sizeVoxel*8;
+            _uvShadow[vertStartLeft + num].v = id.y * sizeVoxel + sizeVoxel/2;
 
             _triangles[vertStartLeft + num].num = vertStartLeft + num;
         }
@@ -250,6 +293,8 @@ void CSMain (uint3 id : SV_DispatchThreadID)
         for(int num = 0; num < 2*3; num++){
             _uv[vertStartDown + num].u = id.x * sizeVoxel + sizeVoxel/2;
             _uv[vertStartDown + num].v = id.y * sizeVoxel + sizeVoxel/2;
+            _uvShadow[vertStartDown + num].u = id.x * sizeVoxel + sizeVoxel/2;
+            _uvShadow[vertStartDown + num].v = id.y * sizeVoxel + sizeVoxel/2 - sizeVoxel*8;
 
             _triangles[vertStartDown + num].num = vertStartDown + num;
         }

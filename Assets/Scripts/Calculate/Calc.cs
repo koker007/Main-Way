@@ -59,6 +59,10 @@ public class Calc
             List<int> resultList = new List<int>();
 
             for (int id = 0; id < trianglesTest.Length; id += 3) {
+                if (id == 73710) {
+                    float test = 0;
+                }
+
                 if (trianglesTest[id + 0] == trianglesTest[id + 1] ||
                     trianglesTest[id + 1] == trianglesTest[id + 2] ||
                     trianglesTest[id + 2] == trianglesTest[id + 0]) {

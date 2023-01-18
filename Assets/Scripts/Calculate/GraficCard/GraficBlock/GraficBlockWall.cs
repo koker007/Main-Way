@@ -53,11 +53,15 @@ public class GraficBlockWall : MonoBehaviour
         ComputeBuffer bufferUV = new ComputeBuffer(dataBlockWall.blockForms.uv.Length, vec2Size);
         bufferUV.SetData(dataBlockWall.blockForms.uv);
 
+        ComputeBuffer bufferUVShadow = new ComputeBuffer(dataBlockWall.blockForms.uvShadow.Length, vec2Size);
+        bufferUVShadow.SetData(dataBlockWall.blockForms.uvShadow);
+
         //Помещаем буфер данных в шейдер
         shaderBlockWall.SetBuffer(_kernelIndex, "_voxel", bufferVoxel);
         shaderBlockWall.SetBuffer(_kernelIndex, "_vertices", bufferVertices);
         shaderBlockWall.SetBuffer(_kernelIndex, "_triangles", bufferTriangles);
         shaderBlockWall.SetBuffer(_kernelIndex, "_uv", bufferUV);
+        shaderBlockWall.SetBuffer(_kernelIndex, "_uvShadow", bufferUVShadow);
 
         shaderBlockWall.SetInt("_typeWall", (int)dataBlockWall.side);
 
@@ -68,12 +72,13 @@ public class GraficBlockWall : MonoBehaviour
         bufferVertices.GetData(dataBlockWall.blockForms.vertices);
         bufferTriangles.GetData(dataBlockWall.blockForms.triangles);
         bufferUV.GetData(dataBlockWall.blockForms.uv);
+        bufferUVShadow.GetData(dataBlockWall.blockForms.uvShadow);
 
         //Высвободить видео память
         bufferVoxel.Dispose();
         bufferVertices.Dispose();
         bufferTriangles.Dispose();
         bufferUV.Dispose();
-
+        bufferUVShadow.Dispose();
     }
 }

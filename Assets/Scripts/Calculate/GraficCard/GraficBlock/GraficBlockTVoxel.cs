@@ -50,6 +50,9 @@ public class GraficBlockTVoxel : MonoBehaviour
         ComputeBuffer bufferUV = new ComputeBuffer(dataBlockVoxel.uv.Length, vec2Size);
         bufferUV.SetData(dataBlockVoxel.uv);
 
+        ComputeBuffer bufferNormals = new ComputeBuffer(dataBlockVoxel.normals.Length, vec3Size);
+        bufferNormals.SetData(dataBlockVoxel.normals);
+
         ComputeBuffer bufferExist = new ComputeBuffer(exist.Length, intSize);
         bufferExist.SetData(exist);
 
@@ -57,6 +60,7 @@ public class GraficBlockTVoxel : MonoBehaviour
         shaderBlockTVoxels.SetBuffer(_kernelIndex, "_vertices", bufferVertices);
         shaderBlockTVoxels.SetBuffer(_kernelIndex, "_triangles", bufferTriangles);
         shaderBlockTVoxels.SetBuffer(_kernelIndex, "_uv", bufferUV);
+        shaderBlockTVoxels.SetBuffer(_kernelIndex, "_normals", bufferNormals);
         shaderBlockTVoxels.SetBuffer(_kernelIndex, "_exist", bufferExist);
 
         shaderBlockTVoxels.SetInt("_sectorX", (int)dataBlockVoxel.sectorX);
@@ -70,11 +74,60 @@ public class GraficBlockTVoxel : MonoBehaviour
         bufferVertices.GetData(dataBlockVoxel.vertices);
         bufferTriangles.GetData(dataBlockVoxel.triangles);
         bufferUV.GetData(dataBlockVoxel.uv);
+        bufferNormals.GetData(dataBlockVoxel.normals);
 
         //Высвободить видео память
         bufferVertices.Dispose();
         bufferTriangles.Dispose();
         bufferUV.Dispose();
+        bufferNormals.Dispose();
+        bufferExist.Dispose();
+    }
+
+    public void calculate(GraficData.BlockVoxel dataBlockVoxel, int[] exist)
+    {
+
+        int intSize = sizeof(int);
+        int vec3Size = sizeof(float) * 3;
+        int vec2Size = sizeof(float) * 2;
+
+        //Заряжаем буфер. первое количество, второе размер одной в битах
+        ComputeBuffer bufferVertices = new ComputeBuffer(dataBlockVoxel.vertices.Length, vec3Size);
+        bufferVertices.SetData(dataBlockVoxel.vertices);
+
+        ComputeBuffer bufferTriangles = new ComputeBuffer(dataBlockVoxel.triangles.Length, intSize);
+        bufferTriangles.SetData(dataBlockVoxel.triangles);
+
+        ComputeBuffer bufferUV = new ComputeBuffer(dataBlockVoxel.uv.Length, vec2Size);
+        bufferUV.SetData(dataBlockVoxel.uv);
+
+        ComputeBuffer bufferNormals = new ComputeBuffer(dataBlockVoxel.normals.Length, vec3Size);
+        bufferNormals.SetData(dataBlockVoxel.normals);
+
+        ComputeBuffer bufferExist = new ComputeBuffer(exist.Length, intSize);
+        bufferExist.SetData(exist);
+
+        //Помещаем буфер данных в шейдер
+        shaderBlockTVoxels.SetBuffer(_kernelIndex, "_vertices", bufferVertices);
+        shaderBlockTVoxels.SetBuffer(_kernelIndex, "_triangles", bufferTriangles);
+        shaderBlockTVoxels.SetBuffer(_kernelIndex, "_uv", bufferUV);
+        shaderBlockTVoxels.SetBuffer(_kernelIndex, "_normals", bufferNormals);
+        shaderBlockTVoxels.SetBuffer(_kernelIndex, "_exist", bufferExist);
+
+        //Начать вычисления шейдера
+        shaderBlockTVoxels.Dispatch(_kernelIndex, 1, 1, 1);
+
+        //Вытащить данные из шейдера
+        bufferVertices.GetData(dataBlockVoxel.vertices);
+        bufferTriangles.GetData(dataBlockVoxel.triangles);
+        bufferUV.GetData(dataBlockVoxel.uv);
+        bufferNormals.GetData(dataBlockVoxel.normals);
+
+        //Высвободить видео память
+        bufferVertices.Dispose();
+        bufferTriangles.Dispose();
+        bufferUV.Dispose();
+        bufferNormals.Dispose();
         bufferExist.Dispose();
     }
 
