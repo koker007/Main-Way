@@ -769,16 +769,15 @@ public class TypeVoxel {
 
         int[] triangles = intm;
 
-        /*
+        
         for (int x = 0; x < triangles.Length; x++)
         {
-            if (triangles[x] >= vertices.Length)
+            if (triangles[x] >= blockVoxelData.vertices.Length)
             {
                 Debug.Log("bad " + x + " " + triangles[x]);
 
             }
         }
-        */
 
         mesh.vertices = blockVoxelData.vertices;
         mesh.uv = blockVoxelData.uv;
