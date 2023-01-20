@@ -79,11 +79,11 @@ Material:
     - _OcclusionStrength: 1
     - _Parallax: 0.02
     - _Shadow: 0
-    - _ShadowBack: 0.401
-    - _ShadowDown: 0.401
-    - _ShadowFace: 0.419
-    - _ShadowLeft: 0.389
-    - _ShadowRight: 0.389
+    - _ShadowBack: 1
+    - _ShadowDown: 1
+    - _ShadowFace: 1
+    - _ShadowLeft: 1
+    - _ShadowRight: 1
     - _ShadowU0: 1
     - _ShadowU1: 0
     - _ShadowUp: 0
