@@ -75,12 +75,15 @@ Shader "Custom/BlockVShader"
             if(shadow > shadowFB)
                 shadow = shadowFB;
 
-            float3 lightDir = float3(_LightVec.x, _LightVec.y, _LightVec.z);
+            float3 lightDir = float3(_ShadowLeft - _ShadowRight, _ShadowDown - _ShadowUp, _ShadowFace - _ShadowBack);
+
             float difLight = max(0, dot (o.Normal, lightDir));
+            float difShadow = min(1, dot(o.Normal*-1,lightDir));
+            float standartLight = 1 - shadow;
 
-            //c = lerp(c, float4(0,0,0,1), shadow);
+            c = lerp(float4(0,0,0,1), c, standartLight);
 
-            o.Albedo = c.rgb * (difLight);
+            o.Albedo = c.rgb * (standartLight + (difLight - difShadow)/2);
             o.Alpha = _Transparent;
         }
 
