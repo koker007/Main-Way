@@ -9,6 +9,8 @@ public class RedactorUICTRL : MonoBehaviour
     [SerializeField]
     RedactorBlocksCTRL redactorBlocks;
     [SerializeField]
+    RedactorBiomeCTRL redactorBiome;
+    [SerializeField]
     RedactorPlanetsCTRL redactorPlanets;
 
 
@@ -42,6 +44,14 @@ public class RedactorUICTRL : MonoBehaviour
         main.gameObject.SetActive(true);
 
         main.redactorBlocks.gameObject.SetActive(true);
+
+        WindowMenuCTRL.CloseALL();
+        UICTRL.IsOpenMainMenu = false;
+    }
+
+    static public void OpenRedactorBiomes() {
+        main.gameObject.SetActive(true);
+        main.redactorBiome.gameObject.SetActive(true);
 
         WindowMenuCTRL.CloseALL();
         UICTRL.IsOpenMainMenu = false;

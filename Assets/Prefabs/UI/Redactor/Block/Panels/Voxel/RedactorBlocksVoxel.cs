@@ -80,6 +80,11 @@ public class RedactorBlocksVoxel : MonoBehaviour
 
     void iniColliders()
     {
+        //Если коллайдеры выключены надо включить
+        if (RedactorBlocksColiders.main != null ||
+            !RedactorBlocksColiders.main.enabled)
+            RedactorBlocksColiders.main.enabled = true;
+
         if (colliders != null)
             return;
 

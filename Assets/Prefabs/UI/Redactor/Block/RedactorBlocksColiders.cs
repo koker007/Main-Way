@@ -38,8 +38,8 @@ public class RedactorBlocksColiders : MonoBehaviour
     private void Awake()
     {
         main = this;
-        TestCreateColliders();
-        SelectWall(lastSide);
+        //TestCreateColliders();
+        //SelectWall(lastSide);
     }
 
     // Start is called before the first frame update
@@ -51,6 +51,16 @@ public class RedactorBlocksColiders : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (RedactorBlocksCTRL.main == null ||
+            !RedactorBlocksCTRL.main.gameObject.activeSelf ||
+            RedactorBlocksCTRL.blockData == null)
+            return;
+
+        if (RedactorBlocksVoxel.main == null ||
+            !RedactorBlocksVoxel.main.gameObject.activeSelf) {
+            this.enabled = false;
+        }
+
         TestCreateColliders();
         SelectWall(lastSide);
     }

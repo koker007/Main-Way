@@ -43,6 +43,8 @@ public class WindowMenuCTRL : MonoBehaviour
     [Header("Redactors")]
     [SerializeField]
     WindowMenu RedactorBlockLoad;
+    [SerializeField]
+    WindowMenu RedactorBiomeLoad;
 
 
     public bool FirstPress = false;
@@ -102,6 +104,11 @@ public class WindowMenuCTRL : MonoBehaviour
     {
         UICTRL.IsOpenMainMenu = true;
         GameObject Obj = Instantiate(main.RedactorBlockLoad.gameObject, main.gameObject.transform);
+        AddInBuffer(Obj.GetComponent<WindowMenu>());
+    }
+    static public void ClickRedactorBiomeLoad() {
+        UICTRL.IsOpenMainMenu = true;
+        GameObject Obj = Instantiate(main.RedactorBiomeLoad.gameObject, main.gameObject.transform);
         AddInBuffer(Obj.GetComponent<WindowMenu>());
     }
 
