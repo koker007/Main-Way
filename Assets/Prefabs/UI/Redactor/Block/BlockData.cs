@@ -40,6 +40,7 @@ public class BlockData
         public const string voxels = "voxels";
         public const string liquid = "liquid";
         public const string name = "name";
+        public const string data = "data";
         public const string main = "main";
 
         public const string wall = "Wall";
@@ -241,7 +242,7 @@ public class BlockData
         }
         void saveTLiquidVisual(string pathBlock) {
             string pathTLiquidVisual = pathBlock + "/" + Str.TLiquid;
-            //blockData
+            blockData.TLiquid.SaveTo(pathTLiquidVisual);
         }
     }
     static public BlockData LoadData(string pathBlockVariant) {
@@ -261,8 +262,12 @@ public class BlockData
         {
             loadBlockWall(pathBlockVariant);
         }
-        else if (resultData.type == Type.voxels) {
+        else if (resultData.type == Type.voxels)
+        {
             loadTVoxelsForm(pathBlockVariant);
+        }
+        else if (resultData.type == Type.liquid) {
+            loadTLiquidForm(pathBlockVariant);
         }
 
         loadBlockPhysics(pathBlockVariant);
@@ -365,6 +370,12 @@ public class BlockData
 
             resultData.TVoxels = new TypeVoxel();
             resultData.TVoxels.LoadFrom(pathTVoxelForm);
+        }
+        void loadTLiquidForm(string path) {
+            string pathTLiquidForm = path + "/" + Str.TLiquid;
+
+            resultData.TLiquid = new TypeLiquid();
+            resultData.TLiquid.LoadFrom(pathTLiquidForm);
         }
         void loadBlockPhysics(string path)
         {
@@ -1379,6 +1390,132 @@ public class TypeLiquid {
 
     public Mesh GetMesh(bool face, bool back, bool left, bool right, bool up, bool down, int lvlUp, int lvlDown) {
         return GetMesh(this.data, face, back, left, right, up, down, lvlUp, lvlDown);
+    }
+
+    public void SaveTo(string path) {
+        if (!Directory.Exists(path))
+        {
+            Directory.CreateDirectory(path);
+        }
+
+        string pathMainData = path + "/" + BlockData.Str.main + BlockData.Str.data + BlockData.Str.formatTXT;
+        string pathPhysics = path + "/" + StrC.physics + BlockData.Str.formatTXT;
+
+        saveMainDate();
+        savePhysics();
+
+        void saveMainDate()
+        {
+            //take all data of liquid block and save to string
+            List<string> dataMain = new List<string>();
+
+            //Color
+            dataMain.Add(StrC.hue + StrC.SEPARATOR + data.colorHue);
+            dataMain.Add(StrC.saturation + StrC.SEPARATOR + data.colorSaturation);
+            dataMain.Add(StrC.value + StrC.SEPARATOR + data.colorValue);
+            dataMain.Add(StrC.hue + StrC.rand + StrC.SEPARATOR + data.colorHue);
+            dataMain.Add(StrC.saturation + StrC.rand + StrC.SEPARATOR + data.colorSaturationEnd);
+            dataMain.Add(StrC.value + StrC.rand + StrC.SEPARATOR + data.colorValueEnd);
+
+            //Noise
+            dataMain.Add(StrC.perlin + StrC.scale + StrC.SEPARATOR + data.perlinScale);
+            dataMain.Add(StrC.perlin + StrC.octaves + StrC.SEPARATOR + data.perlinOctaves);
+            dataMain.Add(StrC.perlin + StrC.scale + StrC.x + StrC.SEPARATOR + data.perlinScaleX);
+            dataMain.Add(StrC.perlin + StrC.scale + StrC.y + StrC.SEPARATOR + data.perlinScaleY);
+            dataMain.Add(StrC.perlin + StrC.scale + StrC.z + StrC.SEPARATOR + data.perlinScaleZ);
+
+            //Animation
+            dataMain.Add(StrC.animation + StrC.lenght + StrC.SEPARATOR + data.texturesMax);
+            dataMain.Add(StrC.animation + StrC.speed + StrC.SEPARATOR + data.animSpeed);
+            dataMain.Add(StrC.animation + StrC.speed + StrC.x + StrC.SEPARATOR + data.animSpeedX);
+            dataMain.Add(StrC.animation + StrC.speed + StrC.y + StrC.SEPARATOR + data.animSpeedY);
+            dataMain.Add(StrC.animation + StrC.speed + StrC.z + StrC.SEPARATOR + data.animSpeedZ);
+            dataMain.Add(StrC.animation + StrC.size + StrC.x + StrC.SEPARATOR + data.animSizeX);
+            dataMain.Add(StrC.animation + StrC.size + StrC.y + StrC.SEPARATOR + data.animSizeY);
+            dataMain.Add(StrC.animation + StrC.size + StrC.z + StrC.SEPARATOR + data.animSizeZ);
+
+            File.WriteAllLines(pathMainData, dataMain.ToArray());
+
+        }
+        void savePhysics() {
+            //take all data of liquid block and save to string
+            List<string> dataPhysics = new List<string>();
+
+            //dataPhysics.Add(StrC.viscosity + StrC.SEPARATOR);
+        }
+    }
+    public void LoadFrom(string path) {
+        if (!Directory.Exists(path)) {
+            Debug.LogError("Load Error Path not exist: " + path);
+            return;
+        }
+
+
+        string pathMainData = path + "/" + BlockData.Str.main + BlockData.Str.data + BlockData.Str.formatTXT;
+        string pathPhysics = path + "/" + StrC.physics + BlockData.Str.formatTXT;
+
+        loadMainDate();
+
+        void loadMainDate() {
+            string[] dataMain;
+
+            dataMain = File.ReadAllLines(pathMainData);
+
+            KeyAndText[] keyAndTexts = KeyAndText.GetKATs(dataMain, StrC.SEPARATOR);
+
+            foreach (KeyAndText keyAndText in keyAndTexts) {
+                loadKaT(keyAndText);
+            }
+
+            void loadKaT(KeyAndText keyAndText) {
+                //Color
+                if (keyAndText.key == StrC.hue)
+                    data.colorHue = (float)System.Convert.ToDouble(keyAndText.text);
+                else if (keyAndText.key == StrC.saturation)
+                    data.colorSaturation = (float)System.Convert.ToDouble(keyAndText.text);
+                else if (keyAndText.key == StrC.value)
+                    data.colorValue = (float)System.Convert.ToDouble(keyAndText.text);
+                else if (keyAndText.key == StrC.hue + StrC.rand)
+                    data.colorHueEnd = (float)System.Convert.ToDouble(keyAndText.text);
+                else if (keyAndText.key == StrC.saturation + StrC.rand)
+                    data.colorSaturationEnd = (float)System.Convert.ToDouble(keyAndText.text);
+                else if (keyAndText.key == StrC.value + StrC.rand)
+                    data.colorValueEnd = (float)System.Convert.ToDouble(keyAndText.text);
+
+                //Noise
+                else if (keyAndText.key == StrC.perlin + StrC.scale)
+                    data.perlinScale = (float)System.Convert.ToDouble(keyAndText.text);
+                else if (keyAndText.key == StrC.perlin + StrC.octaves)
+                    data.perlinOctaves = System.Convert.ToInt32(keyAndText.text);
+                else if (keyAndText.key == StrC.perlin + StrC.scale + StrC.x)
+                    data.perlinScaleX = (float)System.Convert.ToDouble(keyAndText.text);
+                else if (keyAndText.key == StrC.perlin + StrC.scale + StrC.y)
+                    data.perlinScaleY = (float)System.Convert.ToDouble(keyAndText.text);
+                else if (keyAndText.key == StrC.perlin + StrC.scale + StrC.z)
+                    data.perlinScaleZ = (float)System.Convert.ToDouble(keyAndText.text);
+
+                //Animation
+                else if (keyAndText.key == StrC.animation + StrC.lenght)
+                    data.texturesMax = System.Convert.ToInt32(keyAndText.text);
+                else if (keyAndText.key == StrC.animation + StrC.speed)
+                    data.animSpeed = (float)System.Convert.ToDouble(keyAndText.text);
+                else if (keyAndText.key == StrC.animation + StrC.speed + StrC.x)
+                    data.animSpeedX = (float)System.Convert.ToDouble(keyAndText.text);
+                else if (keyAndText.key == StrC.animation + StrC.speed + StrC.y)
+                    data.animSpeedY = (float)System.Convert.ToDouble(keyAndText.text);
+                else if (keyAndText.key == StrC.animation + StrC.speed + StrC.z)
+                    data.animSpeedZ = (float)System.Convert.ToDouble(keyAndText.text);
+                else if (keyAndText.key == StrC.animation + StrC.size + StrC.x)
+                    data.animSizeX = (float)System.Convert.ToDouble(keyAndText.text);
+                else if (keyAndText.key == StrC.animation + StrC.size + StrC.y)
+                    data.animSizeY = (float)System.Convert.ToDouble(keyAndText.text);
+                else if (keyAndText.key == StrC.animation + StrC.size + StrC.z)
+                    data.animSizeZ = (float)System.Convert.ToDouble(keyAndText.text);
+
+
+
+            }
+        }
     }
 }
 

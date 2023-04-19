@@ -286,4 +286,53 @@ class KeyAndText {
         this.key = key;
         this.text = text;
     }
+
+    static public KeyAndText LineToKaT(string textLine, string separator)
+    {
+        string[] separate = { separator };
+        string[] textSplite = textLine.Split(separate, System.StringSplitOptions.None);
+
+        //Если текст разделен не на 2 части то это ошибка
+        if (textSplite.Length != 2)
+        {
+            return null;
+        }
+
+        string key = textSplite[0];
+        string text = textSplite[1];
+
+        //Текст разделен по ключу убираем пробелы в ключе
+        string keyNew = "";
+        foreach (char symbol in key)
+        {
+            //Добавляем символ
+            keyNew += symbol;
+
+            //Если символ не пробел
+            if (symbol != ' ')
+            {
+                //Перезаписываем старый текст - новым
+                key = keyNew;
+            }
+        }
+
+        //Теперь ключ без пробелов
+        //Создаем связку ключ - значение
+        KeyAndText keyAndTextNew = new KeyAndText(key, text);
+
+        return keyAndTextNew;
+    }
+    static public KeyAndText[] GetKATs(string[] dataLines, string separator) {
+        List<KeyAndText> keyAndTextsList = new List<KeyAndText>();
+
+        foreach (string data in dataLines) {
+            KeyAndText keyAndTextNew = LineToKaT(data, separator);
+            if (keyAndTextNew == null)
+                continue;
+
+            keyAndTextsList.Add(keyAndTextNew);
+        }
+
+        return keyAndTextsList.ToArray();
+    }
 }
