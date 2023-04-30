@@ -279,6 +279,11 @@ public class RedactorBlocksCTRL : MonoBehaviour
         }
 
         redrawType();
+
+        if(RedactorBlockRightPanelsCTRL.main)
+            RedactorBlockRightPanelsCTRL.main.ClickSliderPanels();
+
+
     }
 
     //ѕрименить груповые данные на все блоки
@@ -318,11 +323,11 @@ public class RedactorBlocksCTRL : MonoBehaviour
         sliderBlockType.slider.value = (int)data.type;
 
         if (sliderBlockType.slider.value == (int)BlockData.Type.block)
-            sliderBlockType.SetValueText(BlockData.Str.blocks);
+            sliderBlockType.SetValueText(StrC.blocks);
         else if(sliderBlockType.slider.value == (int)BlockData.Type.voxels)
-            sliderBlockType.SetValueText(BlockData.Str.voxels);
+            sliderBlockType.SetValueText(StrC.voxels);
         else if(sliderBlockType.slider.value == (int)BlockData.Type.liquid)
-            sliderBlockType.SetValueText(BlockData.Str.liquid);
+            sliderBlockType.SetValueText(StrC.liquid);
     }
 
     public void clickButtonSave() {

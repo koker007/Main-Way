@@ -62,8 +62,10 @@ public class RedactorBlockRightPanelsCTRL : MonoBehaviour
 
     GameObject GetSelectPanel() {
         int SelectNum = 0;
+        GameObject panelLastCorrect = null;
         for (int x = 0; x < Panels.Length; x++) {
             if (IsCorrectPanelType(Panels[x])) {
+                panelLastCorrect = Panels[x];
                 if (sliderPanels.slider.value == SelectNum) {
                     return Panels[x];
                 }
@@ -71,7 +73,7 @@ public class RedactorBlockRightPanelsCTRL : MonoBehaviour
             }
         }
 
-        return null;
+        return panelLastCorrect;
     }
 
     // Update is called once per frame
@@ -101,6 +103,9 @@ public class RedactorBlockRightPanelsCTRL : MonoBehaviour
         string strPhysics = "Physics";
         string strVisual = "Visual";
         string strFormTVoxel = "Form Voxels";
+        string strFormTLiquid = "Liquid color";
+        string strFormTLiquidPhysics = "Liquid physics";
+
 
         //Узнаем какого рода эта панель
         if (panelSelect.GetComponent<RedactorBlocksVoxel>() != null)
@@ -115,10 +120,17 @@ public class RedactorBlockRightPanelsCTRL : MonoBehaviour
         {
             sliderPanels.SetValueText(strVisual);
         }
-        else if (panelSelect.GetComponent<RedactorBlocksFormTVoxel>() != null) {
+        else if (panelSelect.GetComponent<RedactorBlocksFormTVoxel>() != null)
+        {
             sliderPanels.SetValueText(strFormTVoxel);
         }
-
+        else if (panelSelect.GetComponent<RedactorBlocksFormTLiquid>() != null)
+        {
+            sliderPanels.SetValueText(strFormTLiquid);
+        }
+        else if (panelSelect.GetComponent<RedactorBlocksFormTLiquidPhysics>() != null) {
+            sliderPanels.SetValueText(strFormTLiquidPhysics);
+        }
 
         panelSelect.SetActive(true);
     }

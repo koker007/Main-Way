@@ -22,6 +22,9 @@ public class WindowRedactorBlockLoad : MonoBehaviour
     {
         iniSliderMod();
         iniSliderBlock();
+
+        Invoke("acceptSliderModName", 0.1f);
+        Invoke("acceptSliderBlockName", 0.2f);
     }
 
     // Update is called once per frame
@@ -56,7 +59,7 @@ public class WindowRedactorBlockLoad : MonoBehaviour
             return;
         }
 
-        string pathblocks = pathMod + "/" + BlockData.Str.blocks;
+        string pathblocks = pathMod + "/" + StrC.blocks;
         if (!Directory.Exists(pathblocks))
         {
             pathBlock = "";

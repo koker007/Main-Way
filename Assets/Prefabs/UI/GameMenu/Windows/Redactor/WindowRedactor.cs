@@ -20,6 +20,10 @@ public class WindowRedactor : MonoBehaviour
     {
         RedactorUICTRL.OpenRedactorBlocks();
     }
+    public void clickButtonBiomeRedactor()
+    {
+        RedactorUICTRL.OpenRedactorBiomes();
+    }
     public void clickButtonPlanetRedactor() {
         RedactorUICTRL.OpenRedactorPlanets();
     }
