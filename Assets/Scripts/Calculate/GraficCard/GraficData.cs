@@ -510,4 +510,10 @@ public class GraficData : MonoBehaviour
             normals = new Vector3[verticesCount];
         }
     }
+
+    public class ChankWorldData {
+        public Vector3Int chankPos;
+        public Chank chankData;
+        public BiomeData.GenRules[] genRules;
+    }
 }

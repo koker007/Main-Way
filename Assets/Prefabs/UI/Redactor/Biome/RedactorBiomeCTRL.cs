@@ -31,8 +31,8 @@ public class RedactorBiomeCTRL : MonoBehaviour
     }
 
     void TestOpenGenerator() {
-        if (RedactorBiomeGenerator.main != null && !RedactorBiomeGenerator.main.gameObject.activeSelf)
-            RedactorBiomeGenerator.main.gameObject.SetActive(true);
+        if (RedactorBiomeGenerator.MAIN != null && !RedactorBiomeGenerator.MAIN.gameObject.activeSelf)
+            RedactorBiomeGenerator.MAIN.gameObject.SetActive(true);
     }
 
     public void clickButtonSave()

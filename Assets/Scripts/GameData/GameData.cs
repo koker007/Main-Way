@@ -8,11 +8,9 @@ public class GameData : MonoBehaviour
 {
     int blockMax = 100000;
     //Количество символов принадлежности к моду
-    int charsMod = 3;
+    const int charsMod = 3;
     //количество символов блока
-    int charsName = 3;
-    //символ блока сумарное среднее
-    int charsNameSum = 1;
+    const int charsName = 3;
 
     static public string pathMod = "Mods";
 
@@ -41,13 +39,43 @@ public class GameData : MonoBehaviour
     void iniBlockData() {
         //Нужно определиться сколько данных хранить
         //M = Mod | N - nameBlock | 
-        //[MMMNNNn]
+        //[MMMNNN]
 
-        blockMax = char.MaxValue * charsMod * charsName * charsNameSum;
+        blockMax = char.MaxValue * (charsMod + charsName);
 
         blockData = new BlockData[blockMax];
 
         //теперь надо загрузить все блоки
+    }
+
+    static public uint GetBlockID(string ModName, string BlockName) {
+        //Получаем текстовое сокрашение
+        string abbreviatura = "";
+        //Первые 3 символа мода
+        for (int num = 0; num < charsMod; num++) {
+            //Если текущий символ больше чем имя
+            if (num >= ModName.Length)
+                abbreviatura += "_";
+            else abbreviatura += ModName[num];
+        }
+
+        //Первые 3 символа имени
+        for (int num = 0; num < charsMod; num++)
+        {
+            //Если текущий символ больше чем имя
+            if (num >= BlockName.Length)
+                abbreviatura += "_";
+            else abbreviatura += BlockName[num];
+        }
+
+        //Теперь есть Абревиатура получаем ID
+        uint abbreviaturaID = 0;
+        //Перебираем каждый символ
+        for (int num = 0; num < abbreviatura.Length; num++) {
+            abbreviaturaID += abbreviatura[num];
+        }
+
+        return abbreviaturaID;
     }
 
     void AllReload()

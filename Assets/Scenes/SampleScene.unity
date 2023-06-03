@@ -3452,6 +3452,7 @@ GameObject:
   - component: {fileID: 259411733}
   - component: {fileID: 259411735}
   - component: {fileID: 259411736}
+  - component: {fileID: 259411737}
   m_Layer: 0
   m_Name: GraficCalc
   m_TagString: Untagged
@@ -3584,6 +3585,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShaderPerlinLiquid: {fileID: 7200000, guid: f2aea033e82247a45b1b34e686cc0e38, type: 3}
+--- !u!114 &259411737
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 259411727}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: edba7f71ea21c184581d3c3d07712a77, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShaderGenChankPlanet: {fileID: 0}
 --- !u!1 &265046089
 GameObject:
   m_ObjectHideFlags: 0
@@ -8546,8 +8560,8 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1852592523}
   - {fileID: 1576641415}
+  - {fileID: 1852592523}
   m_Father: {fileID: 41354676}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -18576,7 +18590,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7176533566875976478, guid: d7b2deb1b6f117c4b92abfc7b1942566, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0.000012397766
+      value: -0.00001335144
       objectReference: {fileID: 0}
     - target: {fileID: 7417510024086745306, guid: d7b2deb1b6f117c4b92abfc7b1942566, type: 3}
       propertyPath: m_AnchorMax.x
@@ -28242,7 +28256,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 548056196965636761, guid: d7b2deb1b6f117c4b92abfc7b1942566, type: 3}
       propertyPath: m_RootOrder
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 548056196965636761, guid: d7b2deb1b6f117c4b92abfc7b1942566, type: 3}
       propertyPath: m_AnchorMax.x
@@ -29482,6 +29496,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b32c3841ab643bb44bbf264b18c839d6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Generator: {fileID: 0}
 --- !u!1001 &1639796207
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -31432,7 +31447,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 548056196965636761, guid: d7b2deb1b6f117c4b92abfc7b1942566, type: 3}
       propertyPath: m_RootOrder
-      value: 4
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 548056196965636761, guid: d7b2deb1b6f117c4b92abfc7b1942566, type: 3}
       propertyPath: m_AnchorMax.x
@@ -31592,7 +31607,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7176533566875976478, guid: d7b2deb1b6f117c4b92abfc7b1942566, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: 203.03174
       objectReference: {fileID: 0}
     - target: {fileID: 7417510024086745306, guid: d7b2deb1b6f117c4b92abfc7b1942566, type: 3}
       propertyPath: m_AnchorMax.x

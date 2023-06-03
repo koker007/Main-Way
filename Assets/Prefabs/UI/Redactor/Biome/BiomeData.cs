@@ -9,20 +9,10 @@ public class BiomeData
     public int variant;
 
     //Список правил для генерации блоков в биоме
-    List<GenRules> ListOfRules = new List<GenRules>();
-
-    public enum Type {
-        underground = 0,
-        surface = 1
-    }
+    public List<GenRules> ListOfRules = new List<GenRules>();
 
     //правила генерации блока
     public class GenRules {
-        public string blockName;
-        public string blockMod;
-
-        //only surface
-        public int floorGround;
 
         //parameters for world size 4096
         //Perlin
@@ -36,8 +26,22 @@ public class BiomeData
         //высота генерации от уровня ядра 0% ядро и 100% высота поверхности.
         public float distGenCoreMax = 100;
         public float distGenCoreMin = 0;
+    }
 
-        //только поверхностный биом
-        public float distGenGround = 5;
+    public class GenBlockRules
+    {
+        //Айди блока к которому применяются правила генерации
+        string blockName;
+        string blockMod;
+
+        List<GenRules> genRules;
+
+        public uint GetBlockID() {
+            //Нужно получить ID блока из приложения, из всех подгруженных блоков и модов.
+
+            throw new System.NotImplementedException();
+
+            
+        }
     }
 }

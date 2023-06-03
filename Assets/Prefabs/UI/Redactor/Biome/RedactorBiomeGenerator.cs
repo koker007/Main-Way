@@ -5,7 +5,9 @@ using UnityEngine;
 //Gererate the example biome, use chanks
 public class RedactorBiomeGenerator : MonoBehaviour
 {
-    static public RedactorBiomeGenerator main;
+    static private RedactorBiomeGenerator main;
+    static public RedactorBiomeGenerator MAIN { get { return main; } }
+
 
     [Header("Obj")]
     [SerializeField]
@@ -25,6 +27,9 @@ public class RedactorBiomeGenerator : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        Generate();
+
+
         TestClose();
     }
 
@@ -35,6 +40,10 @@ public class RedactorBiomeGenerator : MonoBehaviour
             //закрываем генератор
             gameObject.SetActive(false);
         }
+        
+    }
+
+    void Generate() {
         
     }
 }
