@@ -129,7 +129,7 @@ public class BlockData
     //Сохранить все данные блока который отправляется
     static public void SaveData(BlockData blockData) {
         //Создаем путь к папке блоке
-        string path = GameData.pathMod + "/" + blockData.mod + "/" + StrC.blocks + "/" + blockData.name + "/" + blockData.variant;
+        string path = GameData.GameData.pathMod + "/" + blockData.mod + "/" + StrC.blocks + "/" + blockData.name + "/" + blockData.variant;
          
         //Проверяем есть ли папка
         if (!Directory.Exists(path)) {
