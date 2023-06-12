@@ -86,19 +86,33 @@ namespace GameData
 
         void loadMod(string pathMod)
         {
-            //Проверяем список блоков
-            string[] directoriesBlock = Directory.GetDirectories(pathMod);
-            foreach (string blockDirectory in directoriesBlock)
-            {
-                BlockData[] datas = BlockData.LoadDatas(blockDirectory);
+            //Загружаем блоки
+            loadModBlocks(pathMod);
 
-                foreach (BlockData data in datas) {
-                    Blocks.SetData(data);
-                }
-            }
+            //Загружаем биомы
 
-            bool test = false;
         }
+
+        void loadModBlocks(string pathMod) {
+
+            //Проверяем список содержимого мода
+            string pathModBlocks = pathMod + "\\" + StrC.blocks;
+
+            //Проверяем что папка блоков существует
+            if (!Directory.Exists(pathModBlocks))
+                return;
+
+            //Получаем список блоков
+            string[] pathsBlockdata = Directory.GetDirectories(pathModBlocks);
+
+            //Загружаем все блоки
+            foreach (string pathBlockData in pathsBlockdata) {
+                BlockData[] BlockVariants = BlockData.LoadDatas(pathBlockData);
+
+                Blocks.SetData(BlockVariants);
+            }
+        }
+
     }
 
 
@@ -112,7 +126,7 @@ namespace GameData
 
         static int blockMax = 100000;
         //путь загрузки блоков
-        static BlockData[] blockData;
+        static BlockData[][] blockData;
 
         static public void Ini()
         {
@@ -122,7 +136,7 @@ namespace GameData
 
             blockMax = char.MaxValue * (GameData.charsMod + GameData.charsName);
 
-            blockData = new BlockData[blockMax];
+            blockData = new BlockData[blockMax][];
 
             //теперь надо загрузить все блоки
         }
@@ -154,7 +168,11 @@ namespace GameData
             //Перебираем каждый символ
             for (int num = 0; num < abbreviatura.Length; num++)
             {
-                abbreviaturaID += abbreviatura[num] + (int)Mathf.Pow(4, num);
+                abbreviaturaID += abbreviatura[num] * (int)Mathf.Pow(5, num);
+            }
+
+            while (abbreviaturaID >= blockData.Length) {
+                abbreviaturaID -= blockData.Length;
             }
 
             return abbreviaturaID;
@@ -172,16 +190,18 @@ namespace GameData
             {
                 //Проверяем что не вышли за пределы массива
                 if (idNow >= blockData.Length)
-                    idNow = 0;
+                    idNow -= blockData.Length;
 
                 //Проверяем по id что блок есть и у него совпадает мод и имя
-                if (blockData[idNow] != null && blockData[idNow].mod == ModName && blockData[idNow].name == BlockName)
+                if (blockData[idNow] != null && blockData[idNow][0].mod == ModName && blockData[idNow][0].name == BlockName)
                     return idNow;
 
 
             }
 
             if (!onlyExistData) {
+                //возвращаем к старту
+                idNow = idStart;
                 for (int num = 0; num < tryingMAX; num++, idNow++)
                 {
                     //Проверяем что не вышли за пределы массива
@@ -189,7 +209,7 @@ namespace GameData
                         idNow = 0;
 
                     //Проверяем по id что блок есть и у него совпадает мод и имя
-                    if (blockData[idNow] == null || blockData[idNow].mod == ModName && blockData[idNow].name == BlockName)
+                    if (blockData[idNow] == null || blockData[idNow][0].mod == ModName && blockData[idNow][0].name == BlockName)
                         return idNow;
 
                 }
@@ -198,11 +218,32 @@ namespace GameData
             return -1;
         }
 
+        static public BlockData GetData(string ModName, string BlockName, uint variant)
+        {
+            //Получаем ID
+            int id = GetBlockID(ModName, BlockName);
+
+            return GetData(id, variant);
+        }
         //Получить информацию о блоке по его id
-        static public BlockData GetData(int blockID) {
+        static public BlockData GetData(int blockID, uint variant) {
+            BlockData[] blockVariants = GetDatas(blockID);
+
+            //Если блока не существует, выходим
+            if (blockVariants == null)
+                return null;
+
+            //если вариант не существует
+            if (variant >= blockVariants.Length)
+                variant = 0;
+
+            return blockVariants[variant];
+        }
+        static public BlockData[] GetDatas(int blockID)
+        {
             return blockData[blockID];
         }
-        static public BlockData GetData(string ModName, string BlockName) {
+        static public BlockData[] GetDatas(string ModName, string BlockName) {
             //Получаем ID
             int id = GetBlockID(ModName, BlockName);
             
@@ -213,14 +254,14 @@ namespace GameData
         }
 
         //Записать данные блока в список
-        static public void SetData(BlockData data) {
+        static public void SetData(BlockData[] data) {
             if (data == null)
                 return;
 
-            int id = GetBlockID(data.mod, data.name, false);
+            int id = GetBlockID(data[0].mod, data[0].name, false);
 
             if (id < 0)
-                Debug.LogError("Not can to load block data: " + data.mod + " " + data.name);
+                Debug.LogError("Not can to load block data: " + data[0].mod + " " + data[0].name);
 
             blockData[id] = data;
             countLoaded++;

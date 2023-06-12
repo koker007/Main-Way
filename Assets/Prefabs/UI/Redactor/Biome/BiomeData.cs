@@ -6,12 +6,11 @@ public class BiomeData
 {
     public string name;
     public string mod;
-    public int variant;
 
     //Список правил для генерации блоков в биоме
-    public List<GenRules> ListOfRules = new List<GenRules>();
+    public List<GenBiomeRules> ListOfRules = new List<GenBiomeRules>();
 
-    //правила генерации блока
+    //правило генерации блока
     public class GenRules {
 
         //parameters for world size 4096
@@ -22,26 +21,43 @@ public class BiomeData
         public float scaleZ = 1;
         public float freq = 3;
         public int octaves = 1;
-
-        //высота генерации от уровня ядра 0% ядро и 100% высота поверхности.
-        public float distGenCoreMax = 100;
-        public float distGenCoreMin = 0;
     }
 
-    public class GenBlockRules
+    public class GenBiomeRules
     {
+        bool inicialized = false;
+        public bool INICIALIZED { get { return inicialized; } }
+
         //Айди блока к которому применяются правила генерации
-        string blockName;
         string blockMod;
+        string blockName;
+        int blockID = -1; //id блока вычисляемый в процессе загрузки игры
 
-        List<GenRules> genRules;
+        List<GenRules> genRules; //список правил генерации этого блока в биоме
 
-        public uint GetBlockID() {
-            //Нужно получить ID блока из приложения, из всех подгруженных блоков и модов.
+        public void ReInicialize() {
+            ReInicialize(blockMod, blockName);
+        }
+        public void ReInicialize(string blockMod, string blockName) {
+            //Сброс инициализации
+            inicialized = false;
 
-            throw new System.NotImplementedException();
+            //Запоминаем имя блока
+            this.blockMod = blockMod;
+            this.blockName = blockName;
 
-            
+            //Получаем ID блока
+            blockID = GameData.Blocks.GetBlockID(this.blockMod, this.blockName);
+
+            //if block not exist - exit
+            if (blockID < 0)
+                return;
+
+            //if have 1 or more gen rules
+            if (genRules != null && genRules.Count > 0)
+                return;
+
+            inicialized = true;
         }
     }
 }

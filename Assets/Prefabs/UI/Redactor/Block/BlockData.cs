@@ -250,10 +250,10 @@ public class BlockData
                 }
             }
 
-            string[] pathMass = new string[pathList.Count];
-            for (int num = 0; num < pathList.Count; num++) {
-                pathMass[num] = pathList[num];
-            }
+            string[] pathMass = pathList.ToArray();
+            //for (int num = 0; num < pathList.Count; num++) {
+            //    pathMass[num] = pathList[num];
+            //}
 
 
 
@@ -268,7 +268,7 @@ public class BlockData
                 return;
             }
 
-            resultData.mod = pathMass[pathMass.Length - 3];
+            resultData.mod = pathMass[pathMass.Length - 4];
             resultData.name = pathMass[pathMass.Length - 2];
             resultData.variant = System.Convert.ToInt32(pathMass[pathMass.Length - 1]);
 
