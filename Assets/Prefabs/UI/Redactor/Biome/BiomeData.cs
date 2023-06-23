@@ -4,14 +4,19 @@ using UnityEngine;
 
 public class BiomeData
 {
+    //Биом проинициализирован или нет
+    bool isInicialized = false;
+    public bool IsInicialized { get { return isInicialized; } }
+
     public string name;
     public string mod;
 
-    //Список правил для генерации блоков в биоме
-    public List<GenBiomeRules> ListOfRules = new List<GenBiomeRules>();
+    //Список ID блоков в этом биоме и их правила генерации
+    public List<int> blockIDs = new List<int>();
+    public List<GenRule> genRules = new List<GenRule>();
 
-    //правило генерации блока
-    public class GenRules {
+    //одно правило генерации блока
+    public class GenRule {
 
         //parameters for world size 4096
         //Perlin
@@ -23,17 +28,18 @@ public class BiomeData
         public int octaves = 1;
     }
 
-    public class GenBiomeRules
+    //Набор правил для генерации одного конкретного блока
+    public class GenBiomeRule
     {
         bool inicialized = false;
         public bool INICIALIZED { get { return inicialized; } }
 
-        //Айди блока к которому применяются правила генерации
+        //имя блока к которому применяются правила генерации
         string blockMod;
         string blockName;
         int blockID = -1; //id блока вычисляемый в процессе загрузки игры
 
-        List<GenRules> genRules; //список правил генерации этого блока в биоме
+        GenRule genRule; //правило генерации этого блока в биоме
 
         public void ReInicialize() {
             ReInicialize(blockMod, blockName);
@@ -51,10 +57,6 @@ public class BiomeData
 
             //if block not exist - exit
             if (blockID < 0)
-                return;
-
-            //if have 1 or more gen rules
-            if (genRules != null && genRules.Count > 0)
                 return;
 
             inicialized = true;

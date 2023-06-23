@@ -512,8 +512,23 @@ public class GraficData : MonoBehaviour
     }
 
     public class ChankWorldData {
+        //ƒанные готовы к расчету или нет
+        bool isInicialized = false;
+        bool IsInizialized { get { return isInicialized; } }
+
         public Vector3Int chankPos;
-        public Chank chankData;
-        public BiomeData.GenRules[] genRules;
+        public BiomeData biomeData;
+
+        // арта представл€ет из себ€ участок размером 10 на 10 (то есть верхн€€ часть биома)
+        public int[,] mapOfHeight;
+        public int[,] mapOfTemperature;
+
+        //»нициализировать данные к расчету
+        public void InicializeTest() {
+            if (!biomeData.IsInicialized)
+                return;
+
+            
+        }
     }
 }

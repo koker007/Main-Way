@@ -4,7 +4,8 @@ using UnityEngine;
 using GenBiome;
 
 //BiomeTypeUnderground data
-//Определяет поведение для подземного биома
+//Определяет поведение для
+//подземного биома
 public class BiomeTypeUnderground : BiomeData
 {
     //высота генерации от уровня ядра 0% ядро и 100% высота поверхности.

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Runtime.InteropServices;
 
+//Шейдер по расчету ID блока в чанке
 public class GraficChankPlanet : MonoBehaviour
 {
     static private GraficChankPlanet main;
@@ -32,19 +33,22 @@ public class GraficChankPlanet : MonoBehaviour
 
     }
 
-    //Установить данные на расчет
-    public void calculate(GraficData.ChankWorldData DataWorld)
+    //Передать биом на расчет и получить чанк
+    public Chank calculate(GraficData.ChankWorldData DataWorld)
     {
+        //Вытаскиваем данные из биома
+        int[] blockIDs = DataWorld.biomeData.blockIDs.ToArray();
+        BiomeData.GenRule[] GenRules = DataWorld.biomeData.genRules.ToArray();
 
-        int sizeOfBlockID = sizeof(uint);
-        int sizeOfGenRules = Marshal.SizeOf(typeof(BiomeData.GenRules));
+        int sizeOfBlockID = sizeof(int);
+        int sizeOfGenRules = Marshal.SizeOf(typeof(BiomeData.GenRule));
 
         //Заряжаем буфер данными. первое количество данных, второе размер одной данной в битах
-        ComputeBuffer bufferBlocksIDs = new ComputeBuffer(DataWorld.chankData.BlocksID.Length, sizeOfBlockID);
-        bufferBlocksIDs.SetData(DataWorld.chankData.BlocksID);
+        ComputeBuffer bufferBlocksIDs = new ComputeBuffer(blockIDs.Length, sizeOfBlockID);
+        bufferBlocksIDs.SetData(blockIDs);
 
-        ComputeBuffer bufferGenRules = new ComputeBuffer(DataWorld.genRules.Length, sizeOfGenRules);
-        bufferGenRules.SetData(DataWorld.genRules);
+        ComputeBuffer bufferGenRules = new ComputeBuffer(GenRules.Length, sizeOfGenRules);
+        bufferGenRules.SetData(GenRules);
 
         //Помещаем буфер данных в шейдер
         ShaderGenChankPlanet.SetBuffer(_kernelIndex, "BlocksIDs", bufferBlocksIDs);
@@ -57,12 +61,17 @@ public class GraficChankPlanet : MonoBehaviour
         //Начать вычисления шейдера
         ShaderGenChankPlanet.Dispatch(_kernelIndex, 1, 1, 1);
 
+        //Чанк в котором надо хранить данные
+        Chank chank = new Chank();
+
         //Вытащить данные из шейдера
-        bufferBlocksIDs.GetData(DataWorld.chankData.BlocksID);
+        bufferBlocksIDs.GetData(chank.BlocksID);
 
         //Высвободить видео память
         bufferBlocksIDs.Dispose();
         bufferGenRules.Dispose();
 
+        //Возвращаем чанк в виде iD блоков
+        return chank;
     }
 }
