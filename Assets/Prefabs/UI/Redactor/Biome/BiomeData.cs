@@ -17,8 +17,6 @@ public class BiomeData
 
     //одно правило генерации блока
     public class GenRule {
-
-        //parameters for world size 4096
         //Perlin
         public float scaleAll = 16;
         public float scaleX = 1;
@@ -29,7 +27,7 @@ public class BiomeData
     }
 
     //Набор правил для генерации одного конкретного блока
-    public class GenBiomeRule
+    public class BiomeRuleData
     {
         bool inicialized = false;
         public bool INICIALIZED { get { return inicialized; } }
