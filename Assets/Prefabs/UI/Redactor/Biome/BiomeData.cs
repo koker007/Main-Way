@@ -12,11 +12,18 @@ public class BiomeData
     public string mod;
 
     //—писок ID блоков в этом биоме и их правила генерации
-    public List<int> blockIDs = new List<int>();
     public List<GenRule> genRules = new List<GenRule>();
+
+    // онструктор
+    public BiomeData() {
+        //ƒолжно быть хот€бы одно правило генерации
+        genRules.Add(new GenRule());
+    }
 
     //одно правило генерации блока
     public class GenRule {
+        public int blockID = 0;
+
         //Perlin
         public float scaleAll = 16;
         public float scaleX = 1;

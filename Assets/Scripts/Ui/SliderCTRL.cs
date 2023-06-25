@@ -62,8 +62,16 @@ public class SliderCTRL : MonoBehaviour
         defaultText = texts[0].text;
     }
 
+    public void SetDefaultText(string defaultKey, string defoltText) {
+
+        string text = Language.GetTextFromKey(defaultKey, defoltText);
+        if (text == "")
+            text = defoltText;
+
+        defaultText = text;
+    }
     public void SetDefaultText(string defaultKey) {
-        defaultText = Language.GetTextFromKey(defaultKey);
+        SetDefaultText(defaultKey, "");
     }
 
     //проверить требуется ли обновление перевода для этого текста

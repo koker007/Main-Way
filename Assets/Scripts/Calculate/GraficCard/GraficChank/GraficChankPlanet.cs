@@ -37,15 +37,16 @@ public class GraficChankPlanet : MonoBehaviour
     public Chank calculate(GraficData.ChankWorldData DataWorld)
     {
         //Вытаскиваем данные из биома
-        int[] blockIDs = DataWorld.biomeData.blockIDs.ToArray();
         BiomeData.GenRule[] GenRules = DataWorld.biomeData.genRules.ToArray();
 
         int sizeOfBlockID = sizeof(int);
         int sizeOfGenRules = Marshal.SizeOf(typeof(BiomeData.GenRule));
 
+        //Чанк в котором надо хранить данные
+        Chank chank = new Chank();
         //Заряжаем буфер данными. первое количество данных, второе размер одной данной в битах
-        ComputeBuffer bufferBlocksIDs = new ComputeBuffer(blockIDs.Length, sizeOfBlockID);
-        bufferBlocksIDs.SetData(blockIDs);
+        ComputeBuffer bufferBlocksIDs = new ComputeBuffer(chank.BlocksID.Length, sizeOfBlockID);
+        bufferBlocksIDs.SetData(chank.BlocksID);
 
         ComputeBuffer bufferGenRules = new ComputeBuffer(GenRules.Length, sizeOfGenRules);
         bufferGenRules.SetData(GenRules);
@@ -60,9 +61,6 @@ public class GraficChankPlanet : MonoBehaviour
 
         //Начать вычисления шейдера
         ShaderGenChankPlanet.Dispatch(_kernelIndex, 1, 1, 1);
-
-        //Чанк в котором надо хранить данные
-        Chank chank = new Chank();
 
         //Вытащить данные из шейдера
         bufferBlocksIDs.GetData(chank.BlocksID);
