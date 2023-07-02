@@ -50,7 +50,7 @@ public class RedactorBlocksFormTLiquid : MonoBehaviour
     }
 
     public void acceptLiquidColor(Color colorStart, Color colorEnd, int perlinOctaves, Vector3 scaleXYZ, float scaleALL, int animLenght, Vector3 animSpeedXYZ, float animSpeedALL, Vector3 animSizeXYZ) {
-        BlockData blockData = RedactorBlocksCTRL.blockData;
+        TypeLiquid typeLiquid = RedactorBlocksCTRL.blockData as TypeLiquid;
         float HStart;
         float SStart;
         float VStart;
@@ -61,28 +61,28 @@ public class RedactorBlocksFormTLiquid : MonoBehaviour
         float VEnd;
         Color.RGBToHSV(colorEnd, out HEnd, out SEnd, out VEnd);
 
-        blockData.TLiquid.data.colorHue = HStart;
-        blockData.TLiquid.data.colorSaturation = SStart;
-        blockData.TLiquid.data.colorValue = VStart;
-        blockData.TLiquid.data.colorHueEnd = HEnd;
-        blockData.TLiquid.data.colorSaturationEnd = SEnd;
-        blockData.TLiquid.data.colorValueEnd = VEnd;
+        typeLiquid.data.colorHue = HStart;
+        typeLiquid.data.colorSaturation = SStart;
+        typeLiquid.data.colorValue = VStart;
+        typeLiquid.data.colorHueEnd = HEnd;
+        typeLiquid.data.colorSaturationEnd = SEnd;
+        typeLiquid.data.colorValueEnd = VEnd;
 
-        blockData.TLiquid.data.perlinOctaves = perlinOctaves;
-        blockData.TLiquid.data.perlinScale = scaleALL;
-        blockData.TLiquid.data.perlinScaleX = 50/scaleXYZ.x;
-        blockData.TLiquid.data.perlinScaleY = 50/scaleXYZ.y;
-        blockData.TLiquid.data.perlinScaleZ = 50/scaleXYZ.z;
-        blockData.TLiquid.data.texturesMax = animLenght;
-        blockData.TLiquid.data.animSpeed = animSpeedALL;
-        blockData.TLiquid.data.animSpeedX = animSpeedXYZ.x/8;
-        blockData.TLiquid.data.animSpeedY = animSpeedXYZ.y/8;
-        blockData.TLiquid.data.animSpeedZ = animSpeedXYZ.z/8;
-        blockData.TLiquid.data.animSizeX = animSizeXYZ.x;
-        blockData.TLiquid.data.animSizeY = animSizeXYZ.y;
-        blockData.TLiquid.data.animSizeZ = animSizeXYZ.z;
+        typeLiquid.data.perlinOctaves = perlinOctaves;
+        typeLiquid.data.perlinScale = scaleALL;
+        typeLiquid.data.perlinScaleX = 50/scaleXYZ.x;
+        typeLiquid.data.perlinScaleY = 50/scaleXYZ.y;
+        typeLiquid.data.perlinScaleZ = 50/scaleXYZ.z;
+        typeLiquid.data.texturesMax = animLenght;
+        typeLiquid.data.animSpeed = animSpeedALL;
+        typeLiquid.data.animSpeedX = animSpeedXYZ.x/8;
+        typeLiquid.data.animSpeedY = animSpeedXYZ.y/8;
+        typeLiquid.data.animSpeedZ = animSpeedXYZ.z/8;
+        typeLiquid.data.animSizeX = animSizeXYZ.x;
+        typeLiquid.data.animSizeY = animSizeXYZ.y;
+        typeLiquid.data.animSizeZ = animSizeXYZ.z;
 
-        blockData.TLiquid.ClearTextures();
+        typeLiquid.ClearTextures();
 
     }
 }

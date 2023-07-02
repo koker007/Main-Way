@@ -217,7 +217,7 @@ public class RedactorBlocksVoxel : MonoBehaviour
     //Изменить цвет выбранного вокселя
     public void acceptVoxColor(TypeBlock.Wall wall, Vector2Int pos, Color color)
     {
-        BlockData blockData = RedactorBlocksCTRL.blockData;
+        TypeBlock typeBlock = RedactorBlocksCTRL.blockData as TypeBlock;
 
         //проверяем что стена корректная
         if (wall == null)
@@ -239,146 +239,146 @@ public class RedactorBlocksVoxel : MonoBehaviour
         if (pos.x == 0)
         {
             //Если текущая сторона лицевая
-            if (wall == blockData.TBlock.wallFace)
+            if (wall == typeBlock.wallFace)
             {
                 //То слева будет левая сторона
-                blockData.TBlock.wallLeft.texture.SetPixel(15, pos.y, color);
-                blockData.TBlock.wallLeft.texture.Apply();
+                typeBlock.wallLeft.texture.SetPixel(15, pos.y, color);
+                typeBlock.wallLeft.texture.Apply();
             }
             //Если текущая сторона верх
-            else if (wall == blockData.TBlock.wallUp)
+            else if (wall == typeBlock.wallUp)
             {
                 //То слева будет левая сторона но позиция Y будет на X
-                blockData.TBlock.wallLeft.texture.SetPixel(15 - pos.y, 15, color);
-                blockData.TBlock.wallLeft.texture.Apply();
+                typeBlock.wallLeft.texture.SetPixel(15 - pos.y, 15, color);
+                typeBlock.wallLeft.texture.Apply();
             }
-            else if (wall == blockData.TBlock.wallDown)
+            else if (wall == typeBlock.wallDown)
             {
-                blockData.TBlock.wallLeft.texture.SetPixel(pos.y, 0, color);
-                blockData.TBlock.wallLeft.texture.Apply();
+                typeBlock.wallLeft.texture.SetPixel(pos.y, 0, color);
+                typeBlock.wallLeft.texture.Apply();
             }
-            else if (wall == blockData.TBlock.wallBack)
+            else if (wall == typeBlock.wallBack)
             {
-                blockData.TBlock.wallRight.texture.SetPixel(15, pos.y, color);
-                blockData.TBlock.wallRight.texture.Apply();
+                typeBlock.wallRight.texture.SetPixel(15, pos.y, color);
+                typeBlock.wallRight.texture.Apply();
             }
-            else if (wall == blockData.TBlock.wallLeft)
+            else if (wall == typeBlock.wallLeft)
             {
-                blockData.TBlock.wallBack.texture.SetPixel(15, pos.y, color);
-                blockData.TBlock.wallBack.texture.Apply();
+                typeBlock.wallBack.texture.SetPixel(15, pos.y, color);
+                typeBlock.wallBack.texture.Apply();
             }
-            else if (wall == blockData.TBlock.wallRight)
+            else if (wall == typeBlock.wallRight)
             {
-                blockData.TBlock.wallFace.texture.SetPixel(15, pos.y, color);
-                blockData.TBlock.wallFace.texture.Apply();
+                typeBlock.wallFace.texture.SetPixel(15, pos.y, color);
+                typeBlock.wallFace.texture.Apply();
             }
         }
         //справа
         else if (pos.x == 15)
         {
-            if (wall == blockData.TBlock.wallFace)
+            if (wall == typeBlock.wallFace)
             {
-                blockData.TBlock.wallRight.texture.SetPixel(0, pos.y, color);
-                blockData.TBlock.wallRight.texture.Apply();
+                typeBlock.wallRight.texture.SetPixel(0, pos.y, color);
+                typeBlock.wallRight.texture.Apply();
             }
-            else if (wall == blockData.TBlock.wallUp)
+            else if (wall == typeBlock.wallUp)
             {
                 //То слева будет левая сторона но позиция Y будет на X
-                blockData.TBlock.wallRight.texture.SetPixel(pos.y, 15, color);
-                blockData.TBlock.wallRight.texture.Apply();
+                typeBlock.wallRight.texture.SetPixel(pos.y, 15, color);
+                typeBlock.wallRight.texture.Apply();
             }
-            else if (wall == blockData.TBlock.wallDown)
+            else if (wall == typeBlock.wallDown)
             {
-                blockData.TBlock.wallRight.texture.SetPixel(15 - pos.y, 0, color);
-                blockData.TBlock.wallRight.texture.Apply();
+                typeBlock.wallRight.texture.SetPixel(15 - pos.y, 0, color);
+                typeBlock.wallRight.texture.Apply();
             }
-            else if (wall == blockData.TBlock.wallBack)
+            else if (wall == typeBlock.wallBack)
             {
-                blockData.TBlock.wallLeft.texture.SetPixel(0, pos.y, color);
-                blockData.TBlock.wallLeft.texture.Apply();
+                typeBlock.wallLeft.texture.SetPixel(0, pos.y, color);
+                typeBlock.wallLeft.texture.Apply();
             }
-            else if (wall == blockData.TBlock.wallLeft)
+            else if (wall == typeBlock.wallLeft)
             {
-                blockData.TBlock.wallFace.texture.SetPixel(0, pos.y, color);
-                blockData.TBlock.wallFace.texture.Apply();
+                typeBlock.wallFace.texture.SetPixel(0, pos.y, color);
+                typeBlock.wallFace.texture.Apply();
             }
-            else if (wall == blockData.TBlock.wallRight)
+            else if (wall == typeBlock.wallRight)
             {
-                blockData.TBlock.wallBack.texture.SetPixel(0, pos.y, color);
-                blockData.TBlock.wallBack.texture.Apply();
+                typeBlock.wallBack.texture.SetPixel(0, pos.y, color);
+                typeBlock.wallBack.texture.Apply();
             }
         }
 
         //Нижне проверки
         if (pos.y == 0)
         {
-            if (wall == blockData.TBlock.wallFace)
+            if (wall == typeBlock.wallFace)
             {
                 //то снизу низ
-                blockData.TBlock.wallDown.texture.SetPixel(pos.x, 15, color);
-                blockData.TBlock.wallDown.texture.Apply();
+                typeBlock.wallDown.texture.SetPixel(pos.x, 15, color);
+                typeBlock.wallDown.texture.Apply();
             }
-            if (wall == blockData.TBlock.wallUp)
+            if (wall == typeBlock.wallUp)
             {
                 //то снизу лицо
-                blockData.TBlock.wallFace.texture.SetPixel(pos.x, 15, color);
-                blockData.TBlock.wallFace.texture.Apply();
+                typeBlock.wallFace.texture.SetPixel(pos.x, 15, color);
+                typeBlock.wallFace.texture.Apply();
             }
-            else if (wall == blockData.TBlock.wallDown)
+            else if (wall == typeBlock.wallDown)
             {
-                blockData.TBlock.wallBack.texture.SetPixel(15 - pos.x, 0, color);
-                blockData.TBlock.wallBack.texture.Apply();
+                typeBlock.wallBack.texture.SetPixel(15 - pos.x, 0, color);
+                typeBlock.wallBack.texture.Apply();
             }
-            else if (wall == blockData.TBlock.wallBack)
+            else if (wall == typeBlock.wallBack)
             {
-                blockData.TBlock.wallDown.texture.SetPixel(15 - pos.x, 0, color);
-                blockData.TBlock.wallDown.texture.Apply();
+                typeBlock.wallDown.texture.SetPixel(15 - pos.x, 0, color);
+                typeBlock.wallDown.texture.Apply();
             }
-            else if (wall == blockData.TBlock.wallLeft)
+            else if (wall == typeBlock.wallLeft)
             {
-                blockData.TBlock.wallDown.texture.SetPixel(0, pos.x, color);
-                blockData.TBlock.wallDown.texture.Apply();
+                typeBlock.wallDown.texture.SetPixel(0, pos.x, color);
+                typeBlock.wallDown.texture.Apply();
             }
-            else if (wall == blockData.TBlock.wallRight)
+            else if (wall == typeBlock.wallRight)
             {
-                blockData.TBlock.wallDown.texture.SetPixel(15, 15 - pos.x, color);
-                blockData.TBlock.wallDown.texture.Apply();
+                typeBlock.wallDown.texture.SetPixel(15, 15 - pos.x, color);
+                typeBlock.wallDown.texture.Apply();
             }
         }
         //Сверху
         else if (pos.y == 15)
         {
-            if (wall == blockData.TBlock.wallFace)
+            if (wall == typeBlock.wallFace)
             {
                 //то сверху верх
-                blockData.TBlock.wallUp.texture.SetPixel(pos.x, 0, color);
-                blockData.TBlock.wallUp.texture.Apply();
+                typeBlock.wallUp.texture.SetPixel(pos.x, 0, color);
+                typeBlock.wallUp.texture.Apply();
             }
-            if (wall == blockData.TBlock.wallUp)
+            if (wall == typeBlock.wallUp)
             {
                 //то сверху зад
-                blockData.TBlock.wallBack.texture.SetPixel(15 - pos.x, 15, color);
-                blockData.TBlock.wallBack.texture.Apply();
+                typeBlock.wallBack.texture.SetPixel(15 - pos.x, 15, color);
+                typeBlock.wallBack.texture.Apply();
             }
-            else if (wall == blockData.TBlock.wallDown)
+            else if (wall == typeBlock.wallDown)
             {
-                blockData.TBlock.wallFace.texture.SetPixel(pos.x, 0, color);
-                blockData.TBlock.wallFace.texture.Apply();
+                typeBlock.wallFace.texture.SetPixel(pos.x, 0, color);
+                typeBlock.wallFace.texture.Apply();
             }
-            else if (wall == blockData.TBlock.wallBack)
+            else if (wall == typeBlock.wallBack)
             {
-                blockData.TBlock.wallUp.texture.SetPixel(15 - pos.x, 15, color);
-                blockData.TBlock.wallUp.texture.Apply();
+                typeBlock.wallUp.texture.SetPixel(15 - pos.x, 15, color);
+                typeBlock.wallUp.texture.Apply();
             }
-            else if (wall == blockData.TBlock.wallLeft)
+            else if (wall == typeBlock.wallLeft)
             {
-                blockData.TBlock.wallUp.texture.SetPixel(0, 15 - pos.x, color);
-                blockData.TBlock.wallUp.texture.Apply();
+                typeBlock.wallUp.texture.SetPixel(0, 15 - pos.x, color);
+                typeBlock.wallUp.texture.Apply();
             }
-            else if (wall == blockData.TBlock.wallRight)
+            else if (wall == typeBlock.wallRight)
             {
-                blockData.TBlock.wallUp.texture.SetPixel(15, pos.x, color);
-                blockData.TBlock.wallUp.texture.Apply();
+                typeBlock.wallUp.texture.SetPixel(15, pos.x, color);
+                typeBlock.wallUp.texture.Apply();
             }
         }
     }
@@ -548,58 +548,59 @@ public class RedactorBlocksVoxel : MonoBehaviour
             //Plane targetPlane = new Plane(cameraR.origin + cameraR.direction, cameraR.origin, cameraR.origin + camera.gameObject.transform.up);
             float vox = 0;
 
+            TypeBlock typeBlock = RedactorBlocksCTRL.blockData as TypeBlock;
 
             //если это лицевая сторона блока
-            if (blockWall == RedactorBlocksCTRL.blockData.TBlock.wallFace)
+            if (blockWall == typeBlock.wallFace)
             {
                 voxPointStart += new Vector3(
                     colliders.VoxelPos.x,
                     colliders.VoxelPos.y,
-                    RedactorBlocksCTRL.blockData.TBlock.wallFace.forms.voxel[colliders.VoxelPos.x, colliders.VoxelPos.y] * -1);
+                    typeBlock.wallFace.forms.voxel[colliders.VoxelPos.x, colliders.VoxelPos.y] * -1);
                 voxDirection = new Vector3(0, 0, -1);
             }
             //Задняя сторона блока
-            else if (blockWall == RedactorBlocksCTRL.blockData.TBlock.wallBack)
+            else if (blockWall == typeBlock.wallBack)
             {
                 voxPointStart += new Vector3(
                     16 - colliders.VoxelPos.x,
                     colliders.VoxelPos.y,
-                    16 + RedactorBlocksCTRL.blockData.TBlock.wallBack.forms.voxel[colliders.VoxelPos.x, colliders.VoxelPos.y] * 1);
+                    16 + typeBlock.wallBack.forms.voxel[colliders.VoxelPos.x, colliders.VoxelPos.y] * 1);
                 voxDirection = new Vector3(0, 0, 1);
             }
             //Левая сторона
-            else if (blockWall == RedactorBlocksCTRL.blockData.TBlock.wallLeft)
+            else if (blockWall == typeBlock.wallLeft)
             {
                 voxPointStart += new Vector3(
-                    RedactorBlocksCTRL.blockData.TBlock.wallLeft.forms.voxel[colliders.VoxelPos.x, colliders.VoxelPos.y] * -1,
+                    typeBlock.wallLeft.forms.voxel[colliders.VoxelPos.x, colliders.VoxelPos.y] * -1,
                     colliders.VoxelPos.y,
                     16 - colliders.VoxelPos.x);
                 voxDirection = new Vector3(-1, 0, 0);
             }
             //правая сторона
-            else if (blockWall == RedactorBlocksCTRL.blockData.TBlock.wallRight)
+            else if (blockWall == typeBlock.wallRight)
             {
                 voxPointStart += new Vector3(
-                    16 + RedactorBlocksCTRL.blockData.TBlock.wallRight.forms.voxel[colliders.VoxelPos.x, colliders.VoxelPos.y] * 1,
+                    16 + typeBlock.wallRight.forms.voxel[colliders.VoxelPos.x, colliders.VoxelPos.y] * 1,
                     colliders.VoxelPos.y,
                     colliders.VoxelPos.x);
                 voxDirection = new Vector3(1, 0, 0);
             }
             //нижняя сторона
-            else if (blockWall == RedactorBlocksCTRL.blockData.TBlock.wallDown)
+            else if (blockWall == typeBlock.wallDown)
             {
                 voxPointStart += new Vector3(
                     colliders.VoxelPos.x,
-                    RedactorBlocksCTRL.blockData.TBlock.wallDown.forms.voxel[colliders.VoxelPos.x, colliders.VoxelPos.y] * -1,
+                    typeBlock.wallDown.forms.voxel[colliders.VoxelPos.x, colliders.VoxelPos.y] * -1,
                     16 - colliders.VoxelPos.y);
                 voxDirection = new Vector3(0, -1, 0);
             }
             //верхняя сторона
-            else if (blockWall == RedactorBlocksCTRL.blockData.TBlock.wallUp)
+            else if (blockWall == typeBlock.wallUp)
             {
                 voxPointStart += new Vector3(
                     colliders.VoxelPos.x,
-                    16 + RedactorBlocksCTRL.blockData.TBlock.wallUp.forms.voxel[colliders.VoxelPos.x, colliders.VoxelPos.y] * 1,
+                    16 + typeBlock.wallUp.forms.voxel[colliders.VoxelPos.x, colliders.VoxelPos.y] * 1,
                     colliders.VoxelPos.y);
                 voxDirection = new Vector3(0, 1, 0);
             }
@@ -626,27 +627,27 @@ public class RedactorBlocksVoxel : MonoBehaviour
 
             //Нужно найти изменение
             float voxNeed = 0.0f;
-            if (blockWall == RedactorBlocksCTRL.blockData.TBlock.wallFace)
+            if (blockWall == typeBlock.wallFace)
             {
                 voxNeed = (lineNearest.PointA.z - meshRenderer.transform.position.z) * -1;
             }
-            else if (blockWall == RedactorBlocksCTRL.blockData.TBlock.wallBack)
+            else if (blockWall == typeBlock.wallBack)
             {
                 voxNeed = (lineNearest.PointA.z - meshRenderer.transform.position.z) - 1;
             }
-            else if (blockWall == RedactorBlocksCTRL.blockData.TBlock.wallLeft)
+            else if (blockWall == typeBlock.wallLeft)
             {
                 voxNeed = (lineNearest.PointA.x - meshRenderer.transform.position.x) * -1;
             }
-            else if (blockWall == RedactorBlocksCTRL.blockData.TBlock.wallRight)
+            else if (blockWall == typeBlock.wallRight)
             {
                 voxNeed = (lineNearest.PointA.x - meshRenderer.transform.position.x) - 1;
             }
-            else if (blockWall == RedactorBlocksCTRL.blockData.TBlock.wallDown)
+            else if (blockWall == typeBlock.wallDown)
             {
                 voxNeed = (lineNearest.PointA.y - meshRenderer.transform.position.y) * -1;
             }
-            else if (blockWall == RedactorBlocksCTRL.blockData.TBlock.wallUp)
+            else if (blockWall == typeBlock.wallUp)
             {
                 voxNeed = (lineNearest.PointA.y - meshRenderer.transform.position.y) - 1;
             }
@@ -796,32 +797,34 @@ public class RedactorBlocksVoxel : MonoBehaviour
         voxZone.SetActive(true);
         voxPos.transform.localPosition = new Vector3(colliders.VoxelPos.x / 16.0f, colliders.VoxelPos.y / 16.0f, 0);
 
-        if (blockWall == RedactorBlocksCTRL.blockData.TBlock.wallFace)
+        TypeBlock typeBlock = RedactorBlocksCTRL.blockData as TypeBlock;
+
+        if (blockWall == typeBlock.wallFace)
         {
             voxZone.transform.localPosition = new Vector3(0, 0, 0);
             voxZone.transform.eulerAngles = new Vector3(0, 0, 0);
         }
-        else if (blockWall == RedactorBlocksCTRL.blockData.TBlock.wallBack)
+        else if (blockWall == typeBlock.wallBack)
         {
             voxZone.transform.localPosition = new Vector3(1, 0, 1);
             voxZone.transform.eulerAngles = new Vector3(0, 180, 0);
         }
-        else if (blockWall == RedactorBlocksCTRL.blockData.TBlock.wallLeft)
+        else if (blockWall == typeBlock.wallLeft)
         {
             voxZone.transform.localPosition = new Vector3(0, 0, 1);
             voxZone.transform.eulerAngles = new Vector3(0, 90, 0);
         }
-        else if (blockWall == RedactorBlocksCTRL.blockData.TBlock.wallRight)
+        else if (blockWall == typeBlock.wallRight)
         {
             voxZone.transform.localPosition = new Vector3(1, 0, 0);
             voxZone.transform.eulerAngles = new Vector3(0, -90, 0);
         }
-        else if (blockWall == RedactorBlocksCTRL.blockData.TBlock.wallUp)
+        else if (blockWall == typeBlock.wallUp)
         {
             voxZone.transform.localPosition = new Vector3(0, 1, 0);
             voxZone.transform.eulerAngles = new Vector3(90, 0, 0);
         }
-        else if (blockWall == RedactorBlocksCTRL.blockData.TBlock.wallDown)
+        else if (blockWall == typeBlock.wallDown)
         {
             voxZone.transform.localPosition = new Vector3(0, 0, 1);
             voxZone.transform.eulerAngles = new Vector3(-90, 0, 0);

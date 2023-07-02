@@ -5,7 +5,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 
 
-public class TypeBlock
+public class TypeBlock: BlockData
 {
     public Wall wallFace;
     public Wall wallBack;
@@ -13,6 +13,20 @@ public class TypeBlock
     public Wall wallRight;
     public Wall wallUp;
     public Wall wallDown;
+
+    public TypeBlock(BlockData blockData): base(blockData) {
+        TypeBlock typeBlock = blockData as TypeBlock;
+
+        if (typeBlock == null)
+            return;
+
+        wallFace = typeBlock.wallFace;
+        wallBack = typeBlock.wallBack;
+        wallLeft = typeBlock.wallLeft;
+        wallRight = typeBlock.wallRight;
+        wallUp = typeBlock.wallUp;
+        wallDown = typeBlock.wallDown;
+    }
 
     /// <summary>
     /// Визуальная часть стены
@@ -262,5 +276,91 @@ public class TypeBlock
         wallLeft.calcVertices();
         wallUp.calcVertices();
         wallDown.calcVertices();
+    }
+
+    public override Mesh GetMesh(bool face, bool back, bool left, bool right, bool up, bool down)
+    {
+        Mesh meshResult = new Mesh();
+
+        meshResult.vertices = GraficCalc.main.mergeVector3(wallFace.forms.vertices, wallBack.forms.vertices, wallRight.forms.vertices, wallLeft.forms.vertices, wallUp.forms.vertices, wallDown.forms.vertices);
+        //meshResult.triangles = GraficCalc.main.mergeTriangleNum(wallFace.forms.triangles, wallBack.forms.triangles, wallRight.forms.triangles, wallLeft.forms.triangles, wallUp.forms.triangles, wallDown.forms.triangles);
+        meshResult.uv = GraficCalc.main.mergeVector2(wallFace.forms.uv, wallBack.forms.uv, wallRight.forms.uv, wallLeft.forms.uv, wallUp.forms.uv, wallDown.forms.uv);
+        meshResult.uv2 = GraficCalc.main.mergeVector2(wallFace.forms.uvShadow, wallBack.forms.uvShadow, wallRight.forms.uvShadow, wallLeft.forms.uvShadow, wallUp.forms.uvShadow, wallDown.forms.uvShadow);
+
+        meshResult.subMeshCount = 6;
+        /////////////////////////////////////////////////////////////
+        //Нужно в данных треугольников надо сдвигать счет примитивов
+        /////////////////////////////////////////////////////////////
+        int addNum = 0;
+        meshResult.SetTriangles(wallFace.forms.triangles, 0);
+        addNum += wallFace.forms.triangles.Length;
+
+        int[] trianglesBack = GraficCalc.main.addToInt(wallBack.forms.triangles, addNum);
+        meshResult.SetTriangles(trianglesBack, 1);
+        addNum += wallBack.forms.triangles.Length;
+
+        int[] trianglesRight = GraficCalc.main.addToInt(wallBack.forms.triangles, addNum);
+        meshResult.SetTriangles(trianglesRight, 2);
+        addNum += wallRight.forms.triangles.Length;
+
+        int[] trianglesLeft = GraficCalc.main.addToInt(wallBack.forms.triangles, addNum);
+        meshResult.SetTriangles(trianglesLeft, 3);
+        addNum += wallLeft.forms.triangles.Length;
+
+        int[] trianglesUp = GraficCalc.main.addToInt(wallBack.forms.triangles, addNum);
+        meshResult.SetTriangles(trianglesUp, 4);
+        addNum += wallUp.forms.triangles.Length;
+
+        int[] trianglesDown = GraficCalc.main.addToInt(wallBack.forms.triangles, addNum);
+        meshResult.SetTriangles(trianglesDown, 5);
+
+        return meshResult;
+    }
+
+    public void saveBlock(string pathBlock) {
+        saveBlockWall(pathBlock);
+    }
+
+    public void loadBlock(string path) {
+        loadBlockWall(path);
+    }
+
+    void saveBlockWall(string pathBlock)
+    {
+        string pathWalls = pathBlock + "/" + StrC.wall;
+
+        wallFace.SaveTo(pathWalls);
+        wallBack.SaveTo(pathWalls);
+        wallLeft.SaveTo(pathWalls);
+        wallRight.SaveTo(pathWalls);
+        wallUp.SaveTo(pathWalls);
+        wallDown.SaveTo(pathWalls);
+    }
+    void loadBlockWall(string path)
+    {
+        string pathWalls = path + "/" + StrC.wall;
+
+        wallFace.LoadFrom(pathWalls);
+        wallBack.LoadFrom(pathWalls);
+        wallLeft.LoadFrom(pathWalls);
+        wallRight.LoadFrom(pathWalls);
+        wallUp.LoadFrom(pathWalls);
+        wallDown.LoadFrom(pathWalls);
+    }
+}
+
+public class BlockForms
+{
+    public float[,] voxel = new float[16, 16];
+    //Стена 16 на 16
+    public Vector3[] vertices;
+    public int[] triangles;
+    public Vector2[] uv;
+    public Vector2[] uvShadow;
+
+    [System.Serializable]
+    public class voxels
+    {
+        public float[,] height = new float[16, 16];
     }
 }

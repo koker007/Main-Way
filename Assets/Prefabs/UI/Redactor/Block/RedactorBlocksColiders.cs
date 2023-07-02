@@ -69,6 +69,8 @@ public class RedactorBlocksColiders : MonoBehaviour
     void TestCreateColliders() {
         float voxelSize = 0.0625f; //1.0f / 16.0f;
 
+        TypeBlock typeBlock = RedactorBlocksCTRL.blockData as TypeBlock;
+
         if (ColidersWallFace == null) {
             //”дал€ем родител€ если был
             if (ObjWallFace != null)
@@ -89,8 +91,8 @@ public class RedactorBlocksColiders : MonoBehaviour
                     objVoxel.transform.localScale = new Vector3(1, 1, 1);
 
                     ColidersWallFace[x, y] = objVoxel.AddComponent<BoxCollider>();
-                    ColidersWallFace[x, y].center = new Vector3(x * voxelSize + voxelSize/2f, y * voxelSize + voxelSize/2f, RedactorBlocksCTRL.blockData.TBlock.wallFace.forms.voxel[x,y]*voxelSize * -0.5f);
-                    ColidersWallFace[x, y].size = new Vector3(voxelSize, voxelSize, RedactorBlocksCTRL.blockData.TBlock.wallFace.forms.voxel[x, y] * voxelSize);
+                    ColidersWallFace[x, y].center = new Vector3(x * voxelSize + voxelSize/2f, y * voxelSize + voxelSize/2f, typeBlock.wallFace.forms.voxel[x,y]*voxelSize * -0.5f);
+                    ColidersWallFace[x, y].size = new Vector3(voxelSize, voxelSize, typeBlock.wallFace.forms.voxel[x, y] * voxelSize);
                 }
             }
         }
@@ -117,8 +119,8 @@ public class RedactorBlocksColiders : MonoBehaviour
                     objVoxel.transform.localScale = new Vector3(1, 1, 1);
 
                     ColidersWallBack[x, y] = objVoxel.AddComponent<BoxCollider>();
-                    ColidersWallBack[x, y].center = new Vector3(x * voxelSize + voxelSize / 2, y * voxelSize + voxelSize / 2, RedactorBlocksCTRL.blockData.TBlock.wallBack.forms.voxel[x, y] * voxelSize * -0.5f);
-                    ColidersWallBack[x, y].size = new Vector3(voxelSize, voxelSize, RedactorBlocksCTRL.blockData.TBlock.wallBack.forms.voxel[x, y] * voxelSize);
+                    ColidersWallBack[x, y].center = new Vector3(x * voxelSize + voxelSize / 2, y * voxelSize + voxelSize / 2, typeBlock.wallBack.forms.voxel[x, y] * voxelSize * -0.5f);
+                    ColidersWallBack[x, y].size = new Vector3(voxelSize, voxelSize, typeBlock.wallBack.forms.voxel[x, y] * voxelSize);
                 }
             }
 
@@ -149,8 +151,8 @@ public class RedactorBlocksColiders : MonoBehaviour
                     objVoxel.transform.localScale = new Vector3(1, 1, 1);
 
                     ColidersWallLeft[x, y] = objVoxel.AddComponent<BoxCollider>();
-                    ColidersWallLeft[x, y].center = new Vector3(x * voxelSize + voxelSize / 2, y * voxelSize + voxelSize / 2, RedactorBlocksCTRL.blockData.TBlock.wallLeft.forms.voxel[x, y] * voxelSize * -0.5f);
-                    ColidersWallLeft[x, y].size = new Vector3(voxelSize, voxelSize, RedactorBlocksCTRL.blockData.TBlock.wallLeft.forms.voxel[x, y] * voxelSize);
+                    ColidersWallLeft[x, y].center = new Vector3(x * voxelSize + voxelSize / 2, y * voxelSize + voxelSize / 2, typeBlock.wallLeft.forms.voxel[x, y] * voxelSize * -0.5f);
+                    ColidersWallLeft[x, y].size = new Vector3(voxelSize, voxelSize, typeBlock.wallLeft.forms.voxel[x, y] * voxelSize);
                 }
             }
 
@@ -181,8 +183,8 @@ public class RedactorBlocksColiders : MonoBehaviour
                     objVoxel.transform.localScale = new Vector3(1, 1, 1);
 
                     ColidersWallRight[x, y] = objVoxel.AddComponent<BoxCollider>();
-                    ColidersWallRight[x, y].center = new Vector3(x * voxelSize + voxelSize / 2, y * voxelSize + voxelSize / 2, RedactorBlocksCTRL.blockData.TBlock.wallRight.forms.voxel[x, y] * voxelSize * -0.5f);
-                    ColidersWallRight[x, y].size = new Vector3(voxelSize, voxelSize, RedactorBlocksCTRL.blockData.TBlock.wallRight.forms.voxel[x, y] * voxelSize);
+                    ColidersWallRight[x, y].center = new Vector3(x * voxelSize + voxelSize / 2, y * voxelSize + voxelSize / 2, typeBlock.wallRight.forms.voxel[x, y] * voxelSize * -0.5f);
+                    ColidersWallRight[x, y].size = new Vector3(voxelSize, voxelSize, typeBlock.wallRight.forms.voxel[x, y] * voxelSize);
                 }
             }
 
@@ -213,8 +215,8 @@ public class RedactorBlocksColiders : MonoBehaviour
                     objVoxel.transform.localScale = new Vector3(1, 1, 1);
 
                     ColidersWallUp[x, y] = objVoxel.AddComponent<BoxCollider>();
-                    ColidersWallUp[x, y].center = new Vector3(x * voxelSize + voxelSize / 2, y * voxelSize + voxelSize / 2, RedactorBlocksCTRL.blockData.TBlock.wallUp.forms.voxel[x, y] * voxelSize * -0.5f);
-                    ColidersWallUp[x, y].size = new Vector3(voxelSize, voxelSize, RedactorBlocksCTRL.blockData.TBlock.wallUp.forms.voxel[x, y] * voxelSize);
+                    ColidersWallUp[x, y].center = new Vector3(x * voxelSize + voxelSize / 2, y * voxelSize + voxelSize / 2, typeBlock.wallUp.forms.voxel[x, y] * voxelSize * -0.5f);
+                    ColidersWallUp[x, y].size = new Vector3(voxelSize, voxelSize, typeBlock.wallUp.forms.voxel[x, y] * voxelSize);
                 }
             }
 
@@ -246,8 +248,8 @@ public class RedactorBlocksColiders : MonoBehaviour
                     objVoxel.transform.localScale = new Vector3(1, 1, 1);
 
                     ColidersWallDown[x, y] = objVoxel.AddComponent<BoxCollider>();
-                    ColidersWallDown[x, y].center = new Vector3(x * voxelSize + voxelSize / 2, y * voxelSize + voxelSize / 2, RedactorBlocksCTRL.blockData.TBlock.wallDown.forms.voxel[x, y] * voxelSize * -0.5f);
-                    ColidersWallDown[x, y].size = new Vector3(voxelSize, voxelSize, RedactorBlocksCTRL.blockData.TBlock.wallDown.forms.voxel[x, y] * voxelSize);
+                    ColidersWallDown[x, y].center = new Vector3(x * voxelSize + voxelSize / 2, y * voxelSize + voxelSize / 2, typeBlock.wallDown.forms.voxel[x, y] * voxelSize * -0.5f);
+                    ColidersWallDown[x, y].size = new Vector3(voxelSize, voxelSize, typeBlock.wallDown.forms.voxel[x, y] * voxelSize);
                 }
             }
 
@@ -358,41 +360,43 @@ public class RedactorBlocksColiders : MonoBehaviour
 
         void iniObjWall(Collider voxelCollider)
         {
+            TypeBlock typeBlock = RedactorBlocksCTRL.blockData as TypeBlock;
+
             //»щем стену
             if (voxelCollider.transform.parent.gameObject == ObjWallFace)
             {
                 lastObjWall = ObjWallFace;
-                lastBlockWall = RedactorBlocksCTRL.blockData.TBlock.wallFace;
+                lastBlockWall = typeBlock.wallFace;
                 lastSide = Side.face;
             }
             else if (voxelCollider.transform.parent.gameObject == ObjWallBack)
             {
                 lastObjWall = ObjWallBack;
-                lastBlockWall = RedactorBlocksCTRL.blockData.TBlock.wallBack;
+                lastBlockWall = typeBlock.wallBack;
                 lastSide = Side.back;
             }
             else if (voxelCollider.transform.parent.gameObject == ObjWallLeft)
             {
                 lastObjWall = ObjWallLeft;
-                lastBlockWall = RedactorBlocksCTRL.blockData.TBlock.wallLeft;
+                lastBlockWall = typeBlock.wallLeft;
                 lastSide = Side.left;
             }
             else if (voxelCollider.transform.parent.gameObject == ObjWallRight)
             {
                 lastObjWall = ObjWallRight;
-                lastBlockWall = RedactorBlocksCTRL.blockData.TBlock.wallRight;
+                lastBlockWall = typeBlock.wallRight;
                 lastSide = Side.right;
             }
             else if (voxelCollider.transform.parent.gameObject == ObjWallUp)
             {
                 lastObjWall = ObjWallUp;
-                lastBlockWall = RedactorBlocksCTRL.blockData.TBlock.wallUp;
+                lastBlockWall = typeBlock.wallUp;
                 lastSide = Side.up;
             }
             else if (voxelCollider.transform.parent.gameObject == ObjWallDown)
             {
                 lastObjWall = ObjWallDown;
-                lastBlockWall = RedactorBlocksCTRL.blockData.TBlock.wallDown;
+                lastBlockWall = typeBlock.wallDown;
                 lastSide = Side.down;
             }
             else
@@ -410,27 +414,29 @@ public class RedactorBlocksColiders : MonoBehaviour
 
 
     public void delCollidersWall(TypeBlock.Wall blockWall) {
-        if (blockWall == RedactorBlocksCTRL.blockData.TBlock.wallFace)
+        TypeBlock typeBlock = RedactorBlocksCTRL.blockData as TypeBlock;
+
+        if (blockWall == typeBlock.wallFace)
         {
             ColidersWallFace = null;
         }
-        else if (blockWall == RedactorBlocksCTRL.blockData.TBlock.wallBack)
+        else if (blockWall == typeBlock.wallBack)
         {
             ColidersWallBack = null;
         }
-        else if (blockWall == RedactorBlocksCTRL.blockData.TBlock.wallLeft)
+        else if (blockWall == typeBlock.wallLeft)
         {
             ColidersWallLeft = null;
         }
-        else if (blockWall == RedactorBlocksCTRL.blockData.TBlock.wallRight)
+        else if (blockWall == typeBlock.wallRight)
         {
             ColidersWallRight = null;
         }
-        else if (blockWall == RedactorBlocksCTRL.blockData.TBlock.wallDown)
+        else if (blockWall == typeBlock.wallDown)
         {
             ColidersWallDown = null;
         }
-        else if (blockWall == RedactorBlocksCTRL.blockData.TBlock.wallUp)
+        else if (blockWall == typeBlock.wallUp)
         {
             ColidersWallUp = null;
         }

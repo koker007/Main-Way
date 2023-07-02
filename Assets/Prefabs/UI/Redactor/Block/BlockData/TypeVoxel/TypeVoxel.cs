@@ -4,7 +4,7 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 
-public class TypeVoxel
+public class TypeVoxel: BlockData
 {
 
     Visual visual;
@@ -21,6 +21,23 @@ public class TypeVoxel
         public int[] triangles;
         public Vector3[] vert;
         public Vector2[] uv;
+    }
+
+    public TypeVoxel() {
+    
+    }
+    public TypeVoxel(BlockData blockData): base(blockData) {
+        
+    }
+
+    public void loadVoxel(string path) {
+
+        string pathTVoxelForm = path + "/" + StrC.TVoxels;
+        LoadFrom(pathTVoxelForm);
+    }
+    public void saveVoxel(string pathBlock) {
+        string pathTVoxelForm = pathBlock + "/" + StrC.TVoxels;
+        SaveTo(pathTVoxelForm);
     }
 
     void existsToAlphaTexture()

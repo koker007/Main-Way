@@ -3,7 +3,7 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 
-public class BlockData
+public abstract class BlockData
 {
     public string name;
     public string mod;
@@ -22,14 +22,22 @@ public class BlockData
     //Светимость
     public int lighting = 0;
 
-    public Type type;
-
     public BlockPhysics physics;
 
-    //Данные разных типов блоков
-    public TypeBlock TBlock;
-    public TypeVoxel TVoxels;
-    public TypeLiquid TLiquid;
+    public BlockData(BlockData blockData) {
+        mod = blockData.mod;
+        name = blockData.name;
+        variant = blockData.variant;
+
+        transparentType = blockData.transparentType;
+        transparentPower = blockData.transparentPower;
+
+        drawNeighbourWall = blockData.drawNeighbourWall;
+
+        lighting = blockData.lighting;
+
+        physics = blockData.physics;
+    }
 
     public enum Type {
         block = 0,
@@ -38,92 +46,15 @@ public class BlockData
     }
 
     //Получить меш куба на основе того какие стены нужно отрисовать
-    public Mesh GetMesh(bool face, bool back, bool left, bool right, bool up, bool down) {
+    public virtual Mesh GetMesh(bool face, bool back, bool left, bool right, bool up, bool down) {
         Mesh meshResult = new Mesh();
-
-        meshResult.vertices = GraficCalc.main.mergeVector3(TBlock.wallFace.forms.vertices, TBlock.wallBack.forms.vertices, TBlock.wallRight.forms.vertices, TBlock.wallLeft.forms.vertices, TBlock.wallUp.forms.vertices, TBlock.wallDown.forms.vertices);
-        //meshResult.triangles = GraficCalc.main.mergeTriangleNum(wallFace.forms.triangles, wallBack.forms.triangles, wallRight.forms.triangles, wallLeft.forms.triangles, wallUp.forms.triangles, wallDown.forms.triangles);
-        meshResult.uv = GraficCalc.main.mergeVector2(TBlock.wallFace.forms.uv, TBlock.wallBack.forms.uv, TBlock.wallRight.forms.uv, TBlock.wallLeft.forms.uv, TBlock.wallUp.forms.uv, TBlock.wallDown.forms.uv);
-        meshResult.uv2 = GraficCalc.main.mergeVector2(TBlock.wallFace.forms.uvShadow, TBlock.wallBack.forms.uvShadow, TBlock.wallRight.forms.uvShadow, TBlock.wallLeft.forms.uvShadow, TBlock.wallUp.forms.uvShadow, TBlock.wallDown.forms.uvShadow);
-
-        meshResult.subMeshCount = 6;
-        /////////////////////////////////////////////////////////////
-        //Нужно в данных треугольников надо сдвигать счет примитивов
-        /////////////////////////////////////////////////////////////
-        int addNum = 0;
-        meshResult.SetTriangles(TBlock.wallFace.forms.triangles, 0);
-        addNum += TBlock.wallFace.forms.triangles.Length;
-
-        int[] trianglesBack = GraficCalc.main.addToInt(TBlock.wallBack.forms.triangles, addNum);
-        meshResult.SetTriangles(trianglesBack, 1);
-        addNum += TBlock.wallBack.forms.triangles.Length;
-
-        int[] trianglesRight = GraficCalc.main.addToInt(TBlock.wallBack.forms.triangles, addNum);
-        meshResult.SetTriangles(trianglesRight, 2);
-        addNum += TBlock.wallRight.forms.triangles.Length;
-
-        int[] trianglesLeft = GraficCalc.main.addToInt(TBlock.wallBack.forms.triangles, addNum);
-        meshResult.SetTriangles(trianglesLeft, 3);
-        addNum += TBlock.wallLeft.forms.triangles.Length;
-
-        int[] trianglesUp = GraficCalc.main.addToInt(TBlock.wallBack.forms.triangles, addNum);
-        meshResult.SetTriangles(trianglesUp, 4);
-        addNum += TBlock.wallUp.forms.triangles.Length;
-
-        int[] trianglesDown = GraficCalc.main.addToInt(TBlock.wallBack.forms.triangles, addNum);
-        meshResult.SetTriangles(trianglesDown, 5);
-
         return meshResult;
     }
 
-    public void TestCreateVoxel() {
-        if (TVoxels != null)
-            return;
-
-        TVoxels = new TypeVoxel();
-        TVoxels.RandomizeData();
-    }
-    public void TestCreateLiquid() {
-        if (TLiquid != null)
-            return;
-
-        TLiquid = new TypeLiquid();
-    }
-    public Mesh GetMeshVoxel() {
-        return TVoxels.GetMesh();
-    }
-    public Mesh GetMeshLiquid(bool face, bool back, bool left, bool right, bool up, bool down, int lvlUp, int lvlDown) {
-        Mesh mesh = new Mesh();
-
-        mesh = TLiquid.GetMesh(face, back, left, right, up, down, lvlUp, lvlDown);
-
-        return mesh;
-    }
-
     public BlockData() {
-        //Создаем по умолчанию тип блока
-        TBlock = new TypeBlock();
-
         //Инициализация блока по умолчанию
         physics = new BlockPhysics();
         physics.parameters = new BlockPhysics.Parameters();
-    }
-
-
-    public void SetRandomVoxel()
-    {
-        for (int x = 0; x < TBlock.wallFace.forms.voxel.GetLength(0); x++)
-        {
-            for (int y = 0; y < TBlock.wallFace.forms.voxel.GetLength(1); y++)
-            {
-                TBlock.wallFace.forms.voxel[x, y] = Random.Range(0, 1.0f);
-                TBlock.wallBack.forms.voxel[x, y] = Random.Range(0, 1.0f);
-                TBlock.wallRight.forms.voxel[x, y] = Random.Range(0, 1.0f);
-                TBlock.wallLeft.forms.voxel[x, y] = Random.Range(0, 1.0f);
-                TBlock.wallUp.forms.voxel[x, y] = Random.Range(0, 1.0f);
-                TBlock.wallDown.forms.voxel[x, y] = Random.Range(0, 1.0f);
-            }
-        }
     }
 
     //Сохранить все данные блока который отправляется
@@ -139,17 +70,21 @@ public class BlockData
         //Сохраняем главные данные блока
         saveBlockMain(path);
 
+        TypeBlock typeBlock = blockData as TypeBlock;
+        TypeVoxel typeVoxel = blockData as TypeVoxel;
+        TypeLiquid typeLiquid = blockData as TypeLiquid;
+
         //Сохраняем в зависимости от типа блока
-        if (blockData.type == Type.block) {
+        if (typeBlock != null) {
             //Сохраняем стены
-            saveBlockWall(path);
+            typeBlock.saveBlock(path);
         }
         //Сохраняем воксельную форму
-        else if (blockData.type == Type.voxels) {
-            saveTVoxelForm(path);
+        else if (typeVoxel != null) {
+            typeVoxel.saveVoxel(path);
         }
-        else if (blockData.type == Type.liquid) {
-            saveTLiquidVisual(path);
+        else if (typeLiquid != null) {
+            typeLiquid.saveLiquid(path);
         }
 
         //Сохраняем физику
@@ -165,11 +100,11 @@ public class BlockData
             string dataOne = "";
             //Запоминаем тип
             dataOne = StrC.type + StrC.SEPARATOR;
-            if (blockData.type == Type.block)
+            if (blockData as TypeBlock != null)
                 dataOne += StrC.TBlock;
-            else if (blockData.type == Type.voxels)
+            else if (blockData as TypeVoxel != null)
                 dataOne += StrC.TVoxels;
-            else if (blockData.type == Type.liquid)
+            else if (blockData as TypeLiquid != null)
                 dataOne += StrC.TLiquid;
 
             dataList.Add(dataOne);
@@ -184,55 +119,53 @@ public class BlockData
             }
             File.WriteAllLines(pathMainStr, dataList.ToArray());
         }
-        void saveBlockWall(string pathBlock) {
-            string pathWalls = pathBlock + "/" + StrC.wall;
-
-            blockData.TBlock.wallFace.SaveTo(pathWalls);
-            blockData.TBlock.wallBack.SaveTo(pathWalls);
-            blockData.TBlock.wallLeft.SaveTo(pathWalls);
-            blockData.TBlock.wallRight.SaveTo(pathWalls);
-            blockData.TBlock.wallUp.SaveTo(pathWalls);
-            blockData.TBlock.wallDown.SaveTo(pathWalls);
-        }       
         void saveBlockPhysics(string pathBlock) {
             string pathPhysics = pathBlock + "/" + StrC.physics;
 
             blockData.physics.saveColliderZone(pathPhysics);
         }
 
-        void saveTVoxelForm(string pathBlock) {
-            string pathTVoxelForm = pathBlock + "/" + StrC.TVoxels;
-            blockData.TVoxels.SaveTo(pathTVoxelForm);
-        }
-        void saveTLiquidVisual(string pathBlock) {
-            string pathTLiquidVisual = pathBlock + "/" + StrC.TLiquid;
-            blockData.TLiquid.SaveTo(pathTLiquidVisual);
-        }
     }
     static public BlockData LoadData(string pathBlockVariant) {
-        //Если пипки блока нет - выходим
+        //Если папки блока нет - выходим
         if (!Directory.Exists(pathBlockVariant))
         {
             Debug.Log(pathBlockVariant + " Not exist");
             return null;
         }
 
-        BlockData resultData = new BlockData();
+        string mod = "";
+        string name = "";
+        int variant = 0;
+        Type type = Type.block;
+
+        BlockData resultData;
+
+        TypeBlock typeBlock = new TypeBlock();
+        TypeVoxel typeVoxel = new TypeVoxel();
+        TypeLiquid typeLiquid = new TypeLiquid();
 
         //Загрузка основных данных блока
         loadBlockMain(pathBlockVariant);
 
-        if (resultData.type == Type.block)
+        if (type == Type.voxels)
         {
-            loadBlockWall(pathBlockVariant);
+            typeVoxel.loadVoxel(pathBlockVariant);
+            resultData = typeVoxel;
         }
-        else if (resultData.type == Type.voxels)
+        else if (type == Type.liquid) {
+            typeLiquid.loadLiquid(pathBlockVariant);
+            resultData = typeLiquid;
+        }
+        else //Type Block
         {
-            loadTVoxelsForm(pathBlockVariant);
+            typeBlock.loadBlock(pathBlockVariant);
+            resultData = typeBlock;
         }
-        else if (resultData.type == Type.liquid) {
-            loadTLiquidForm(pathBlockVariant);
-        }
+
+        resultData.mod = mod;
+        resultData.name = name;
+        resultData.variant = variant;
 
         loadBlockPhysics(pathBlockVariant);
 
@@ -268,9 +201,9 @@ public class BlockData
                 return;
             }
 
-            resultData.mod = pathMass[pathMass.Length - 4];
-            resultData.name = pathMass[pathMass.Length - 2];
-            resultData.variant = System.Convert.ToInt32(pathMass[pathMass.Length - 1]);
+            mod = pathMass[pathMass.Length - 4];
+            name = pathMass[pathMass.Length - 2];
+            variant = System.Convert.ToInt32(pathMass[pathMass.Length - 1]);
 
             //Нужно загрузить файл с основными данными
             loadMainTXT();
@@ -298,48 +231,26 @@ public class BlockData
                         continue;
                     }
 
-                    testParametr(data[0], data[1]);
+                    GetType(data[0], data[1]);
                 }
                 //////////////////////////////////////////////////////////////////////////////////////
                 ///
 
-                void testParametr(string name, string value) {
+                void GetType(string name, string value) {
                     if (name == StrC.type)
                     {
                         if (value == StrC.TBlock)
-                            resultData.type = Type.block;
+                            type = Type.block;
                         else if (value == StrC.TVoxels)
-                            resultData.type = Type.voxels;
+                            type = Type.voxels;
                         else if (value == StrC.TLiquid)
-                            resultData.type = Type.liquid;
+                            type = Type.liquid;
                         else
                             Debug.LogError("Bad parametr of " + name + ": " + value);
 
                     }
                 }
             }
-        }
-        void loadBlockWall(string path) {
-            string pathWalls = path + "/" + StrC.wall;
-
-            resultData.TBlock.wallFace.LoadFrom(pathWalls);
-            resultData.TBlock.wallBack.LoadFrom(pathWalls);
-            resultData.TBlock.wallLeft.LoadFrom(pathWalls);
-            resultData.TBlock.wallRight.LoadFrom(pathWalls);
-            resultData.TBlock.wallUp.LoadFrom(pathWalls);
-            resultData.TBlock.wallDown.LoadFrom(pathWalls);
-        }
-        void loadTVoxelsForm(string path) {
-            string pathTVoxelForm = path + "/" + StrC.TVoxels;
-
-            resultData.TVoxels = new TypeVoxel();
-            resultData.TVoxels.LoadFrom(pathTVoxelForm);
-        }
-        void loadTLiquidForm(string path) {
-            string pathTLiquidForm = path + "/" + StrC.TLiquid;
-
-            resultData.TLiquid = new TypeLiquid();
-            resultData.TLiquid.LoadFrom(pathTLiquidForm);
         }
         void loadBlockPhysics(string path)
         {
@@ -377,20 +288,6 @@ public class BlockData
         }
 
         return blockDatas;
-    }
-}
-
-public class BlockForms {
-    public float[,] voxel = new float[16, 16];
-    //Стена 16 на 16
-    public Vector3[] vertices;
-    public int[] triangles;
-    public Vector2[] uv;
-    public Vector2[] uvShadow;
-
-    [System.Serializable]
-    public class voxels {
-        public float[,] height = new float[16, 16];
     }
 }
 

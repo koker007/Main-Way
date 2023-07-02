@@ -70,9 +70,9 @@ public class RedactorBlocksFormTVoxel : MonoBehaviour
     }
     void acceptVoxColor(Vector3Int TVoxelPos, Color color)
     {
-        BlockData blockData = RedactorBlocksCTRL.blockData;
+        TypeVoxel blockData = RedactorBlocksCTRL.blockData as TypeVoxel;
 
-        Texture2D texture2D = blockData.TVoxels.GetTexture();
+        Texture2D texture2D = blockData.GetTexture();
 
         int TexU = TVoxelPos.x + 16 * TVoxelPos.z;
         int TexV = TVoxelPos.y;
@@ -111,8 +111,8 @@ public class RedactorBlocksFormTVoxel : MonoBehaviour
     }
     public void acceptVoxExist(Vector3Int position, bool exist) {
 
-        BlockData blockData = RedactorBlocksCTRL.blockData;
-        TypeVoxel.Data data = blockData.TVoxels.GetData();
+        TypeVoxel blockData = RedactorBlocksCTRL.blockData as TypeVoxel;
+        TypeVoxel.Data data = blockData.GetData();
 
         int id = position.x + position.y * 16 + position.z * 16 * 16;
 

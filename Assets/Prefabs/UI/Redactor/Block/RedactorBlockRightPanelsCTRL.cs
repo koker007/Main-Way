@@ -38,20 +38,20 @@ public class RedactorBlockRightPanelsCTRL : MonoBehaviour
     bool IsCorrectPanelType(GameObject panel) {
         bool result = false;
 
-        if (RedactorBlocksCTRL.blockData.type == BlockData.Type.block)
+        if (RedactorBlocksCTRL.blockData as TypeBlock != null)
         {
             if (panel.GetComponent<RedactorBlocksVoxel>() != null ||
                 panel.GetComponent<RedactorBlocksPhysics>() != null ||
                 panel.GetComponent<RedactorBlocksVisual>() != null)
                 return true;
         }
-        else if (RedactorBlocksCTRL.blockData.type == BlockData.Type.voxels)
+        else if (RedactorBlocksCTRL.blockData as TypeVoxel != null)
         {
             if (panel.GetComponent<RedactorBlocksFormTVoxel>() != null ||
                 panel.GetComponent<RedactorBlocksPhysics>() != null)
                 return true;
         }
-        else if (RedactorBlocksCTRL.blockData.type == BlockData.Type.liquid) {
+        else if (RedactorBlocksCTRL.blockData as TypeLiquid != null) {
             if (panel.GetComponent<RedactorBlocksFormTLiquid>() != null ||
                 panel.GetComponent<RedactorBlocksFormTLiquidPhysics>() != null)
                 return true;

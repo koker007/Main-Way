@@ -93,18 +93,22 @@ public class RedactorBlocksVisualizator : MonoBehaviour, IPointerEnterHandler, I
         //получаем блок
         BlockData blockData = RedactorBlocksCTRL.blockData;
 
-        if (blockData.type == BlockData.Type.block)
+        TypeBlock typeBlock = blockData as TypeBlock;
+        TypeVoxel typeVoxel = blockData as TypeVoxel;
+        TypeLiquid typeLiquid = blockData as TypeLiquid;
+
+        if (typeBlock != null)
             MeshBlock();
-        else if (blockData.type == BlockData.Type.voxels)
+        else if (typeVoxel != null)
             MeshVoxel();
-        else if (blockData.type == BlockData.Type.liquid)
+        else if (typeLiquid != null)
             MeshLiquid();
 
 
         ///////////////////////////////////////////
         ////
         void MeshBlock() {
-            meshFilter.sharedMesh = blockData.GetMesh(true, true, true, true, true, true);
+            meshFilter.sharedMesh = typeBlock.GetMesh(true, true, true, true, true, true);
             meshFilter.sharedMesh.Optimize();
 
             //применяем материалы к мешу
@@ -117,28 +121,27 @@ public class RedactorBlocksVisualizator : MonoBehaviour, IPointerEnterHandler, I
                 materialBlock,
             };
 
-            meshRenderer.materials[0].mainTexture = RedactorBlocksCTRL.blockData.TBlock.wallFace.texture;
-            meshRenderer.materials[1].mainTexture = RedactorBlocksCTRL.blockData.TBlock.wallBack.texture;
-            meshRenderer.materials[2].mainTexture = RedactorBlocksCTRL.blockData.TBlock.wallRight.texture;
-            meshRenderer.materials[3].mainTexture = RedactorBlocksCTRL.blockData.TBlock.wallLeft.texture;
-            meshRenderer.materials[4].mainTexture = RedactorBlocksCTRL.blockData.TBlock.wallUp.texture;
-            meshRenderer.materials[5].mainTexture = RedactorBlocksCTRL.blockData.TBlock.wallDown.texture;
+            meshRenderer.materials[0].mainTexture = typeBlock.wallFace.texture;
+            meshRenderer.materials[1].mainTexture = typeBlock.wallBack.texture;
+            meshRenderer.materials[2].mainTexture = typeBlock.wallRight.texture;
+            meshRenderer.materials[3].mainTexture = typeBlock.wallLeft.texture;
+            meshRenderer.materials[4].mainTexture = typeBlock.wallUp.texture;
+            meshRenderer.materials[5].mainTexture = typeBlock.wallDown.texture;
         }
         void MeshVoxel() {
-            blockData.TestCreateVoxel();
+            typeVoxel.RandomizeData();
 
-            meshFilter.sharedMesh = blockData.GetMeshVoxel();
+            meshFilter.sharedMesh = typeVoxel.GetMesh();
 
             meshRenderer.materials = new Material[1] { 
                 materialVoxels
             };
 
-            meshRenderer.materials[0].mainTexture = blockData.TVoxels.GetTexture();
+            meshRenderer.materials[0].mainTexture = typeVoxel.GetTexture();
         }
         void MeshLiquid() {
-            blockData.TestCreateLiquid();
 
-            meshFilter.sharedMesh = blockData.GetMeshLiquid(true, true, true, true, true, true, (int)RedactorBlocksFormTLiquid.main.sliderExampleVolumeMax.slider.value, (int)RedactorBlocksFormTLiquid.main.sliderExampleVolumeMin.slider.value);
+            meshFilter.sharedMesh = typeLiquid.GetMesh(true, true, true, true, true, true, (int)RedactorBlocksFormTLiquid.main.sliderExampleVolumeMax.slider.value, (int)RedactorBlocksFormTLiquid.main.sliderExampleVolumeMin.slider.value);
             meshRenderer.materials = new Material[6] {
                 materialBlock,
                 materialBlock,
@@ -148,61 +151,17 @@ public class RedactorBlocksVisualizator : MonoBehaviour, IPointerEnterHandler, I
                 materialBlock
             };
 
-            long textureNum = (long)(Time.time / (1.0f/blockData.TLiquid.data.animSpeed));
+            long textureNum = (long)(Time.time / (1.0f/ typeLiquid.data.animSpeed));
 
-            int tickNum = (int)(textureNum % blockData.TLiquid.data.texturesMax);
+            int tickNum = (int)(textureNum % typeLiquid.data.texturesMax);
 
-            meshRenderer.materials[0].mainTexture = blockData.TLiquid.GetTexture(tickNum, Side.face);
-            meshRenderer.materials[1].mainTexture = blockData.TLiquid.GetTexture(tickNum, Side.back);
-            meshRenderer.materials[2].mainTexture = blockData.TLiquid.GetTexture(tickNum, Side.left);
-            meshRenderer.materials[3].mainTexture = blockData.TLiquid.GetTexture(tickNum, Side.right);
-            meshRenderer.materials[4].mainTexture = blockData.TLiquid.GetTexture(tickNum, Side.down);
-            meshRenderer.materials[5].mainTexture = blockData.TLiquid.GetTexture(tickNum, Side.up);
+            meshRenderer.materials[0].mainTexture = typeLiquid.GetTexture(tickNum, Side.face);
+            meshRenderer.materials[1].mainTexture = typeLiquid.GetTexture(tickNum, Side.back);
+            meshRenderer.materials[2].mainTexture = typeLiquid.GetTexture(tickNum, Side.left);
+            meshRenderer.materials[3].mainTexture = typeLiquid.GetTexture(tickNum, Side.right);
+            meshRenderer.materials[4].mainTexture = typeLiquid.GetTexture(tickNum, Side.down);
+            meshRenderer.materials[5].mainTexture = typeLiquid.GetTexture(tickNum, Side.up);
         }
-    }
-    void UpdateMeshOld()
-    {
-        if (RedactorBlocksCTRL.main == null)
-            return;
-
-        //Удаляем старые данные
-        MeshFilter meshFilter = meshRenderer.GetComponent<MeshFilter>();
-
-        if (meshFilter.sharedMesh != null)
-        {
-            meshFilter.sharedMesh.Clear(false);
-            Destroy(meshFilter.sharedMesh);
-
-            Destroy(meshRenderer.materials[0]);
-            Destroy(meshRenderer.materials[1]);
-            Destroy(meshRenderer.materials[2]);
-            Destroy(meshRenderer.materials[3]);
-            Destroy(meshRenderer.materials[4]);
-            Destroy(meshRenderer.materials[5]);
-        }
-
-        //Получаем меш куба
-        BlockData blockData = RedactorBlocksCTRL.blockData;
-        meshFilter.sharedMesh = blockData.GetMesh(true, true, true, true, true, true);
-        meshFilter.sharedMesh.Optimize();
-
-        //применяем материалы к мешу
-        meshRenderer.materials = new Material[6]{
-             materialBlock,
-             materialBlock,
-             materialBlock,
-             materialBlock,
-             materialBlock,
-             materialBlock,
-        };
-
-
-        meshRenderer.materials[0].mainTexture = RedactorBlocksCTRL.blockData.TBlock.wallFace.texture;
-        meshRenderer.materials[1].mainTexture = RedactorBlocksCTRL.blockData.TBlock.wallBack.texture;
-        meshRenderer.materials[2].mainTexture = RedactorBlocksCTRL.blockData.TBlock.wallRight.texture;
-        meshRenderer.materials[3].mainTexture = RedactorBlocksCTRL.blockData.TBlock.wallLeft.texture;
-        meshRenderer.materials[4].mainTexture = RedactorBlocksCTRL.blockData.TBlock.wallUp.texture;
-        meshRenderer.materials[5].mainTexture = RedactorBlocksCTRL.blockData.TBlock.wallDown.texture;
     }
 
     //отрендерить то что видят камеры

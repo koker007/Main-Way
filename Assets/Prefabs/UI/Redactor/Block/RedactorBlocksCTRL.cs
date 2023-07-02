@@ -64,7 +64,7 @@ public class RedactorBlocksCTRL : MonoBehaviour
 
         blockDatas = new BlockData[(int)sliderVariationMaximum.slider.value + 1];
         for (int num = 0; num < blockDatas.Length; num++) {
-            blockDatas[num] = new BlockData();
+            blockDatas[num] = new TypeBlock();
         }
 
         blockDatasBuffer = new BlockData[1];
@@ -225,7 +225,7 @@ public class RedactorBlocksCTRL : MonoBehaviour
                         blockDatasNew[num] = blockDatasBuffer[num];
                     }
                     else {
-                        blockDatasNew[num] = new BlockData();
+                        blockDatasNew[num] = new TypeBlock();
                     }
                 }
             }
@@ -267,15 +267,24 @@ public class RedactorBlocksCTRL : MonoBehaviour
         //Принять новый тип блока
         if (sliderBlockType.slider.value == (int)BlockData.Type.voxels)
         {
-            blockDatas[(int)sliderVariationSelected.slider.value].type = BlockData.Type.voxels;
+            TypeVoxel typeVoxel = blockDatas[(int)sliderVariationSelected.slider.value] as TypeVoxel;
+            typeVoxel ??= new TypeVoxel(blockDatas[(int)sliderVariationSelected.slider.value]);
+
+            blockDatas[(int)sliderVariationSelected.slider.value] = typeVoxel;
         }
         else if (sliderBlockType.slider.value == (int)BlockData.Type.liquid) {
-            blockDatas[(int)sliderVariationSelected.slider.value].type = BlockData.Type.liquid;
+            TypeLiquid typeLiquid = blockDatas[(int)sliderVariationSelected.slider.value] as TypeLiquid;
+            typeLiquid ??= new TypeLiquid(blockDatas[(int)sliderVariationSelected.slider.value]);
+
+            blockDatas[(int)sliderVariationSelected.slider.value] = typeLiquid;
         }
         //По умолчанию блок
         else //if (sliderBlockType.slider.value == (int)BlockData.Type.block)
         {
-            blockDatas[(int)sliderVariationSelected.slider.value].type = BlockData.Type.block;
+            TypeBlock typeBlock = blockDatas[(int)sliderVariationSelected.slider.value] as TypeBlock;
+            typeBlock ??= new TypeBlock(blockDatas[(int)sliderVariationSelected.slider.value]);
+
+            blockDatas[(int)sliderVariationSelected.slider.value] = typeBlock;
         }
 
         redrawType();
@@ -310,6 +319,9 @@ public class RedactorBlocksCTRL : MonoBehaviour
     }
     void redrawType() {
         BlockData data = blockData;
+        TypeBlock typeBlock = data as TypeBlock;
+        TypeVoxel typeVoxel = data as TypeVoxel;
+        TypeLiquid typeLiquid = data as TypeLiquid;
 
         int maximum = (int)BlockData.Type.block;
         if (maximum < (int)BlockData.Type.liquid)
@@ -320,14 +332,23 @@ public class RedactorBlocksCTRL : MonoBehaviour
         sliderBlockType.slider.minValue = 0;
         sliderBlockType.slider.maxValue = maximum;
 
-        sliderBlockType.slider.value = (int)data.type;
 
-        if (sliderBlockType.slider.value == (int)BlockData.Type.block)
+        //Меняем значение слайдера
+        if (typeBlock != null)
+        {
+            sliderBlockType.slider.value = (int)BlockData.Type.block;
             sliderBlockType.SetValueText(StrC.blocks);
-        else if(sliderBlockType.slider.value == (int)BlockData.Type.voxels)
+        }
+        else if (typeVoxel != null)
+        {
+            sliderBlockType.slider.value = (int)BlockData.Type.voxels;
             sliderBlockType.SetValueText(StrC.voxels);
-        else if(sliderBlockType.slider.value == (int)BlockData.Type.liquid)
+        }
+        else if (typeLiquid != null)
+        {
+            sliderBlockType.slider.value = (int)BlockData.Type.liquid;
             sliderBlockType.SetValueText(StrC.liquid);
+        }
     }
 
     public void clickButtonSave() {
@@ -378,37 +399,40 @@ public class RedactorBlocksCTRL : MonoBehaviour
     }
 
     public void reDrawBlock() {
-        BlockData blockDataLocal = blockData;
+        TypeBlock typeBlock = blockData as TypeBlock;
 
-        if (blockDataLocal.TBlock.wallFace != null)
+        if (typeBlock == null)
+            return;
+
+        if (typeBlock.wallFace != null)
         {
-            blockDataLocal.TBlock.wallFace.calcVertices();
-            RedactorBlocksColiders.main.delCollidersWall(blockDataLocal.TBlock.wallFace);
+            typeBlock.wallFace.calcVertices();
+            RedactorBlocksColiders.main.delCollidersWall(typeBlock.wallFace);
         }
-        if (blockDataLocal.TBlock.wallBack != null)
+        if (typeBlock.wallBack != null)
         {
-            blockDataLocal.TBlock.wallBack.calcVertices();
-            RedactorBlocksColiders.main.delCollidersWall(blockDataLocal.TBlock.wallBack);
+            typeBlock.wallBack.calcVertices();
+            RedactorBlocksColiders.main.delCollidersWall(typeBlock.wallBack);
         }
-        if (blockDataLocal.TBlock.wallLeft != null)
+        if (typeBlock.wallLeft != null)
         {
-            blockDataLocal.TBlock.wallLeft.calcVertices();
-            RedactorBlocksColiders.main.delCollidersWall(blockDataLocal.TBlock.wallLeft);
+            typeBlock.wallLeft.calcVertices();
+            RedactorBlocksColiders.main.delCollidersWall(typeBlock.wallLeft);
         }
-        if (blockDataLocal.TBlock.wallRight != null)
+        if (typeBlock.wallRight != null)
         {
-            blockDataLocal.TBlock.wallRight.calcVertices();
-            RedactorBlocksColiders.main.delCollidersWall(blockDataLocal.TBlock.wallRight);
+            typeBlock.wallRight.calcVertices();
+            RedactorBlocksColiders.main.delCollidersWall(typeBlock.wallRight);
         }
-        if (blockDataLocal.TBlock.wallUp != null)
+        if (typeBlock.wallUp != null)
         {
-            blockDataLocal.TBlock.wallUp.calcVertices();
-            RedactorBlocksColiders.main.delCollidersWall(blockDataLocal.TBlock.wallUp);
+            typeBlock.wallUp.calcVertices();
+            RedactorBlocksColiders.main.delCollidersWall(typeBlock.wallUp);
         }
-        if (blockDataLocal.TBlock.wallDown != null)
+        if (typeBlock.wallDown != null)
         {
-            blockDataLocal.TBlock.wallDown.calcVertices();
-            RedactorBlocksColiders.main.delCollidersWall(blockDataLocal.TBlock.wallDown);
+            typeBlock.wallDown.calcVertices();
+            RedactorBlocksColiders.main.delCollidersWall(typeBlock.wallDown);
         }
     }
 }
