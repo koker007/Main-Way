@@ -27,7 +27,7 @@ public class RedactorBiomeCTRL : MonoBehaviour
     SliderCTRL sliderRules;
 
     //Данные биома
-    BiomeData biomeData;
+    public BiomeData biomeData;
 
     BiomeTypeSurface bufferBiomeSurface; //Type 0
     BiomeTypeUnderground bufferBiomeUnderground; //Type 1
@@ -35,7 +35,8 @@ public class RedactorBiomeCTRL : MonoBehaviour
     BiomeTypeRings bufferBiomeRings; //Type 3
 
     //Если данные биома были изменены
-    event Action changeBiome;
+    static public event Action changeBiome;
+    static public event Action changeSelectBlock;
 
     const string keySliderType = "RedactorBiomeSliderType";
     const string keySliderRules = "RedactorBiomeSliderRule";
@@ -51,8 +52,6 @@ public class RedactorBiomeCTRL : MonoBehaviour
 
         iniSliderType();
         iniSliderRules();
-
-        updateUI();
 
         void iniSliderType()
         {
@@ -296,6 +295,9 @@ public class RedactorBiomeCTRL : MonoBehaviour
 
         changeBiome();
 
+        if(changeSelectBlock != null)
+            changeSelectBlock();
+
         void DelRule() {
             
             biomeData.genRules.RemoveAt((int)sliderRules.slider.value);
@@ -345,4 +347,16 @@ public class RedactorBiomeCTRL : MonoBehaviour
         }
     }
 
+
+    public BlockData GetSelectBlock() {
+
+        //Выбираем выбранное правило
+        BlockData select = GameData.Blocks.GetData(biomeData.genRules[0].blockID, 0);
+
+        return select;
+    }
+
+    public void SetSelectBlock() {
+        
+    }
 }

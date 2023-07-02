@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BiomeData
+public abstract class BiomeData
 {
     //Биом проинициализирован или нет
     bool isInicialized = false;

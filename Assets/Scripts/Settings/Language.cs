@@ -6,7 +6,7 @@ using System;
 using System.IO;
 
 //Load text from language
-static public class Language {
+static public partial class Language {
     //Путь до папки с языками
     public const string directive = "Language";
     const string mainKey = "|=|";
@@ -177,7 +177,7 @@ static public class Language {
 
         //Проверяем в выбранном языке
         int numTry = 0;
-        for (int num = numStart; num < KATSelect.Length && numTry <= MaximumKeyOneSumbol; num++) {
+        for (int num = numStart; KATSelect != null && num < KATSelect.Length && numTry <= MaximumKeyOneSumbol; num++) {
             numTry++;
 
             //Если эта ячейка пустая или в ней не совпадают ключи ищем дальше
@@ -199,7 +199,7 @@ static public class Language {
 
         //ищем дальше в английском языке
         numTry = 0;
-        for (int num = numStart; num < KATEnglish.Length && numTry <= MaximumKeyOneSumbol; num++)
+        for (int num = numStart; KATEnglish != null && num < KATEnglish.Length && numTry <= MaximumKeyOneSumbol; num++)
         {
             numTry++;
 

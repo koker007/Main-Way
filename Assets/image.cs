@@ -2,8 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-//Эта панель регулирует условия для генерирования выбранного биома
-public class RedactorBiomeTPlanetConditions : MonoBehaviour
+public class image : MonoBehaviour
 {
     // Start is called before the first frame update
     void Start()
