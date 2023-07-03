@@ -7,4 +7,9 @@ using UnityEngine;
 public class BiomeTypeRings : BiomeData
 {
     //Кольца будут реализованы как длинный прямой участок, который будет поворачиваться относительно планеты родителя, и генерироваться участок рядом с игроком.
+
+    public override void save()
+    {
+        throw new System.NotImplementedException();
+    }
 }

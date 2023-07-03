@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.IO;
 
 public abstract class BiomeData
 {
@@ -14,10 +15,38 @@ public abstract class BiomeData
     //Список ID блоков в этом биоме и их правила генерации
     public List<GenRule> genRules = new List<GenRule>();
 
+
     //Конструктор
     public BiomeData() {
         //Должно быть хотябы одно правило генерации
         genRules.Add(new GenRule());
+    }
+
+    public virtual void save() {
+        //Получаем путь к папке
+        string path = getPathFolder();
+        if (!Directory.Exists(path))
+            Directory.CreateDirectory(path);
+
+        
+
+    }
+    static BiomeData load(string pathBiome)
+    {
+        BiomeData data = null;
+
+
+
+        return data;
+    }
+
+    /// <summary>
+    /// Возвращает путь к папке текущего биома
+    /// </summary>
+    protected string getPathFolder() {
+        //Создаем путь к папке биома
+        string path = GameData.GameData.pathMod + "/" + mod + "/" + StrC.biomes + "/" + name;
+        return path;
     }
 
     //одно правило генерации блока
@@ -67,4 +96,6 @@ public abstract class BiomeData
             inicialized = true;
         }
     }
+
+    
 }

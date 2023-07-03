@@ -10,5 +10,8 @@ public class BiomeTypeSurface: BiomeData
     float distGenSeaLevelMax = 100;
     float distGenSeaLevelMin = -100;
 
-
+    public override void save()
+    {
+        throw new System.NotImplementedException();
+    }
 }
