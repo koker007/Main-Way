@@ -15,8 +15,4 @@ public class BiomeTypeUnderground : BiomeData
     public float tempGenMax = 100;
     public float tempGenMin = 0;
 
-    public override void save()
-    {
-        throw new System.NotImplementedException();
-    }
 }

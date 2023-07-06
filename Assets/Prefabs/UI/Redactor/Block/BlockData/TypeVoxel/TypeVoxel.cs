@@ -24,7 +24,7 @@ public class TypeVoxel: BlockData
     }
 
     public TypeVoxel() {
-        RandomizeData();
+    
     }
     public TypeVoxel(BlockData blockData): base(blockData) {
         

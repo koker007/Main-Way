@@ -6,7 +6,6 @@ public class StrC
     public const string SEPARATOR = ":=";
 
     public const string mod = "Mod";
-    public const string biomes = "Biomes";
     public const string blocks = "Blocks";
     public const string voxels = "Voxels";
     public const string liquid = "Liquid";

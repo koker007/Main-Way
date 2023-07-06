@@ -6,8 +6,5 @@ using UnityEngine;
 //Карликовые кланеты, космические тела, не плоские
 public class BiomeTypeDwarf: BiomeData
 {
-    public override void save()
-    {
-        throw new System.NotImplementedException();
-    }
+
 }
