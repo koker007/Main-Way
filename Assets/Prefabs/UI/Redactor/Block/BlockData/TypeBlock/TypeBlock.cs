@@ -282,37 +282,102 @@ public class TypeBlock: BlockData
     {
         Mesh meshResult = new Mesh();
 
-        meshResult.vertices = GraficCalc.main.mergeVector3(wallFace.forms.vertices, wallBack.forms.vertices, wallRight.forms.vertices, wallLeft.forms.vertices, wallUp.forms.vertices, wallDown.forms.vertices);
-        //meshResult.triangles = GraficCalc.main.mergeTriangleNum(wallFace.forms.triangles, wallBack.forms.triangles, wallRight.forms.triangles, wallLeft.forms.triangles, wallUp.forms.triangles, wallDown.forms.triangles);
-        meshResult.uv = GraficCalc.main.mergeVector2(wallFace.forms.uv, wallBack.forms.uv, wallRight.forms.uv, wallLeft.forms.uv, wallUp.forms.uv, wallDown.forms.uv);
-        meshResult.uv2 = GraficCalc.main.mergeVector2(wallFace.forms.uvShadow, wallBack.forms.uvShadow, wallRight.forms.uvShadow, wallLeft.forms.uvShadow, wallUp.forms.uvShadow, wallDown.forms.uvShadow);
+        System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
+        stopwatch = new System.Diagnostics.Stopwatch();
+        stopwatch.Start();
+        List<Vector3> listVert = new List<Vector3>();
+        List<Vector2> listUV = new List<Vector2>();
+        List<Vector2> listUV2 = new List<Vector2>();
+
+        //int addNum = 0;
+
+        if (face)
+        {
+            listVert.AddRange(wallFace.forms.vertices);
+            listUV.AddRange(wallFace.forms.uv);
+            listUV2.AddRange(wallFace.forms.uv);
+        }
+        if (back)
+        {
+            listVert.AddRange(wallBack.forms.vertices);
+            listUV.AddRange(wallBack.forms.uv);
+            listUV2.AddRange(wallBack.forms.uv);
+        }
+        if (right)
+        {
+            listVert.AddRange(wallRight.forms.vertices);
+            listUV.AddRange(wallRight.forms.uv);
+            listUV2.AddRange(wallRight.forms.uv);
+        }
+        if (left)
+        {
+            listVert.AddRange(wallLeft.forms.vertices);
+            listUV.AddRange(wallLeft.forms.uv);
+            listUV2.AddRange(wallLeft.forms.uv);
+        }
+        if (up)
+        {
+            listVert.AddRange(wallUp.forms.vertices);
+            listUV.AddRange(wallUp.forms.uv);
+            listUV2.AddRange(wallUp.forms.uv);
+        }
+        if (down)
+        {
+            listVert.AddRange(wallDown.forms.vertices);
+            listUV.AddRange(wallDown.forms.uv);
+            listUV2.AddRange(wallDown.forms.uv);
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////
+
+        meshResult.vertices = listVert.ToArray();
+        meshResult.uv = listUV.ToArray();
+        meshResult.uv2 = listUV2.ToArray();
 
         meshResult.subMeshCount = 6;
-        /////////////////////////////////////////////////////////////
-        //Нужно в данных треугольников надо сдвигать счет примитивов
-        /////////////////////////////////////////////////////////////
+
         int addNum = 0;
-        meshResult.SetTriangles(wallFace.forms.triangles, 0);
-        addNum += wallFace.forms.triangles.Length;
+        if (face)
+        {
+            meshResult.SetTriangles(wallFace.forms.triangles, 0);
+            addNum += wallFace.forms.triangles.Length;
+        }
 
-        int[] trianglesBack = GraficCalc.main.addToInt(wallBack.forms.triangles, addNum);
-        meshResult.SetTriangles(trianglesBack, 1);
-        addNum += wallBack.forms.triangles.Length;
+        if (back)
+        {
+            int[] trianglesBack = Calc.Array.changeEvery(wallBack.forms.triangles, addNum);
+            meshResult.SetTriangles(trianglesBack, 1);
+            addNum += wallBack.forms.triangles.Length;
+        }
 
-        int[] trianglesRight = GraficCalc.main.addToInt(wallBack.forms.triangles, addNum);
-        meshResult.SetTriangles(trianglesRight, 2);
-        addNum += wallRight.forms.triangles.Length;
+        if (right)
+        {
+            int[] trianglesRight = Calc.Array.changeEvery(wallRight.forms.triangles, addNum);
+            meshResult.SetTriangles(trianglesRight, 2);
+            addNum += wallRight.forms.triangles.Length;
+        }
 
-        int[] trianglesLeft = GraficCalc.main.addToInt(wallBack.forms.triangles, addNum);
-        meshResult.SetTriangles(trianglesLeft, 3);
-        addNum += wallLeft.forms.triangles.Length;
+        if (left)
+        {
+            int[] trianglesLeft = Calc.Array.changeEvery(wallLeft.forms.triangles, addNum);
+            meshResult.SetTriangles(trianglesLeft, 3);
+            addNum += wallLeft.forms.triangles.Length;
+        }
 
-        int[] trianglesUp = GraficCalc.main.addToInt(wallBack.forms.triangles, addNum);
-        meshResult.SetTriangles(trianglesUp, 4);
-        addNum += wallUp.forms.triangles.Length;
+        if (up) {
+            int[] trianglesUp = Calc.Array.changeEvery(wallUp.forms.triangles, addNum);
+            meshResult.SetTriangles(trianglesUp, 4);
+            addNum += wallUp.forms.triangles.Length;
+        }
 
-        int[] trianglesDown = GraficCalc.main.addToInt(wallBack.forms.triangles, addNum);
-        meshResult.SetTriangles(trianglesDown, 5);
+        if (down)
+        {
+            int[] trianglesDown = Calc.Array.changeEvery(wallDown.forms.triangles, addNum);
+            meshResult.SetTriangles(trianglesDown, 5);
+        }
+
+        stopwatch.Stop();
+        Debug.Log("Stopwatch processor: " + stopwatch.ElapsedMilliseconds);
 
         return meshResult;
     }
@@ -346,6 +411,13 @@ public class TypeBlock: BlockData
         wallRight.LoadFrom(pathWalls);
         wallUp.LoadFrom(pathWalls);
         wallDown.LoadFrom(pathWalls);
+
+        wallFace.calcVertices();
+        wallBack.calcVertices();
+        wallRight.calcVertices();
+        wallLeft.calcVertices();
+        wallUp.calcVertices();
+        wallDown.calcVertices();
     }
 }
 

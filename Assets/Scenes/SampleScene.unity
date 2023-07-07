@@ -3755,6 +3755,38 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShaderGenChankPlanet: {fileID: 7200000, guid: 5858fdc43877cad48a209b9c5ec0e461, type: 3}
+--- !u!1 &262324757
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 262324758}
+  m_Layer: 0
+  m_Name: PreviewSystem
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &262324758
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 262324757}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1385244041}
+  m_Father: {fileID: 357705771}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &263702068
 GameObject:
   m_ObjectHideFlags: 0
@@ -5618,6 +5650,7 @@ Transform:
   m_Children:
   - {fileID: 1374687972}
   - {fileID: 1524935578}
+  - {fileID: 262324758}
   m_Father: {fileID: 0}
   m_RootOrder: 12
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -9161,6 +9194,34 @@ PrefabInstance:
     - target: {fileID: 3421321276486409421, guid: a57782a0f03e17442ae070dc02fb7542, type: 3}
       propertyPath: m_fontSize
       value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 3749112547988860521, guid: a57782a0f03e17442ae070dc02fb7542, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3749112547988860521, guid: a57782a0f03e17442ae070dc02fb7542, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3749112547988860521, guid: a57782a0f03e17442ae070dc02fb7542, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 320765413}
+    - target: {fileID: 3749112547988860521, guid: a57782a0f03e17442ae070dc02fb7542, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3749112547988860521, guid: a57782a0f03e17442ae070dc02fb7542, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: ClickButtonSelectBlock
+      objectReference: {fileID: 0}
+    - target: {fileID: 3749112547988860521, guid: a57782a0f03e17442ae070dc02fb7542, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: Redactor.RedactorBiomeSelectedBlock, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 3749112547988860521, guid: a57782a0f03e17442ae070dc02fb7542, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 7043841153223277830, guid: a57782a0f03e17442ae070dc02fb7542, type: 3}
       propertyPath: m_Maskable
@@ -19471,7 +19532,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7176533566875976478, guid: d7b2deb1b6f117c4b92abfc7b1942566, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -0.00005054474
+      value: 0.0000019073486
       objectReference: {fileID: 0}
     - target: {fileID: 7417510024086745306, guid: d7b2deb1b6f117c4b92abfc7b1942566, type: 3}
       propertyPath: m_AnchorMax.x
@@ -26195,6 +26256,51 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 1341871556024239066, guid: a3424dd0561feb04ba6f36644bd04c7f, type: 3}
   m_PrefabInstance: {fileID: 1384886356}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1385244040
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1385244041}
+  - component: {fileID: 1385244042}
+  m_Layer: 0
+  m_Name: Blocks
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1385244041
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1385244040}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 262324758}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1385244042
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1385244040}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42ef83636f714c9448b55125c1840fe5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  prefabPreview: {fileID: 3507517494119653721, guid: 895f51f984ddab1468e08c346c614555, type: 3}
 --- !u!1 &1387161682
 GameObject:
   m_ObjectHideFlags: 0
@@ -29623,7 +29729,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7176533566875976478, guid: d7b2deb1b6f117c4b92abfc7b1942566, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: 202.81445
       objectReference: {fileID: 0}
     - target: {fileID: 7417510024086745306, guid: d7b2deb1b6f117c4b92abfc7b1942566, type: 3}
       propertyPath: m_AnchorMax.x
@@ -36737,6 +36843,7 @@ MonoBehaviour:
   Graffic: {fileID: 0}
   RedactorBlockLoad: {fileID: 7817550422028120696, guid: e3f2f232ed76a9c4ea498b87f79bf637, type: 3}
   RedactorBiomeLoad: {fileID: 7817550422028120696, guid: 877630a801b2e144ba042f90bc9c6a69, type: 3}
+  RedactorBiomeSelectBlock: {fileID: 572717944390261068, guid: f733e4e94041d27429e5a861fcd3f733, type: 3}
   FirstPress: 0
 --- !u!224 &1929535313 stripped
 RectTransform:

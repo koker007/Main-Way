@@ -129,8 +129,6 @@ public class RedactorBlocksVisualizator : MonoBehaviour, IPointerEnterHandler, I
             meshRenderer.materials[5].mainTexture = typeBlock.wallDown.texture;
         }
         void MeshVoxel() {
-            typeVoxel.RandomizeData();
-
             meshFilter.sharedMesh = typeVoxel.GetMesh();
 
             meshRenderer.materials = new Material[1] { 

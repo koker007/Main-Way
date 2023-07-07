@@ -33,7 +33,7 @@ namespace GameData
         {
 
         }
-
+        /*
         static public uint GetBlockID(string ModName, string BlockName)
         {
             //Получаем текстовое сокрашение
@@ -66,7 +66,7 @@ namespace GameData
 
             return abbreviaturaID;
         }
-
+        */
         void AllReload()
         {
             //Проверяем есть ли папка мод

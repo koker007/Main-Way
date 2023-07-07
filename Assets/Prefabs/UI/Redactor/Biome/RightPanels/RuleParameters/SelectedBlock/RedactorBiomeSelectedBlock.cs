@@ -39,6 +39,11 @@ namespace Redactor
             ReSelectBlock();
         }
 
+        public void ClickButtonSelectBlock()
+        {
+            WindowMenuCTRL.ClickRedactorBiomeSelectBlock();
+        }
+
         //Взять данные о блоке и обновить все данные о нем
         void ReSelectBlock() {
             if(RedactorBiomeCTRL.main != null)

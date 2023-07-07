@@ -210,7 +210,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.14117648, g: 0.12941177, b: 0.12941177, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -341,7 +341,7 @@ PrefabInstance:
     - target: {fileID: 3749112547988860521, guid: a57782a0f03e17442ae070dc02fb7542, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1165404071666836787}
     - target: {fileID: 3749112547988860521, guid: a57782a0f03e17442ae070dc02fb7542, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
       value: 2
@@ -352,7 +352,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3749112547988860521, guid: a57782a0f03e17442ae070dc02fb7542, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: WindowRedactorBlockLoad, Assembly-CSharp
+      value: WindowRedactorBiomeSelectBlock, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 3749112547988860521, guid: a57782a0f03e17442ae070dc02fb7542, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
@@ -478,18 +478,18 @@ PrefabInstance:
     - target: {fileID: 6428759398118587056, guid: 01b84696695d3cb4a98521f42a03b9e1, type: 3}
       propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1165404071666836787}
     - target: {fileID: 6428759398118587056, guid: 01b84696695d3cb4a98521f42a03b9e1, type: 3}
       propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 6428759398118587056, guid: 01b84696695d3cb4a98521f42a03b9e1, type: 3}
       propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: acceptSliderModName
+      value: eventBlockChange
       objectReference: {fileID: 0}
     - target: {fileID: 6428759398118587056, guid: 01b84696695d3cb4a98521f42a03b9e1, type: 3}
       propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: WindowRedactorBlockLoad, Assembly-CSharp
+      value: WindowRedactorBiomeSelectBlock, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 6428759398118587056, guid: 01b84696695d3cb4a98521f42a03b9e1, type: 3}
       propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
@@ -534,6 +534,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 273429895643774188, guid: 01b84696695d3cb4a98521f42a03b9e1, type: 3}
   m_PrefabInstance: {fileID: 1598511743545933592}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &3460759315374801241 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2749478035862486593, guid: 01b84696695d3cb4a98521f42a03b9e1, type: 3}
+  m_PrefabInstance: {fileID: 1598511743545933592}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e580ad8fa27c094095d78318f75c511, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &4092904302816692427
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -648,7 +659,7 @@ PrefabInstance:
     - target: {fileID: 3749112547988860521, guid: a57782a0f03e17442ae070dc02fb7542, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1165404071666836787}
     - target: {fileID: 3749112547988860521, guid: a57782a0f03e17442ae070dc02fb7542, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
       value: 2
@@ -659,7 +670,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3749112547988860521, guid: a57782a0f03e17442ae070dc02fb7542, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: WindowRedactorBlockLoad, Assembly-CSharp
+      value: WindowRedactorBiomeSelectBlock, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 3749112547988860521, guid: a57782a0f03e17442ae070dc02fb7542, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
@@ -789,7 +800,7 @@ PrefabInstance:
     - target: {fileID: 3749112547988860521, guid: a57782a0f03e17442ae070dc02fb7542, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1165404071666836787}
     - target: {fileID: 3749112547988860521, guid: a57782a0f03e17442ae070dc02fb7542, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
       value: 2
@@ -800,7 +811,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3749112547988860521, guid: a57782a0f03e17442ae070dc02fb7542, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: WindowRedactorBlockLoad, Assembly-CSharp
+      value: WindowRedactorBiomeSelectBlock, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 3749112547988860521, guid: a57782a0f03e17442ae070dc02fb7542, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
@@ -926,7 +937,7 @@ PrefabInstance:
     - target: {fileID: 3749112547988860521, guid: a57782a0f03e17442ae070dc02fb7542, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1165404071666836787}
     - target: {fileID: 3749112547988860521, guid: a57782a0f03e17442ae070dc02fb7542, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
       value: 2
@@ -937,7 +948,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3749112547988860521, guid: a57782a0f03e17442ae070dc02fb7542, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: WindowRedactorBlockLoad, Assembly-CSharp
+      value: WindowRedactorBiomeSelectBlock, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 3749112547988860521, guid: a57782a0f03e17442ae070dc02fb7542, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
@@ -949,6 +960,17 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a57782a0f03e17442ae070dc02fb7542, type: 3}
+--- !u!114 &7945890943914277963 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3749112547988860521, guid: a57782a0f03e17442ae070dc02fb7542, type: 3}
+  m_PrefabInstance: {fileID: 6504038203645039138}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &7828726867915226132
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1059,18 +1081,18 @@ PrefabInstance:
     - target: {fileID: 6428759398118587056, guid: 01b84696695d3cb4a98521f42a03b9e1, type: 3}
       propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1165404071666836787}
     - target: {fileID: 6428759398118587056, guid: 01b84696695d3cb4a98521f42a03b9e1, type: 3}
       propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 6428759398118587056, guid: 01b84696695d3cb4a98521f42a03b9e1, type: 3}
       propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: acceptSliderBlockName
+      value: eventBlockChange
       objectReference: {fileID: 0}
     - target: {fileID: 6428759398118587056, guid: 01b84696695d3cb4a98521f42a03b9e1, type: 3}
       propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: WindowRedactorBlockLoad, Assembly-CSharp
+      value: WindowRedactorBiomeSelectBlock, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 6428759398118587056, guid: 01b84696695d3cb4a98521f42a03b9e1, type: 3}
       propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
@@ -1078,7 +1100,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7123445997634560406, guid: 01b84696695d3cb4a98521f42a03b9e1, type: 3}
       propertyPath: m_Name
-      value: SliderBiomeNameSelect
+      value: SliderBlockNameSelect
       objectReference: {fileID: 0}
     - target: {fileID: 7929479769830607738, guid: 01b84696695d3cb4a98521f42a03b9e1, type: 3}
       propertyPath: m_AnchorMax.x
@@ -1110,6 +1132,17 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 01b84696695d3cb4a98521f42a03b9e1, type: 3}
+--- !u!114 &5371987517542679125 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2749478035862486593, guid: 01b84696695d3cb4a98521f42a03b9e1, type: 3}
+  m_PrefabInstance: {fileID: 7828726867915226132}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e580ad8fa27c094095d78318f75c511, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!224 &8029445969402986744 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 273429895643774188, guid: 01b84696695d3cb4a98521f42a03b9e1, type: 3}
@@ -1218,6 +1251,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7965957027801989778, guid: 7d0590f3b5a9e0a4cb6d7cd8b25eb5ca, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1165404071666836787}
+    - target: {fileID: 7965957027801989778, guid: 7d0590f3b5a9e0a4cb6d7cd8b25eb5ca, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: clickButtonClose
+      objectReference: {fileID: 0}
+    - target: {fileID: 7965957027801989778, guid: 7d0590f3b5a9e0a4cb6d7cd8b25eb5ca, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: WindowRedactorBiomeSelectBlock, Assembly-CSharp
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7d0590f3b5a9e0a4cb6d7cd8b25eb5ca, type: 3}
 --- !u!1 &6269781133542286125 stripped
@@ -1237,8 +1282,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 90db4f7e87071e746bbbf569f75dbcb9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sliderModName: {fileID: 0}
-  sliderBlockName: {fileID: 0}
+  sliderModName: {fileID: 3460759315374801241}
+  sliderBlockName: {fileID: 5371987517542679125}
+  renderBlock: {fileID: 0}
+  rawImageBlock: {fileID: 2715528324277510092}
+  previewBlock: {fileID: 0}
+  buttonLoad: {fileID: 7945890943914277963}
 --- !u!224 &9017989485971075560 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 1177862286523857871, guid: 7d0590f3b5a9e0a4cb6d7cd8b25eb5ca, type: 3}
@@ -1358,7 +1407,7 @@ PrefabInstance:
     - target: {fileID: 3749112547988860521, guid: a57782a0f03e17442ae070dc02fb7542, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1165404071666836787}
     - target: {fileID: 3749112547988860521, guid: a57782a0f03e17442ae070dc02fb7542, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
       value: 2
@@ -1369,7 +1418,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3749112547988860521, guid: a57782a0f03e17442ae070dc02fb7542, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: WindowRedactorBlockLoad, Assembly-CSharp
+      value: WindowRedactorBiomeSelectBlock, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 3749112547988860521, guid: a57782a0f03e17442ae070dc02fb7542, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName

@@ -16,6 +16,8 @@ public class WindowRedactorBiomeSelectBlock : MonoBehaviour
     RenderTexture renderBlock;
     [SerializeField]
     RawImage rawImageBlock;
+    [SerializeField]
+    PreviewBlock previewBlock;
 
     [SerializeField]
     Button buttonLoad;
@@ -23,24 +25,34 @@ public class WindowRedactorBiomeSelectBlock : MonoBehaviour
     string textNotHaveMod = "None";
     string textNotHaveBlock = "None";
 
+    BlockData[] blockDatas;
     string pathMod;
     string pathBlock;
+    string nameMod;
+    string nameBlock;
 
     event Action changeBlock;
 
     // Start is called before the first frame update
     void Start()
     {
-        
+        iniChangeBlock();
+
+        Invoke("clickButtonModBack", 0.1f);
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        UpdatePreview();
     }
 
-    
+    void UpdatePreview() {
+        if (previewBlock == null)
+            previewBlock.GetRender();
+
+        rawImageBlock.texture = previewBlock.GetRender();
+    }
 
     public void clickButtonModNext()
     {
@@ -92,7 +104,9 @@ public class WindowRedactorBiomeSelectBlock : MonoBehaviour
             pathNew += path;
         }
 
-        RedactorBlocksCTRL.main.loadBlock(pathNew);
+        blockDatas = BlockData.LoadDatas(pathNew);
+        RedactorBiomeCTRL.main.SetSelectBlock(blockDatas[0].mod, blockDatas[0].name);
+
         clickButtonClose();
     }
 
@@ -117,9 +131,9 @@ public class WindowRedactorBiomeSelectBlock : MonoBehaviour
 
         //Вытаскиваем имя мода
         string[] path = pathMod.Split("\\");
-        string modName = path[path.Length - 1];
+        nameMod = path[path.Length - 1];
         //Изменяем имя слайдера
-        sliderModName.SetValueText(modName);
+        sliderModName.SetValueText(nameMod);
 
         void updateSliderMod()
         {
@@ -156,9 +170,9 @@ public class WindowRedactorBiomeSelectBlock : MonoBehaviour
 
         //Вытаскиваем имя мода
         string[] path = pathBlock.Split("\\");
-        string BlockName = path[path.Length - 1];
+        nameBlock = path[path.Length - 1];
         //Изменяем имя слайдера
-        sliderBlockName.SetValueText(BlockName);
+        sliderBlockName.SetValueText(nameBlock);
 
         void updateSliderBlock()
         {
@@ -189,14 +203,44 @@ public class WindowRedactorBiomeSelectBlock : MonoBehaviour
         }
     }
 
-    void updateButtonLoad() {
-    
+    public void eventBlockChange() {
+        changeBlock();
+    }
+
+    void iniDataBlock() {
+        if (pathBlock == null || pathBlock.Length <= 0)
+            return;
+
+        //Вытаскиваем путь
+        string[] pathPart = pathBlock.Split("\\");
+        string pathNew = "";
+        foreach (string path in pathPart)
+        {
+            if (pathNew.Length != 0)
+                pathNew += '/';
+
+            pathNew += path;
+        }
+
+        blockDatas = GameData.Blocks.GetDatas(nameMod, nameBlock);
+
+        
+    }
+
+    void iniRenderBlock() {
+
+        previewBlock = PreviewBlocksCTRL.GetPreview(blockDatas[0]);        
     }
 
     //Инициализировать событие изменения выбранного блока
     void iniChangeBlock() {
-        changeBlock += acceptModName;
-        changeBlock += acceptBlockName;
+        //Если блок требует изменений
+        changeBlock += acceptModName; //Обновить имя мода
+        changeBlock += acceptBlockName; //Обновить имя блока
+        changeBlock += iniDataBlock;
 
+        changeBlock += iniRenderBlock; //обновить превью
     }
+
+
 }

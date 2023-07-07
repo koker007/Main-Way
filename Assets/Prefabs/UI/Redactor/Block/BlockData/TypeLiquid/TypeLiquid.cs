@@ -146,10 +146,10 @@ public class TypeLiquid: BlockData
             Vector2[] uv = new Vector2[4];
             int[] triangles = new int[6];
 
-            vertices[0] = new Vector3(0.0f, voxDown, 1.0f);
-            vertices[1] = new Vector3(0.0f, voxUp, 1.0f);
-            vertices[2] = new Vector3(0.0f, voxUp, 0.0f);
-            vertices[3] = new Vector3(0.0f, voxDown, 0.0f);
+            vertices[0] = new Vector3(1.0f, voxDown, 0.0f);
+            vertices[1] = new Vector3(1.0f, voxUp, 0.0f);
+            vertices[2] = new Vector3(1.0f, voxUp, 1.0f);
+            vertices[3] = new Vector3(1.0f, voxDown, 1.0f);
 
             uv[0] = new Vector2(0.0f, voxDown);
             uv[1] = new Vector2(0.0f, voxUp);
@@ -177,10 +177,10 @@ public class TypeLiquid: BlockData
             Vector2[] uv = new Vector2[4];
             int[] triangles = new int[6];
 
-            vertices[0] = new Vector3(1.0f, voxDown, 0.0f);
-            vertices[1] = new Vector3(1.0f, voxUp, 0.0f);
-            vertices[2] = new Vector3(1.0f, voxUp, 1.0f);
-            vertices[3] = new Vector3(1.0f, voxDown, 1.0f);
+            vertices[0] = new Vector3(0.0f, voxDown, 1.0f);
+            vertices[1] = new Vector3(0.0f, voxUp, 1.0f);
+            vertices[2] = new Vector3(0.0f, voxUp, 0.0f);
+            vertices[3] = new Vector3(0.0f, voxDown, 0.0f);
 
             uv[0] = new Vector2(0.0f, voxDown);
             uv[1] = new Vector2(0.0f, voxUp);
@@ -454,9 +454,48 @@ public class TypeLiquid: BlockData
 
         Mesh meshResult = new Mesh();
 
-        meshResult.vertices = GraficCalc.main.mergeVector3(meshs[lvlUp, lvlDown, 0].vertices, meshs[lvlUp, lvlDown, 1].vertices, meshs[lvlUp, lvlDown, 2].vertices, meshs[lvlUp, lvlDown, 3].vertices, meshs[lvlUp, lvlDown, 4].vertices, meshs[lvlUp, lvlDown, 5].vertices);
+        System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
+        stopwatch = new System.Diagnostics.Stopwatch();
+        stopwatch.Start();
+
+        List<Vector3> listVert = new List<Vector3>();
+        List<Vector2> listUV = new List<Vector2>();
+        List<Vector2> listUV2 = new List<Vector2>();
+
+        if (face)
+        {
+            listVert.AddRange(meshs[lvlUp, lvlDown, 0].vertices);
+            listUV.AddRange(meshs[lvlUp, lvlDown, 0].uv);
+        }
+        if (back)
+        {
+            listVert.AddRange(meshs[lvlUp, lvlDown, 1].vertices);
+            listUV.AddRange(meshs[lvlUp, lvlDown, 1].uv);
+        }
+        if (right)
+        {
+            listVert.AddRange(meshs[lvlUp, lvlDown, 2].vertices);
+            listUV.AddRange(meshs[lvlUp, lvlDown, 2].uv);
+        }
+        if (left)
+        {
+            listVert.AddRange(meshs[lvlUp, lvlDown, 3].vertices);
+            listUV.AddRange(meshs[lvlUp, lvlDown, 3].uv);
+        }
+        if (up)
+        {
+            listVert.AddRange(meshs[lvlUp, lvlDown, 4].vertices);
+            listUV.AddRange(meshs[lvlUp, lvlDown, 4].uv);
+        }
+        if (down)
+        {
+            listVert.AddRange(meshs[lvlUp, lvlDown, 5].vertices);
+            listUV.AddRange(meshs[lvlUp, lvlDown, 5].uv);
+        }
+
+        meshResult.vertices = listVert.ToArray();
         //meshResult.triangles = GraficCalc.main.mergeTriangleNum(wallFace.forms.triangles, wallBack.forms.triangles, wallRight.forms.triangles, wallLeft.forms.triangles, wallUp.forms.triangles, wallDown.forms.triangles);
-        meshResult.uv = GraficCalc.main.mergeVector2(meshs[lvlUp, lvlDown, 0].uv, meshs[lvlUp, lvlDown, 1].uv, meshs[lvlUp, lvlDown, 2].uv, meshs[lvlUp, lvlDown, 3].uv, meshs[lvlUp, lvlDown, 4].uv, meshs[lvlUp, lvlDown, 5].uv);
+        meshResult.uv = listUV.ToArray();
 
 
         meshResult.subMeshCount = 6;
@@ -464,27 +503,40 @@ public class TypeLiquid: BlockData
         //Нужно в данных треугольников надо сдвигать счет примитивов
         /////////////////////////////////////////////////////////////
         int addNum = 0;
-        meshResult.SetTriangles(meshs[lvlUp, lvlDown, 0].triangles, 0);
-        addNum += meshs[lvlUp, lvlDown, 0].vertices.Length;
-
-        int[] trianglesBack = GraficCalc.main.addToInt(meshs[lvlUp, lvlDown, 1].triangles, addNum);
-        meshResult.SetTriangles(trianglesBack, 1);
-        addNum += meshs[lvlUp, lvlDown, 1].vertices.Length;
-
-        int[] trianglesRight = GraficCalc.main.addToInt(meshs[lvlUp, lvlDown, 2].triangles, addNum);
-        meshResult.SetTriangles(trianglesRight, 2);
-        addNum += meshs[lvlUp, lvlDown, 2].vertices.Length;
-
-        int[] trianglesLeft = GraficCalc.main.addToInt(meshs[lvlUp, lvlDown, 3].triangles, addNum);
-        meshResult.SetTriangles(trianglesLeft, 3);
-        addNum += meshs[lvlUp, lvlDown, 3].vertices.Length;
-
-        int[] trianglesUp = GraficCalc.main.addToInt(meshs[lvlUp, lvlDown, 4].triangles, addNum);
-        meshResult.SetTriangles(trianglesUp, 4);
-        addNum += meshs[lvlUp, lvlDown, 4].vertices.Length;
-
-        int[] trianglesDown = GraficCalc.main.addToInt(meshs[lvlUp, lvlDown, 5].triangles, addNum);
-        meshResult.SetTriangles(trianglesDown, 5);
+        if (face)
+        {
+            meshResult.SetTriangles(meshs[lvlUp, lvlDown, 0].triangles, 0);
+            addNum += meshs[lvlUp, lvlDown, 0].vertices.Length;
+        }
+        if (back)
+        {
+            int[] trianglesBack = GraficCalc.main.addToInt(meshs[lvlUp, lvlDown, 1].triangles, addNum);
+            meshResult.SetTriangles(trianglesBack, 1);
+            addNum += meshs[lvlUp, lvlDown, 1].vertices.Length;
+        }
+        if (right)
+        {
+            int[] trianglesRight = GraficCalc.main.addToInt(meshs[lvlUp, lvlDown, 2].triangles, addNum);
+            meshResult.SetTriangles(trianglesRight, 2);
+            addNum += meshs[lvlUp, lvlDown, 2].vertices.Length;
+        }
+        if (left)
+        {
+            int[] trianglesLeft = GraficCalc.main.addToInt(meshs[lvlUp, lvlDown, 3].triangles, addNum);
+            meshResult.SetTriangles(trianglesLeft, 3);
+            addNum += meshs[lvlUp, lvlDown, 3].vertices.Length;
+        }
+        if (up)
+        {
+            int[] trianglesUp = GraficCalc.main.addToInt(meshs[lvlUp, lvlDown, 4].triangles, addNum);
+            meshResult.SetTriangles(trianglesUp, 4);
+            addNum += meshs[lvlUp, lvlDown, 4].vertices.Length;
+        }
+        if (down)
+        {
+            int[] trianglesDown = GraficCalc.main.addToInt(meshs[lvlUp, lvlDown, 5].triangles, addNum);
+            meshResult.SetTriangles(trianglesDown, 5);
+        }
 
         return meshResult;
 
@@ -493,6 +545,10 @@ public class TypeLiquid: BlockData
     public Mesh GetMesh(bool face, bool back, bool left, bool right, bool up, bool down, int lvlUp, int lvlDown)
     {
         return GetMesh(this.data, face, back, left, right, up, down, lvlUp, lvlDown);
+    }
+    public override Mesh GetMesh(bool face, bool back, bool left, bool right, bool up, bool down)
+    {
+        return GetMesh(face, back, left, right, up, down, 15, 0);
     }
 
     public void SaveTo(string path)

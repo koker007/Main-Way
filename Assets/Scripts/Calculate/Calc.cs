@@ -52,6 +52,30 @@ public class Calc
 
             return result;
         }
+
+        public static void changeEvery(ref int[] array, int valueAdd) {
+            if (array == null)
+                return;
+
+            for (int num = 0; num > array.Length; num++) {
+                array[num] += valueAdd;
+            }
+        }
+
+        public static int[] changeEvery(int[] array, int valueAdd)
+        {
+            if (array == null)
+                return array;
+
+            int[] arrayNew = new int[array.Length];
+
+            for (int num = 0; num < array.Length; num++)
+            {
+                arrayNew[num] = array[num] + valueAdd;
+            }
+
+            return arrayNew;
+        }
     }
 
     public class Mesh {

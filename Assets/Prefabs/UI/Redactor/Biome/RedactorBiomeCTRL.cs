@@ -356,7 +356,13 @@ public class RedactorBiomeCTRL : MonoBehaviour
         return select;
     }
 
-    public void SetSelectBlock() {
-        
+    public void SetSelectBlock(string modName, string blockName) {
+
+        int blockID = GameData.Blocks.GetBlockID(modName, blockName);
+        int ruleNum = (int)sliderRules.slider.value;
+
+        biomeData.genRules[ruleNum].blockID = blockID;
+
+        changeSelectBlock();
     }
 }
