@@ -22,8 +22,8 @@ public class PreviewBlock : MonoBehaviour
 
     float timeLastUse = 0;
     public bool isFree { get {
-            //Если превью не используется больше 5 секунд оно свободно
-            if (timeLastUse < Time.unscaledTime - 5)
+            //Если превью не используется больше 3 секунд оно свободно
+            if (timeLastUse < Time.unscaledTime - 3)
                 return true;
 
             return false;
@@ -55,6 +55,7 @@ public class PreviewBlock : MonoBehaviour
         renderTexture = new RenderTexture(100, 100, 32);
         camera.targetTexture = renderTexture;
         camera.enabled = false;
+        camera.Render();
     }
 
     void UpdateMesh()

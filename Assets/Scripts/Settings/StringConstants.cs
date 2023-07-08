@@ -6,6 +6,7 @@ public class StrC
     public const string SEPARATOR = ":=";
 
     public const string mod = "Mod";
+    public const string biomes = "Biomes";
     public const string blocks = "Blocks";
     public const string voxels = "Voxels";
     public const string liquid = "Liquid";
@@ -35,6 +36,11 @@ public class StrC
     public const string TBlock = "TBlock";
     public const string TVoxels = "TVoxels";
     public const string TLiquid = "TLiquid";
+
+    public const string TSurface = "TSurface";
+    public const string TUnderground = "TUnderground";
+    public const string TDwarf = "TDwarf";
+    public const string TRings = "TRings";
 
     public const string saturation = "Saturation";
     public const string value = "Value";

@@ -48,7 +48,7 @@ public class WindowRedactorBiomeSelectBlock : MonoBehaviour
     }
 
     void UpdatePreview() {
-        if (previewBlock == null)
+        if (previewBlock != null)
             previewBlock.GetRender();
 
         rawImageBlock.texture = previewBlock.GetRender();

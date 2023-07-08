@@ -36,7 +36,6 @@ public class RedactorBiomeCTRL : MonoBehaviour
 
     //Если данные биома были изменены
     static public event Action changeBiome;
-    static public event Action changeSelectBlock;
 
     const string keySliderType = "RedactorBiomeSliderType";
     const string keySliderRules = "RedactorBiomeSliderRule";
@@ -107,47 +106,38 @@ public class RedactorBiomeCTRL : MonoBehaviour
     public void clickButtonSave()
     {
 
-        /*
         //проверяем что имя мода есть
-        if (blockDatas[0].mod == null || blockDatas[0].mod.Length == 0)
+        if (biomeData.mod == null || biomeData.mod.Length == 0)
         {
             Debug.Log("NotSave Need Mod Name");
             return;
         }
         //проверяем что имя мода больше 3
-        if (blockDatas[0].mod.Length < 3)
+        if (biomeData.mod.Length < 3)
         {
             Debug.Log("NotSave Need Mod Name Lenght > 3");
             return;
         }
-        //Проверяем что имя блока есть
-        if (blockDatas[0].name == null || blockDatas[0].name.Length == 0)
+        //Проверяем что имя биома есть
+        if (biomeData.name == null || biomeData.name.Length == 0)
         {
-            Debug.Log("NotSave Need Block Name");
+            Debug.Log("NotSave Need Biome Name");
             return;
         }
         //Проверняем что имя больше 3х символов
-        if (blockDatas[0].name.Length < 3)
+        if (biomeData.name.Length < 3)
         {
-            Debug.Log("NotSave Need Block Name Lenght > 3");
+            Debug.Log("NotSave Need Biome Name Lenght > 3");
             return;
         }
 
-        //Применяем общие данные на все блоки
-        acceptGroupParameters();
-
-        //Сохраняем все блоки
-        for (int num = 0; num < blockDatas.Length; num++)
-        {
-            BlockData.SaveData(blockDatas[num]);
-        }
-        */
+        BiomeData.SaveData(biomeData);
     }
 
     public void clickButtonLoad()
     {
         WindowMenuCTRL.CloseALL(true);
-        //WindowMenuCTRL.ClickRedactorBlockLoad();
+        WindowMenuCTRL.ClickRedactorBiomeLoad();
     }
 
 
@@ -267,7 +257,7 @@ public class RedactorBiomeCTRL : MonoBehaviour
     public void sliderSelectRuleUpdate()
     {
         //Обновляем слайдер правила генерации
-        updateUI();
+        changeBiome();
     }
     public void clickButtonAddRule()
     {
@@ -294,9 +284,6 @@ public class RedactorBiomeCTRL : MonoBehaviour
         DelRule();
 
         changeBiome();
-
-        if(changeSelectBlock != null)
-            changeSelectBlock();
 
         void DelRule() {
             
@@ -351,9 +338,13 @@ public class RedactorBiomeCTRL : MonoBehaviour
     public BlockData GetSelectBlock() {
 
         //Выбираем выбранное правило
-        BlockData select = GameData.Blocks.GetData(biomeData.genRules[0].blockID, 0);
+        BlockData select = GameData.Blocks.GetData(biomeData.genRules[(int)sliderRules.slider.value].blockID, 0);
 
         return select;
+    }
+    public BiomeData.GenRule GetSelectGenRule() {
+        BiomeData.GenRule genRule = biomeData.genRules[(int)sliderRules.slider.value];
+        return genRule;
     }
 
     public void SetSelectBlock(string modName, string blockName) {
@@ -363,6 +354,18 @@ public class RedactorBiomeCTRL : MonoBehaviour
 
         biomeData.genRules[ruleNum].blockID = blockID;
 
-        changeSelectBlock();
+        changeBiome();
+    }
+    public void SetSelectRuleParameters(float scaleAll, int octaves, int freq, Vector3 scale) {
+        int ruleNum = (int)sliderRules.slider.value;
+
+        biomeData.genRules[ruleNum].scaleAll = scaleAll;
+        biomeData.genRules[ruleNum].octaves = octaves;
+        biomeData.genRules[ruleNum].scaleX = scale.x;
+        biomeData.genRules[ruleNum].scaleY = scale.y;
+        biomeData.genRules[ruleNum].scaleZ = scale.z;
+        biomeData.genRules[ruleNum].freq = freq;
+
+        changeBiome();
     }
 }
