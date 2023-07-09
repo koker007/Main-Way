@@ -110,7 +110,7 @@ PrefabInstance:
     - target: {fileID: 3749112547988860521, guid: a57782a0f03e17442ae070dc02fb7542, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 1841942780}
+      objectReference: {fileID: 4693998673317831813}
     - target: {fileID: 3749112547988860521, guid: a57782a0f03e17442ae070dc02fb7542, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
       value: 2
@@ -121,7 +121,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3749112547988860521, guid: a57782a0f03e17442ae070dc02fb7542, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: WindowRedactorBlockLoad, Assembly-CSharp
+      value: WindowRedactorBiomeLoad, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 3749112547988860521, guid: a57782a0f03e17442ae070dc02fb7542, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
@@ -226,7 +226,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1371192221785815757, guid: a57782a0f03e17442ae070dc02fb7542, type: 3}
       propertyPath: m_Name
-      value: ButtonBlockNameNext
+      value: ButtonBiomeNameNext
       objectReference: {fileID: 0}
     - target: {fileID: 3421321276486409421, guid: a57782a0f03e17442ae070dc02fb7542, type: 3}
       propertyPath: m_text
@@ -247,18 +247,18 @@ PrefabInstance:
     - target: {fileID: 3749112547988860521, guid: a57782a0f03e17442ae070dc02fb7542, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 1841942780}
+      objectReference: {fileID: 4693998673317831813}
     - target: {fileID: 3749112547988860521, guid: a57782a0f03e17442ae070dc02fb7542, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 3749112547988860521, guid: a57782a0f03e17442ae070dc02fb7542, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: clickButtonBlockNext
+      value: clickButtonBiomeNext
       objectReference: {fileID: 0}
     - target: {fileID: 3749112547988860521, guid: a57782a0f03e17442ae070dc02fb7542, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: WindowRedactorBlockLoad, Assembly-CSharp
+      value: WindowRedactorBiomeLoad, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 3749112547988860521, guid: a57782a0f03e17442ae070dc02fb7542, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
@@ -384,14 +384,14 @@ PrefabInstance:
     - target: {fileID: 7965957027801989778, guid: 7d0590f3b5a9e0a4cb6d7cd8b25eb5ca, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 1841942780}
+      objectReference: {fileID: 4693998673317831813}
     - target: {fileID: 7965957027801989778, guid: 7d0590f3b5a9e0a4cb6d7cd8b25eb5ca, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
       value: clickButtonClose
       objectReference: {fileID: 0}
     - target: {fileID: 7965957027801989778, guid: 7d0590f3b5a9e0a4cb6d7cd8b25eb5ca, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: WindowRedactorBlockLoad, Assembly-CSharp
+      value: WindowRedactorBiomeLoad, Assembly-CSharp
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7d0590f3b5a9e0a4cb6d7cd8b25eb5ca, type: 3}
@@ -405,7 +405,7 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 4214369326212180234, guid: 7d0590f3b5a9e0a4cb6d7cd8b25eb5ca, type: 3}
   m_PrefabInstance: {fileID: 500455315133260051}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1841942780
+--- !u!114 &4693998673317831813
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -414,11 +414,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 4363297442361542681}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 19fc12d61a25a9841b23bf6f83e31fa1, type: 3}
+  m_Script: {fileID: 11500000, guid: 4ad8b952ab2b6b940a6b6627b545612d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   sliderModName: {fileID: 2367172400391394335}
-  sliderBlockName: {fileID: 2367172400298269773}
+  sliderBiomeName: {fileID: 2367172400298269773}
 --- !u!1001 &500455315491328855
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -533,7 +533,7 @@ PrefabInstance:
     - target: {fileID: 3749112547988860521, guid: a57782a0f03e17442ae070dc02fb7542, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 1841942780}
+      objectReference: {fileID: 4693998673317831813}
     - target: {fileID: 3749112547988860521, guid: a57782a0f03e17442ae070dc02fb7542, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
       value: 2
@@ -544,7 +544,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3749112547988860521, guid: a57782a0f03e17442ae070dc02fb7542, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: WindowRedactorBlockLoad, Assembly-CSharp
+      value: WindowRedactorBiomeLoad, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 3749112547988860521, guid: a57782a0f03e17442ae070dc02fb7542, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
@@ -653,7 +653,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1371192221785815757, guid: a57782a0f03e17442ae070dc02fb7542, type: 3}
       propertyPath: m_Name
-      value: ButtonBlockNameBack
+      value: ButtonBiomeNameBack
       objectReference: {fileID: 0}
     - target: {fileID: 3421321276486409421, guid: a57782a0f03e17442ae070dc02fb7542, type: 3}
       propertyPath: m_text
@@ -674,18 +674,18 @@ PrefabInstance:
     - target: {fileID: 3749112547988860521, guid: a57782a0f03e17442ae070dc02fb7542, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 1841942780}
+      objectReference: {fileID: 4693998673317831813}
     - target: {fileID: 3749112547988860521, guid: a57782a0f03e17442ae070dc02fb7542, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 3749112547988860521, guid: a57782a0f03e17442ae070dc02fb7542, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: clickButtonBlockBack
+      value: clickButtonBiomeBack
       objectReference: {fileID: 0}
     - target: {fileID: 3749112547988860521, guid: a57782a0f03e17442ae070dc02fb7542, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: WindowRedactorBlockLoad, Assembly-CSharp
+      value: WindowRedactorBiomeLoad, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 3749112547988860521, guid: a57782a0f03e17442ae070dc02fb7542, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
@@ -811,18 +811,18 @@ PrefabInstance:
     - target: {fileID: 6428759398118587056, guid: 01b84696695d3cb4a98521f42a03b9e1, type: 3}
       propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 1841942780}
+      objectReference: {fileID: 4693998673317831813}
     - target: {fileID: 6428759398118587056, guid: 01b84696695d3cb4a98521f42a03b9e1, type: 3}
       propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 6428759398118587056, guid: 01b84696695d3cb4a98521f42a03b9e1, type: 3}
       propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: acceptSliderModName
+      value: acceptSliderBiomeName
       objectReference: {fileID: 0}
     - target: {fileID: 6428759398118587056, guid: 01b84696695d3cb4a98521f42a03b9e1, type: 3}
       propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: WindowRedactorBlockLoad, Assembly-CSharp
+      value: WindowRedactorBiomeLoad, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 6428759398118587056, guid: 01b84696695d3cb4a98521f42a03b9e1, type: 3}
       propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
@@ -988,18 +988,18 @@ PrefabInstance:
     - target: {fileID: 6428759398118587056, guid: 01b84696695d3cb4a98521f42a03b9e1, type: 3}
       propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 1841942780}
+      objectReference: {fileID: 4693998673317831813}
     - target: {fileID: 6428759398118587056, guid: 01b84696695d3cb4a98521f42a03b9e1, type: 3}
       propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 6428759398118587056, guid: 01b84696695d3cb4a98521f42a03b9e1, type: 3}
       propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: acceptSliderBlockName
+      value: acceptSliderBiomeName
       objectReference: {fileID: 0}
     - target: {fileID: 6428759398118587056, guid: 01b84696695d3cb4a98521f42a03b9e1, type: 3}
       propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: WindowRedactorBlockLoad, Assembly-CSharp
+      value: WindowRedactorBiomeLoad, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 6428759398118587056, guid: 01b84696695d3cb4a98521f42a03b9e1, type: 3}
       propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
@@ -1169,7 +1169,7 @@ PrefabInstance:
     - target: {fileID: 3749112547988860521, guid: a57782a0f03e17442ae070dc02fb7542, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 1841942780}
+      objectReference: {fileID: 4693998673317831813}
     - target: {fileID: 3749112547988860521, guid: a57782a0f03e17442ae070dc02fb7542, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
       value: 2
@@ -1180,7 +1180,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3749112547988860521, guid: a57782a0f03e17442ae070dc02fb7542, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: WindowRedactorBlockLoad, Assembly-CSharp
+      value: WindowRedactorBiomeLoad, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 3749112547988860521, guid: a57782a0f03e17442ae070dc02fb7542, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName

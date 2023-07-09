@@ -14,6 +14,11 @@ public class InputFieldCTRL : MonoBehaviour
     [SerializeField]
     TextMeshProUGUI textPlaceholder;
 
+    public string text { 
+        get { return inputField.text; }
+        set { inputField.text = value; }
+    }
+
     // Start is called before the first frame update
     void Start()
     {
@@ -30,5 +35,4 @@ public class InputFieldCTRL : MonoBehaviour
     {
 
     }
-
 }

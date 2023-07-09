@@ -98,6 +98,11 @@ public class RedactorBiomeCTRL : MonoBehaviour
         TestOpenGenerator();
     }
 
+    static public void SetBiome(BiomeData biomeData) {
+        main.biomeData = biomeData;
+        changeBiome();
+    }
+
     void TestOpenGenerator() {
         if (RedactorBiomeGenerator.MAIN != null && !RedactorBiomeGenerator.MAIN.gameObject.activeSelf)
             RedactorBiomeGenerator.MAIN.gameObject.SetActive(true);
@@ -140,11 +145,19 @@ public class RedactorBiomeCTRL : MonoBehaviour
         WindowMenuCTRL.ClickRedactorBiomeLoad();
     }
 
-
+    public void acceptName() {
+        biomeData.mod = Mod.text;
+        biomeData.name = Name.text;
+    }
     public void updateUI() {
+        testName();
         testSliderType();
         testSliderRules();
 
+        void testName() {
+            Mod.text = biomeData.mod;
+            Name.text = biomeData.name;
+        }
         void testSliderType()
         {
             sliderType.SetDefaultText(keySliderType, "Type");
@@ -160,7 +173,6 @@ public class RedactorBiomeCTRL : MonoBehaviour
             else
                 sliderType.SetValueText("???");
         }
-
         void testSliderRules() {
             sliderRules.slider.minValue = 0;
             sliderRules.slider.maxValue = biomeData.genRules.Count - 1;

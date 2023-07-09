@@ -149,6 +149,9 @@ public abstract class BiomeData
         if (biomeData == null)
             return null;
 
+        biomeData.mod = mod;
+        biomeData.name = name;
+
         LoadRules();
 
         return biomeData;
@@ -182,7 +185,7 @@ public abstract class BiomeData
             }
 
             mod = pathMass[pathMass.Length - 4];
-            name = pathMass[pathMass.Length - 2];
+            name = pathMass[pathMass.Length - 1];
 
             //Нужно загрузить файл с основными данными
             loadMainTXT();
