@@ -173,7 +173,8 @@ public class WindowRedactorBiomeLoad : MonoBehaviour
             pathNew += path;
         }
 
-        RedactorBiomeCTRL.SetBiome(BiomeData.LoadData(pathNew));
+        BiomeData biomeData = BiomeData.LoadData(pathNew);
+        RedactorBiomeCTRL.SetBiome(biomeData);
         clickButtonClose();
     }
     public void clickButtonClose()

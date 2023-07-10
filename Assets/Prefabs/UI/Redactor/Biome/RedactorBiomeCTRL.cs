@@ -99,6 +99,9 @@ public class RedactorBiomeCTRL : MonoBehaviour
     }
 
     static public void SetBiome(BiomeData biomeData) {
+        if (biomeData == null)
+            return;
+
         main.biomeData = biomeData;
         changeBiome();
     }
@@ -145,10 +148,14 @@ public class RedactorBiomeCTRL : MonoBehaviour
         WindowMenuCTRL.ClickRedactorBiomeLoad();
     }
 
-    public void acceptName() {
+    public void acceptBiomeMod() {
         biomeData.mod = Mod.text;
+    }
+    public void acceptBiomeName()
+    {
         biomeData.name = Name.text;
     }
+
     public void updateUI() {
         testName();
         testSliderType();

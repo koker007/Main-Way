@@ -7,6 +7,7 @@ public class StrC
 
     public const string mod = "Mod";
     public const string biomes = "Biomes";
+    public const string rules = "Rules";
     public const string blocks = "Blocks";
     public const string voxels = "Voxels";
     public const string liquid = "Liquid";
@@ -49,6 +50,7 @@ public class StrC
     public const string perlin = "Perlin";
     public const string scale = "Scale";
     public const string octaves = "Octaves";
+    public const string frequency = "Frequency";
     public const string x = "X";
     public const string y = "Y";
     public const string z = "Z";

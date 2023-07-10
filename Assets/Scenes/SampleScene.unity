@@ -7125,7 +7125,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3580704277534739306, guid: 7c13e56be5c5d694da5abeb73a3afbfc, type: 3}
       propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: acceptName
+      value: acceptBiomeName
       objectReference: {fileID: 0}
     - target: {fileID: 3580704277534739306, guid: 7c13e56be5c5d694da5abeb73a3afbfc, type: 3}
       propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
@@ -12504,7 +12504,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3580704277534739306, guid: 7c13e56be5c5d694da5abeb73a3afbfc, type: 3}
       propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: acceptName
+      value: acceptBiomeMod
       objectReference: {fileID: 0}
     - target: {fileID: 3580704277534739306, guid: 7c13e56be5c5d694da5abeb73a3afbfc, type: 3}
       propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
@@ -18318,7 +18318,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7176533566875976478, guid: d7b2deb1b6f117c4b92abfc7b1942566, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -0.000005722046
+      value: 0.000014305115
       objectReference: {fileID: 0}
     - target: {fileID: 7417510024086745306, guid: d7b2deb1b6f117c4b92abfc7b1942566, type: 3}
       propertyPath: m_AnchorMax.x

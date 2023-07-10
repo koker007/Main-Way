@@ -126,7 +126,69 @@ public abstract class BiomeData
             File.WriteAllLines(pathMain, dataList.ToArray());
         }
         void SaveRules() {
-            
+            //Создаем путь к папке блоков
+            string pathRules = path + "/" + StrC.rules;
+
+            //Если директория есть, необходимо ее удалить создать заного
+            if (!Directory.Exists(pathRules))
+            {
+                Directory.CreateDirectory(pathRules);
+            }
+
+            //Получаем все файлы и удаляем их
+            string[] files = Directory.GetFiles(pathRules);
+            foreach (string file in files)
+                File.Delete(file);
+
+
+            //Обрабатываем все правила
+            for (int num = 0; num < biomeData.genRules.Count; num++) {
+                SetRule(biomeData.genRules[num], num);
+            }
+
+            void SetRule(GenRule genRule, int num) {
+                //создаем путь к правилу
+                string pathRule = pathRules + "/" + num + StrC.formatTXT;
+                if (File.Exists(pathRule))
+                    File.Delete(pathRule);
+
+                //Получаем имя блока
+                BlockData blockData = GameData.Blocks.GetData(genRule.blockID, 0);
+                if (blockData == null)
+                {
+                    //Если блока нет значит пустота
+                    blockData = new TypeBlock();
+                    blockData.mod = "";
+                    blockData.name = "";
+                }
+
+                //Сохранить надо в текстовый файл
+                //создаем список того что надо запомнить
+                List<string> dataList = new List<string>();
+
+                string data = "";
+                //Запоминаем мод и имя блока
+                data = StrC.blocks + StrC.mod + StrC.SEPARATOR + blockData.mod;
+                dataList.Add(data);
+                data = StrC.blocks + StrC.name + StrC.SEPARATOR + blockData.name;
+                dataList.Add(data);
+
+                data = StrC.perlin + StrC.scale + StrC.SEPARATOR + genRule.scaleAll;
+                dataList.Add(data);
+                data = StrC.perlin + StrC.octaves + StrC.SEPARATOR + genRule.octaves;
+                dataList.Add(data);
+                data = StrC.perlin + StrC.scale + StrC.x + StrC.SEPARATOR + genRule.scaleX;
+                dataList.Add(data);
+                data = StrC.perlin + StrC.scale + StrC.y + StrC.SEPARATOR + genRule.scaleY;
+                dataList.Add(data);
+                data = StrC.perlin + StrC.scale + StrC.z + StrC.SEPARATOR + genRule.scaleZ;
+                dataList.Add(data);
+                data = StrC.perlin + StrC.scale + StrC.frequency + StrC.SEPARATOR + genRule.freq;
+                dataList.Add(data);
+
+                //Сохраняем в файл
+                File.WriteAllLines(pathRule, dataList.ToArray());
+            }
         }
     }
     static public BiomeData LoadData(string pathBiome) {
@@ -152,7 +214,9 @@ public abstract class BiomeData
         biomeData.mod = mod;
         biomeData.name = name;
 
-        LoadRules();
+        //Если хоть что-то не загрузилось, то отмена
+        if (!LoadRules())
+            return null;
 
         return biomeData;
 
@@ -240,8 +304,86 @@ public abstract class BiomeData
                 }
             }
         }
-        void LoadRules() {
-            
+        bool LoadRules() {
+            //Создаем путь к папке блоков
+            string pathRule = pathBiome + "/" + StrC.rules;
+
+            if (!Directory.Exists(pathRule))
+                return false;
+
+            //получили все папки с правилами
+            string[] pathRulesAll = Directory.GetFiles(pathRule);
+
+            //Обрабатываем все
+            List<GenRule> ruleDatas = new List<GenRule>();
+            foreach (string path in pathRulesAll) {
+                GetRule(path);
+            }
+
+            biomeData.genRules = ruleDatas;
+
+            return true;
+
+            void GetRule(string path) {
+                //Вытаскиваем номер правила
+                string[] spliters = new string[3];
+                spliters[0] = "/";
+                spliters[1] = "\\";
+                spliters[2] = StrC.formatTXT;
+
+                string[] pathArray = path.Split(spliters, System.StringSplitOptions.RemoveEmptyEntries);
+
+                string[] DatasStr = File.ReadAllLines(path);
+                GenRule genRule = new GenRule();
+
+                string mod = "";
+                string name = "";
+
+                foreach (string DataStr in DatasStr) {
+                    SetData(DataStr);
+                }
+
+                genRule.blockID = GameData.Blocks.GetBlockID(mod, name);
+
+                //Правило создано, добавляем
+                ruleDatas.Add(genRule);
+
+                void SetData(string DataStr) {
+                    string[] data = DataStr.Split(StrC.SEPARATOR);
+
+                    if (data.Length != 2) {
+                        Debug.LogError("Bad biome data:" + path);
+                        return;
+                    }
+
+                    switch (data[0]) {
+                        case StrC.blocks + StrC.mod:
+                            mod = data[1];
+                            break;
+                        case StrC.blocks + StrC.name:
+                            name = data[1];
+                            break;
+                        case StrC.perlin + StrC.scale:
+                            genRule.scaleAll = (float)System.Convert.ToDouble(data[1]);
+                            break;
+                        case StrC.perlin + StrC.octaves:
+                            genRule.octaves = System.Convert.ToInt32(data[1]);
+                            break;
+                        case StrC.perlin + StrC.scale + StrC.x:
+                            genRule.scaleX = (float)System.Convert.ToDouble(data[1]);
+                            break;
+                        case StrC.perlin + StrC.scale + StrC.y:
+                            genRule.scaleY = (float)System.Convert.ToDouble(data[1]);
+                            break;
+                        case StrC.perlin + StrC.scale + StrC.z:
+                            genRule.scaleZ = (float)System.Convert.ToDouble(data[1]);
+                            break;
+                        case StrC.perlin + StrC.frequency:
+                            genRule.freq = (float)System.Convert.ToDouble(data[1]);
+                            break;
+                    }
+                }
+            }
         }
     }
 }

@@ -1,0 +1,8 @@
+BlocksMod:=Main
+BlocksName:=Water
+PerlinScale:=16
+PerlinOctaves:=1
+PerlinScaleX:=1
+PerlinScaleY:=50
+PerlinScaleZ:=50
+PerlinScaleFrequency:=3
