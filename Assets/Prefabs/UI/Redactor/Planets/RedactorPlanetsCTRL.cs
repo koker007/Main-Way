@@ -92,15 +92,15 @@ public class RedactorPlanetsCTRL : MonoBehaviour
 
         void iniMaxSize()
         {
-            sliderMaxSize.slider.maxValue = (int)Size.s16384;
-            sliderMaxSize.slider.minValue = (int)Size.s1024;
-            sliderMaxSize.slider.value = (int)Size.s16384;
+            sliderMaxSize.slider.maxValue = (int)Size.s2048o;
+            sliderMaxSize.slider.minValue = (int)Size.s128o;
+            sliderMaxSize.slider.value = (int)Size.s2048o;
         }
         void iniMinSize()
         {
-            sliderMinSize.slider.maxValue = (int)Size.s16384;
-            sliderMinSize.slider.minValue = (int)Size.s1024;
-            sliderMinSize.slider.value = (int)Size.s1024;
+            sliderMinSize.slider.maxValue = (int)Size.s2048o;
+            sliderMinSize.slider.minValue = (int)Size.s128o;
+            sliderMinSize.slider.value = (int)Size.s128o;
         }
         void iniMaxTemperature()
         {
@@ -160,7 +160,7 @@ public class RedactorPlanetsCTRL : MonoBehaviour
 
         cellS.pos = new Vector3(0.5f, 0.5f, 0.5f);
         cellS.mainObjs = new SpaceObjData(cellS);
-        cellS.mainObjs.size = Size.s65536;
+        cellS.mainObjs.size = Size.s8192o;
         cellS.mainObjs.radiusChildZone = 500000;
 
         //Создаем планету

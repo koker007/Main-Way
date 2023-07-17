@@ -93,6 +93,8 @@ public class RedactorBiomeCTRL : MonoBehaviour
         inicialize();
 
         changeBiome += updateUI;
+
+        CreatePlanet();
     }
 
     // Update is called once per frame
@@ -389,5 +391,10 @@ public class RedactorBiomeCTRL : MonoBehaviour
         biomeData.genRules[ruleNum].freq = freq;
 
         changeBiome();
+    }
+
+    public void CreatePlanet() {
+        //CellS cellS = new CellS(new Vector3(0,0,0), 0.987654321f, GalaxyCtrl.galaxy);
+        //planetData = new SpaceObjData(cellS);
     }
 }

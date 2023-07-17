@@ -29,9 +29,17 @@ public class RedactorBiomeVisualizator : MonoBehaviour
         //¬ключить генератор если выключен
         RedactorBiomeGenerator.TestOpen();
         TestRenderTexture();
+
+        SetPlanetHeightMap();
     }
 
     void TestRenderTexture() {
         renderTexture.texture = RedactorBiomeGenerator.GetRender();
+    }
+
+    void SetPlanetHeightMap() {
+        Size quality = Size.s1o;
+        float[,] heightMap = RedactorBiomeCTRL.main.planetData.GetHeightMap((int)quality);
+        RedactorBiomeGenerator.SetHeightMap(heightMap, quality);
     }
 }

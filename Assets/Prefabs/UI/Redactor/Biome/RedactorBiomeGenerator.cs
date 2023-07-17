@@ -22,7 +22,8 @@ public class RedactorBiomeGenerator : MonoBehaviour
 
     [Header("Parameters")]
     [SerializeField]
-    int[,] heightMap;
+    float[,] heightMap;
+    Size quarityMap = Size.s1o;
     [SerializeField]
     MeshRenderer PlanetPlane;
     MeshFilter PlanetPlaneFilter;
@@ -104,9 +105,9 @@ public class RedactorBiomeGenerator : MonoBehaviour
         
     }
 
-    static public void SetHeightMap(int[,] heightMap) {
+    static public void SetHeightMap(float[,] heightMap, Size quarity) {
         main.heightMap = heightMap;
-
+        main.quarityMap = quarity;
 
     }
 
@@ -128,6 +129,9 @@ public class RedactorBiomeGenerator : MonoBehaviour
             mesh.RecalculateNormals();
 
             PlanetPlaneFilter.mesh = mesh;
+
+            float scale = Calc.GetSizeInt(quarityMap);
+            PlanetPlane.gameObject.transform.localScale = new Vector3(scale, scale, scale);
 
             Vector3[] GetVertices() {
                 List<Vector3> vertices = new List<Vector3>();
@@ -181,14 +185,20 @@ public class RedactorBiomeGenerator : MonoBehaviour
 
             PlanetLiquidFilter.mesh = mesh;
 
+            float scale = Calc.GetSizeInt(quarityMap);
+            PlanetLiquid.gameObject.transform.localScale = new Vector3(scale, scale, scale);
+
             Vector3[] GetVertices()
             {
                 List<Vector3> vertices = new List<Vector3>();
 
+                int xMax = heightMap.GetLength(0) - 1;
+                int yMax = heightMap.GetLength(1) - 1;
+
                 vertices.Add(new Vector3(0, 0, 0));
-                vertices.Add(new Vector3(0, 0, heightMap.GetLength(1) - 1));
-                vertices.Add(new Vector3(heightMap.GetLength(0) - 1, 0, heightMap.GetLength(1) - 1));
-                vertices.Add(new Vector3(heightMap.GetLength(0) - 1, 0, 0));
+                vertices.Add(new Vector3(0, 0, yMax));
+                vertices.Add(new Vector3(xMax, 0, yMax));
+                vertices.Add(new Vector3(xMax, 0, 0));
 
                 return vertices.ToArray();
             }
@@ -217,14 +227,15 @@ public class RedactorBiomeGenerator : MonoBehaviour
             if (heightMap != null)
                 return;
 
-            heightMap = new int[100, 100];
+            heightMap = new float[100, 100];
 
             for (int x = 0; x < heightMap.GetLength(0); x++) {
                 for (int y = 0; y < heightMap.GetLength(1); y++) {
-                    heightMap[x, y] = UnityEngine.Random.Range(0, 5);
+                    heightMap[x, y] = UnityEngine.Random.Range(0.0f, 5.0f);
                 }
             }
 
         }
+
     }
 }
