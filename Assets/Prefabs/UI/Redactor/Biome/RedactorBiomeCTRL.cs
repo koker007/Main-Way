@@ -26,6 +26,9 @@ public class RedactorBiomeCTRL : MonoBehaviour
     [SerializeField]
     SliderCTRL sliderRules;
 
+    //Данные планеты в которой происходит генерация биома
+    public SpaceObjData planetData;
+
     //Данные биома
     public BiomeData biomeData;
 

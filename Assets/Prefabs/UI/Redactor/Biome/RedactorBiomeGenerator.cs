@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
+using System.Diagnostics;
 
 //Gererate the example biome, use chanks
 public class RedactorBiomeGenerator : MonoBehaviour
@@ -13,37 +15,216 @@ public class RedactorBiomeGenerator : MonoBehaviour
     [SerializeField]
     GameObject chanksParent;
     [SerializeField]
-    GameObject cameraObj;
+    Camera camera;
 
     [SerializeField]
     GameObject chankPrefab;
+
+    [Header("Parameters")]
+    [SerializeField]
+    int[,] heightMap;
+    [SerializeField]
+    MeshRenderer PlanetPlane;
+    MeshFilter PlanetPlaneFilter;
+    [SerializeField]
+    MeshRenderer PlanetLiquid;
+    MeshFilter PlanetLiquidFilter;
+
 
     // Start is called before the first frame update
     void Start()
     {
         main = this;
+        iniCamera();
+        iniPlanetPlane();
+        iniPlanetLiquid();
     }
-
     // Update is called once per frame
     void Update()
     {
         Generate();
-
+        TestCamera();
 
         TestClose();
     }
 
+    static public RenderTexture GetRender() {
+
+        if (!main || !main.camera)
+            return null;
+
+        return main.camera.targetTexture;
+    }
+
+    void iniCamera()
+    {
+        camera = gameObject.GetComponentInChildren<Camera>();
+    }
+    void iniPlanetPlane() {
+        if (PlanetPlane == null)
+            return;
+
+        PlanetPlaneFilter = PlanetPlane.GetComponent <MeshFilter>();
+    }
+    void iniPlanetLiquid() {
+        if (PlanetLiquid == null)
+            return;
+
+        PlanetLiquidFilter = PlanetLiquid.GetComponent<MeshFilter>();
+    }
+
+
+    void TestCamera() {
+        if (camera == null)
+            return;
+
+        //проинициалзировать камеру
+        if (camera.targetTexture != null && camera.targetTexture.width != Screen.width && camera.targetTexture.height != Screen.height) {
+            camera.targetTexture = null;
+        }
+
+        camera.targetTexture ??= new RenderTexture(Screen.width, Screen.height, 32);
+    }
+
+    static public void TestOpen() {
+        //открыть генератор биомов
+        if (main == null)
+            return;
+
+        main.gameObject.SetActive(true);
+
+    }
     void TestClose() {
         //Если меню нет или оно не активно
         if (RedactorBiomeCTRL.main == null ||
-            !RedactorBiomeCTRL.main.gameObject.activeSelf) {
+            !RedactorBiomeCTRL.main.gameObject.activeInHierarchy) {
             //закрываем генератор
             gameObject.SetActive(false);
         }
         
     }
 
+    static public void SetHeightMap(int[,] heightMap) {
+        main.heightMap = heightMap;
+
+
+    }
+
     void Generate() {
-        
+
+        RandomizeHeightMap();
+
+        ReGeneratePlanetPlane();
+        ReGeneratePlanetLiquid();
+
+        void ReGeneratePlanetPlane() {
+            if (!PlanetPlane || !PlanetPlaneFilter)
+                return;
+
+            Mesh mesh = new Mesh();
+            mesh.vertices = GetVertices();
+            mesh.triangles = GetTriangles();
+
+            mesh.RecalculateNormals();
+
+            PlanetPlaneFilter.mesh = mesh;
+
+            Vector3[] GetVertices() {
+                List<Vector3> vertices = new List<Vector3>();
+
+                for (int y = 0; y < heightMap.GetLength(1); y++)
+                {
+                    for (int x = 0; x < heightMap.GetLength(0); x++)
+                    {
+                        vertices.Add(new Vector3(x, heightMap[x, y], y));
+                    }
+                }
+
+                return vertices.ToArray();
+            }
+            int[] GetTriangles() {
+                List<int> triangles = new List<int>();
+
+                for (int x = 0; x < heightMap.GetLength(0) - 1; x++) {
+                    for (int y = 0; y < heightMap.GetLength(1) - 1; y++) {
+
+                        int smeshenieX = heightMap.GetLength(0);
+
+                        int vert00 = y * smeshenieX + x;
+                        int vert01 = vert00 + smeshenieX;
+                        int vert11 = vert00 + smeshenieX + 1;
+                        int vert10 = vert00 + 1;
+
+                        triangles.Add(vert00);
+                        triangles.Add(vert01);
+                        triangles.Add(vert11);
+
+                        triangles.Add(vert11);
+                        triangles.Add(vert10);
+                        triangles.Add(vert00);
+
+                    }
+                }
+                
+                return triangles.ToArray();
+            }
+        }
+        void ReGeneratePlanetLiquid() {
+            if (!PlanetLiquid || !PlanetLiquidFilter)
+                return;
+
+            Mesh mesh = new Mesh();
+            mesh.vertices = GetVertices();
+            mesh.triangles = GetTriangles();
+
+            mesh.RecalculateNormals();
+
+            PlanetLiquidFilter.mesh = mesh;
+
+            Vector3[] GetVertices()
+            {
+                List<Vector3> vertices = new List<Vector3>();
+
+                vertices.Add(new Vector3(0, 0, 0));
+                vertices.Add(new Vector3(0, 0, heightMap.GetLength(1) - 1));
+                vertices.Add(new Vector3(heightMap.GetLength(0) - 1, 0, heightMap.GetLength(1) - 1));
+                vertices.Add(new Vector3(heightMap.GetLength(0) - 1, 0, 0));
+
+                return vertices.ToArray();
+            }
+            int[] GetTriangles()
+            {
+                List<int> triangles = new List<int>();
+
+                int vert00 = 0;
+                int vert01 = 1;
+                int vert11 = 2;
+                int vert10 = 3;
+
+                triangles.Add(vert00);
+                triangles.Add(vert01);
+                triangles.Add(vert11);
+
+                triangles.Add(vert11);
+                triangles.Add(vert10);
+                triangles.Add(vert00);
+
+                return triangles.ToArray();
+            }
+        }
+
+        void RandomizeHeightMap() {
+            if (heightMap != null)
+                return;
+
+            heightMap = new int[100, 100];
+
+            for (int x = 0; x < heightMap.GetLength(0); x++) {
+                for (int y = 0; y < heightMap.GetLength(1); y++) {
+                    heightMap[x, y] = UnityEngine.Random.Range(0, 5);
+                }
+            }
+
+        }
     }
 }

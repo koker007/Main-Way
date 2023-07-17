@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class RedactorBiomeVisualizator : MonoBehaviour
 {
@@ -8,44 +9,29 @@ public class RedactorBiomeVisualizator : MonoBehaviour
 
     static public RedactorBiomeVisualizator MAIN { get { return main; }  }
 
-
-
-    [SerializeField]
-    RedactorBiomeGenerator Generator;
+    RawImage renderTexture;
 
     // Start is called before the first frame update
     void Start()
     {
         main = this;
+        iniRawImage();
+
+    }
+
+    void iniRawImage() {
+        renderTexture = GetComponent<RawImage>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        //¬ключить генератор если выключен
+        RedactorBiomeGenerator.TestOpen();
+        TestRenderTexture();
     }
 
-    private void OnEnable()
-    {
-        Tests();
-    }
-
-    void Tests() {
-
-        generatorTest();
-
-
-        //¬ключить если выключеннр
-        void generatorTest()
-        {
-
-            if (!(Generator ??= RedactorBiomeGenerator.MAIN))
-                return;
-
-            if (!Generator.gameObject.activeSelf)
-                Generator.gameObject.SetActive(true);
-
-
-        }
+    void TestRenderTexture() {
+        renderTexture.texture = RedactorBiomeGenerator.GetRender();
     }
 }
