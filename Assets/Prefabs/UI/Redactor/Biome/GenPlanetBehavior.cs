@@ -2,13 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using GenBiome;
+using Cosmos;
 
 public class GenPlanetBehavior : IGenBiome
 {
     //Ссылка на вычислительный шейдер
     static private GraficChankPlanet GenChankShader;
 
-    public Chank GenerateBlock(List<BiomeData.GenRule> rules, Vector3Int chankPosition, SpaceObjData worldData)
+    public Chank GenerateBlock(List<BiomeData.GenRule> rules, Vector3Int chankPosition, ObjData worldData)
     {
         //Нужно создать чанк
         Chank chank = new Chank();

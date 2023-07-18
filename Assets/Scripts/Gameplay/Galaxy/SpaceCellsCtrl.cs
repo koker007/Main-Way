@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Cosmos;
 
 //отвечает за создание звезд внутри космической €чейки
 public class SpaceCellsCtrl : MonoBehaviour
@@ -69,7 +70,7 @@ public class SpaceCellsCtrl : MonoBehaviour
             }
         }
 
-        void Visualize(SpaceObjData spaceObj, Vector3 camPos) {
+        void Visualize(ObjData spaceObj, Vector3 camPos) {
             //выходим если нечего визуализировать
             if (spaceObj == null) 
                 return;
@@ -95,7 +96,7 @@ public class SpaceCellsCtrl : MonoBehaviour
                 return;
 
             //ѕеребираем луны на визуализацию
-            for (int i = 0; i < spaceObj.childs.Length; i++)
+            for (int i = 0; i < spaceObj.childs.Count; i++)
             {
                 Visualize(spaceObj.childs[i], camPos);
             }

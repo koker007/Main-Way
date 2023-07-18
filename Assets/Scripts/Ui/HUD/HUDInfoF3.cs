@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Cosmos;
 
 public class HUDInfoF3 : MonoBehaviour
 {
@@ -149,7 +150,7 @@ public class HUDInfoF3 : MonoBehaviour
             int moonsSum = 0;
 
             if (GalaxyCtrl.galaxy.cells[PlayerCTRL.local.NumCell.x, PlayerCTRL.local.NumCell.y, PlayerCTRL.local.NumCell.z].mainObjs != null)
-                foreach (SpaceObjData planetData in GalaxyCtrl.galaxy.cells[PlayerCTRL.local.NumCell.x, PlayerCTRL.local.NumCell.y, PlayerCTRL.local.NumCell.z].mainObjs.childs)
+                foreach (ObjData planetData in GalaxyCtrl.galaxy.cells[PlayerCTRL.local.NumCell.x, PlayerCTRL.local.NumCell.y, PlayerCTRL.local.NumCell.z].mainObjs.childs)
                 {
                     planetsSum++;
 
@@ -160,12 +161,12 @@ public class HUDInfoF3 : MonoBehaviour
             TextCompPlanetsCount.UpdateText();
 
             //Посчитать в рекурсии сколько лун
-            void CalcMoons(SpaceObjData objData) {
+            void CalcMoons(ObjData objData) {
 
-                if (objData.childs == null || objData.childs.Length <= 0)
+                if (objData.childs == null || objData.childs.Count <= 0)
                     return;
 
-                foreach (SpaceObjData moonData in objData.childs) {
+                foreach (ObjData moonData in objData.childs) {
                     moonsSum++;
 
                     CalcMoons(moonData);

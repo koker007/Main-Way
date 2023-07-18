@@ -2,11 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Сosmos
+namespace Cosmos
 {
     public class PlanetData : ObjData
     {
         HeightMap[] heightMaps;
+
+        PatternPlanet pattern;
 
         public PlanetData(CellS cell)
         {
@@ -15,6 +17,9 @@ namespace Сosmos
 
         public override void GenData(ObjData parent, float perlin) {
             base.GenData(parent, perlin);
+
+            GenStandart();
+            IniOrbitRadius();
 
             GenHeightMap();
 
@@ -25,6 +30,70 @@ namespace Сosmos
 
                 //Создали массив текстур
                 heightMaps = new HeightMap[needTextures];
+            }
+
+            void GenStandart() {
+                float startMass = 65536;
+                float startSize = 65536;
+                //Если родитель есть
+                if (parent != null)
+                {
+                    //Делаем максимальную массу и размер на 2 порядка ниже
+                    startMass = parent.mass / 4;
+                    startSize = (int)parent.size - 2;
+                }
+
+                //Генерация планет и лун
+                color = new Color(Random.Range(0.5f, 1), Random.Range(0.5f, 1), Random.Range(0.5f, 1));
+
+                //Размер
+                int sizePower = (int)(((randSize * 1000) % startSize - 3) + 3); //размер меньше 7-го порядка не нужен
+                this.size = (Size)sizePower;
+            }
+
+            void IniOrbitRadius()
+            {
+                radiusOrbit = 0;
+                radiusChildZone = 0;
+
+                if (parent == null)
+                    return;
+
+
+                //прибавляем на радиус родителя
+                radiusOrbit += Calc.GetSizeInt(parent.size);
+
+                //прибавляем радиус планет что впереди
+                int index = 0;
+                foreach (ObjData objData in parent.childs)
+                {
+                    if (objData != this)
+                    {
+                        //Прибавляем радиус влияния планеты
+                        radiusOrbit += objData.radiusGravity + objData.radiusVoid;
+                        //radiusOrbit += Calc.GetSizeInt(objData.size);
+                        index++;
+                    }
+                    else
+                    {
+                        //Узнаем какой возможный максимум для влияния этой планеты
+                        radiusGravity = Calc.GetSizeInt(objData.size) * 4;
+                        //Проблемма!! надо проверять что растояние гравитации не будет больше distanceChildFree
+
+                        radiusChildZone = (int)(radiusGravity * perlin);
+
+
+                        //Определяемся с размером пустоты
+                        radiusVoid = (int)(radiusGravity * ((perlin * 100) % 10));
+
+                        //Узнаем сколько свободного места осталось у родителя
+
+
+                        radiusOrbit += radiusGravity / 2 + radiusVoid / 2;
+                        //radiusOrbit += Calc.GetSizeInt(objData.size)/2;
+                        break;
+                    }
+                }
             }
         }
 

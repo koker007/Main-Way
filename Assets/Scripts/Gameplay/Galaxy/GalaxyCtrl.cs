@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Cosmos;
 
 public class GalaxyCtrl : MonoBehaviour
 {
@@ -349,7 +350,7 @@ public class GalaxyCtrl : MonoBehaviour
     }
 
     //Создаем космический объект на основе его данных
-    void SpawnGalaxyObj(SpaceObjData myData) {
+    void SpawnGalaxyObj(ObjData myData) {
 
         GameObject SpaceObj = Instantiate(GalaxyObjPrefab.gameObject, transform);
         GalaxyObjCtrl spaceObjCtrl = SpaceObj.GetComponent<GalaxyObjCtrl>();

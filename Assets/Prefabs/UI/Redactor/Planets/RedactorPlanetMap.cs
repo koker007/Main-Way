@@ -53,7 +53,7 @@ public class RedactorPlanetMap : MonoBehaviour
         }
 
         void TestMap() {
-            imageMap.texture = redactor.planetObjData.GetMainTexture((int)quarity.slider.value);
+            imageMap.texture = redactor.planetObjData.GetMainTexture((Size)quarity.slider.value);
         }
     }
 }

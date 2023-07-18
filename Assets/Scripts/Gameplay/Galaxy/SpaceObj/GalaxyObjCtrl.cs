@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Cosmos;
 
 public class GalaxyObjCtrl : MonoBehaviour
 {
@@ -12,11 +13,11 @@ public class GalaxyObjCtrl : MonoBehaviour
 
     [Header("Data")]
     [SerializeField]
-    public SpaceObjData data;
+    public ObjData data;
 
     float timeLookAtOld = 0;
 
-    public void Ini(SpaceObjData data) {
+    public void Ini(ObjData data) {
         //Связываем информацию и объект друг с другом
         this.data = data;
         this.data.cell.visual = this;

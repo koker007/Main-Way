@@ -1,13 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Cosmos;
 
 
 //Визуализирует космический объект 
 public class SpaceObjCtrl : MonoBehaviour
 {
     [SerializeField]
-    public SpaceObjData data;
+    public ObjData data;
 
     [SerializeField]
     public Transform rotateObj;
@@ -36,7 +37,7 @@ public class SpaceObjCtrl : MonoBehaviour
 
     }
 
-    public void Ini(SpaceObjData data)
+    public void Ini(ObjData data)
     {
         this.data = data;
         data.visual = this;
@@ -170,7 +171,7 @@ public class SpaceObjCtrl : MonoBehaviour
 
         //Проверяем на наличие детей
         if (data != null && data.childs != null)
-            foreach (SpaceObjData spaceObjData in data.childs)
+            foreach (ObjData spaceObjData in data.childs)
             {
                 if (spaceObjData.visual == null)
                     continue;

@@ -2,11 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Сosmos
+namespace Cosmos
 {
     //Родительский класс всех космических объектов
     public abstract class ObjData
     {
+        //визуальная часть
+        public SpaceObjCtrl visual;
+
         public CellS cell; //Ячейка родитель
 
         public ObjData parent; //Космический объект - родитель
@@ -39,8 +42,8 @@ namespace Сosmos
         {
             this.parent = parent;
 
-            float randMass = 0;
-            float randSize = 0;
+            randMass = 0;
+            randSize = 0;
 
             //Если родитель есть
             if (parent != null)
@@ -153,7 +156,8 @@ namespace Сosmos
             void AddPlanet(float distFree)
             {
                 //Создаем планету
-                childs.Add(new PlanetData(cell));
+                ObjData objData = new PlanetData(cell);
+                childs.Add(objData);
 
                 int index = childs.Count - 1;
 
@@ -166,6 +170,12 @@ namespace Сosmos
 
             }
         }
+    }
+
+    public enum TidalLocking
+    {
+        No,
+        Yes
     }
 
     public class HeightMap

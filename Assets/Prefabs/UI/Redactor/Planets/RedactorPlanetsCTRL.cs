@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Cosmos;
 
 public class RedactorPlanetsCTRL : MonoBehaviour
 {
@@ -37,7 +38,7 @@ public class RedactorPlanetsCTRL : MonoBehaviour
     PatternPlanet patternPlanet;
 
     //Объект на примере которого смотрим паттерн (данные)
-    public SpaceObjData planetObjData;
+    public ObjData planetObjData;
 
 
     string strMaxSize = "Max Size";
@@ -159,14 +160,14 @@ public class RedactorPlanetsCTRL : MonoBehaviour
         //Создаем в нулевой ячейке указанную звезду
 
         cellS.pos = new Vector3(0.5f, 0.5f, 0.5f);
-        cellS.mainObjs = new SpaceObjData(cellS);
+        cellS.mainObjs = new PlanetData(cellS);
         cellS.mainObjs.size = Size.s65536;
         cellS.mainObjs.radiusChildZone = 500000;
 
         //Создаем планету
-        cellS.mainObjs.childs = new SpaceObjData[1];
+        cellS.mainObjs.childs = new List<ObjData>();
 
-        cellS.mainObjs.childs[0] = new SpaceObjData(cellS);
+        cellS.mainObjs.childs.Add(new PlanetData(cellS));
         planetObjData = cellS.mainObjs.childs[0];
 
         float seed = Random.Range(0.0f, 100);
@@ -175,7 +176,7 @@ public class RedactorPlanetsCTRL : MonoBehaviour
         planetObjData.size = (Size)Random.Range(sliderMinSize.slider.value, sliderMaxSize.slider.value);
 
         //Создаем объект по паттерну
-        planetObjData.GenObjData(cellS.mainObjs, seed, 0, patternPlanet);
+        planetObjData.GenData(cellS.mainObjs, seed);
 
         planetObjData.GenPerlinLoc(seed);
     }

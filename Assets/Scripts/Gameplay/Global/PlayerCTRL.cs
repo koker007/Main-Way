@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Steamworks;
 using Mirror;
+using Cosmos;
 
 
 //Игрок на сервере
@@ -69,8 +70,8 @@ public class PlayerCTRL : NetworkBehaviour
     public GameObject CamPlayer; //Основная планетарная камера, локальная на игроке
 
     //Серверные расчеты
-    SpaceObjData planetCurrent; //Текущая планета игрока
-    public SpaceObjData PlanetCurrent {
+    ObjData planetCurrent; //Текущая планета игрока
+    public ObjData PlanetCurrent {
         get {
             return planetCurrent;
         }
@@ -170,7 +171,7 @@ public class PlayerCTRL : NetworkBehaviour
     /// Установить текушую планету игрока
     /// </summary>
     /// <param name="spaceObj"></param>
-    void ServerSetPlanet(SpaceObjData spaceObj) {
+    void ServerSetPlanet(ObjData spaceObj) {
         //только сервер
         if (!isServer)
             return;
@@ -189,7 +190,7 @@ public class PlayerCTRL : NetworkBehaviour
         CellS cell = spaceObj.cell;
 
         //Перебираем все планеты до самой звезды
-        SpaceObjData select = spaceObj;
+        ObjData select = spaceObj;
         string planetsInvers = "";
         while (select != null) {
             //если родителя нет - выходим
@@ -197,7 +198,7 @@ public class PlayerCTRL : NetworkBehaviour
                 break;
 
             //Если родитель есть узнаем номер этого объекта у родителя
-            for (int num = 0; num < select.parent.childs.Length; num++) {
+            for (int num = 0; num < select.parent.childs.Count; num++) {
                 //Нашли текущую планету
                 if (select == select.parent.childs[num]) {
                     //прибавляем разделитель и номер

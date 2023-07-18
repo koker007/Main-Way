@@ -1,9 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Сosmos;
+using Cosmos;
 
-namespace Сosmos
+namespace Cosmos
 {
     public class StarData : ObjData
     {
@@ -29,12 +29,11 @@ namespace Сosmos
             base.GenData(parent, perlin);
 
             GenStandart();
+            IniOrbitRadius();
             GenHeightMap();
 
             void GenStandart()
             {
-
-                IniOrbitRadius();
 
                 //Это должна быть звезда, выбираем из 5 размеров от 13-17 порядка
                 int massPower = (int)((randMass * 1000) % 5) + 13;
@@ -47,49 +46,48 @@ namespace Сosmos
                 iniData(Calc.GetSizeInt(size), mass);
 
                 this.time360Rotate = perlin;
+            }
+            void IniOrbitRadius()
+            {
+                radiusOrbit = 0;
+                radiusChildZone = 0;
 
-                void IniOrbitRadius()
+                if (parent == null)
+                    return;
+
+
+                //прибавляем на радиус родителя
+                radiusOrbit += Calc.GetSizeInt(parent.size);
+
+                //прибавляем радиус планет что впереди
+                int index = 0;
+                foreach (ObjData objData in parent.childs)
                 {
-                    radiusOrbit = 0;
-                    radiusChildZone = 0;
-
-                    if (parent == null)
-                        return;
-
-
-                    //прибавляем на радиус родителя
-                    radiusOrbit += Calc.GetSizeInt(parent.size);
-
-                    //прибавляем радиус планет что впереди
-                    int index = 0;
-                    foreach (ObjData objData in parent.childs)
+                    if (objData != this)
                     {
-                        if (objData != this)
-                        {
-                            //Прибавляем радиус влияния планеты
-                            radiusOrbit += objData.radiusGravity + objData.radiusVoid;
-                            //radiusOrbit += Calc.GetSizeInt(objData.size);
-                            index++;
-                        }
-                        else
-                        {
-                            //Узнаем какой возможный максимум для влияния этой планеты
-                            radiusGravity = Calc.GetSizeInt(objData.size) * 4;
-                            //Проблемма!! надо проверять что растояние гравитации не будет больше distanceChildFree
+                        //Прибавляем радиус влияния планеты
+                        radiusOrbit += objData.radiusGravity + objData.radiusVoid;
+                        //radiusOrbit += Calc.GetSizeInt(objData.size);
+                        index++;
+                    }
+                    else
+                    {
+                        //Узнаем какой возможный максимум для влияния этой планеты
+                        radiusGravity = Calc.GetSizeInt(objData.size) * 4;
+                        //Проблемма!! надо проверять что растояние гравитации не будет больше distanceChildFree
 
-                            radiusChildZone = (int)(radiusGravity * perlin);
+                        radiusChildZone = (int)(radiusGravity * perlin);
 
 
-                            //Определяемся с размером пустоты
-                            radiusVoid = (int)(radiusGravity * ((perlin * 100) % 10));
+                        //Определяемся с размером пустоты
+                        radiusVoid = (int)(radiusGravity * ((perlin * 100) % 10));
 
-                            //Узнаем сколько свободного места осталось у родителя
+                        //Узнаем сколько свободного места осталось у родителя
 
 
-                            radiusOrbit += radiusGravity / 2 + radiusVoid / 2;
-                            //radiusOrbit += Calc.GetSizeInt(objData.size)/2;
-                            break;
-                        }
+                        radiusOrbit += radiusGravity / 2 + radiusVoid / 2;
+                        //radiusOrbit += Calc.GetSizeInt(objData.size)/2;
+                        break;
                     }
                 }
             }

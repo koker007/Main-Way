@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using Cosmos;
 
 public class RedactorBiomeCTRL : MonoBehaviour
 {
@@ -27,7 +28,7 @@ public class RedactorBiomeCTRL : MonoBehaviour
     SliderCTRL sliderRules;
 
     //Данные планеты в которой происходит генерация биома
-    public SpaceObjData planetData;
+    public ObjData planetData;
 
     //Данные биома
     public BiomeData biomeData;
