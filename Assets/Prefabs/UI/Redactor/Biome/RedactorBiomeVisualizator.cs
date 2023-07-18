@@ -30,7 +30,7 @@ public class RedactorBiomeVisualizator : MonoBehaviour
         RedactorBiomeGenerator.TestOpen();
         TestRenderTexture();
 
-        SetPlanetHeightMap();
+        //SetPlanetHeightMap();
     }
 
     void TestRenderTexture() {
@@ -38,7 +38,7 @@ public class RedactorBiomeVisualizator : MonoBehaviour
     }
 
     void SetPlanetHeightMap() {
-        Size quality = Size.s1o;
+        Size quality = Size.s64;
         float[,] heightMap = RedactorBiomeCTRL.main.planetData.GetHeightMap((int)quality);
         RedactorBiomeGenerator.SetHeightMap(heightMap, quality);
     }

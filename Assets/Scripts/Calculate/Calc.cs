@@ -379,38 +379,44 @@ public class Calc
     }
 
     public static Size GetSize(float size) {
-        if (size >= 81920) return Size.s8192o;
-        if (size >= 40960) return Size.s4096o;
-        if (size >= 20480) return Size.s2048o;
-        if (size >= 10240) return Size.s1024o;
-        if (size >= 5120) return Size.s512o;
-        if (size >= 2560) return Size.s256o;
-        if (size >= 1280) return Size.s128o;
-        if (size >= 640) return Size.s64o;
-        if (size >= 320) return Size.s32o;
-        if (size >= 160) return Size.s16o;
-        if (size >= 80) return Size.s8o;
-        if (size >= 40) return Size.s4o;
-        if (size >= 20) return Size.s2o;
-        else return Size.s1o;
+        if (size >= 65536) return Size.s65536;
+        if (size >= 32768) return Size.s32768;
+        if (size >= 16384) return Size.s16384;
+        if (size >= 8192) return Size.s8192;
+        if (size >= 4096) return Size.s4096;
+        if (size >= 2048) return Size.s2048;
+        if (size >= 1024) return Size.s1024;
+        if (size >= 512) return Size.s512;
+        if (size >= 256) return Size.s256;
+        if (size >= 128) return Size.s128;
+        if (size >= 64) return Size.s64;
+        if (size >= 32) return Size.s32;
+        if (size >= 16) return Size.s16;
+        if (size >= 8) return Size.s8;
+        if (size >= 4) return Size.s4;
+        if (size >= 2) return Size.s2;
+        else return Size.s1;
     }
 
     public static int GetSizeInt(Size size)
     {
-        if ((int)size >= 14) return 81920;
-        if ((int)size >= 13) return 40960;
-        if ((int)size >= 12) return 20480;
-        if ((int)size >= 11) return 10240;
-        if ((int)size >= 10) return 5120;
-        if ((int)size >= 9) return 2560;
-        if ((int)size >= 8) return 1280;
-        if ((int)size >= 7) return 640;
-        if ((int)size >= 6) return 320;
-        if ((int)size >= 5) return 160;
-        if ((int)size >= 4) return 80;
-        if ((int)size >= 3) return 40;
-        if ((int)size >= 2) return 20;
-        else return 10;
+        if ((int)size >= 17) return 65536;
+        if ((int)size >= 16) return 32768;
+        if ((int)size >= 15) return 16384;
+        if ((int)size >= 14) return 8192;
+        if ((int)size >= 13) return 4096;
+        if ((int)size >= 12) return 2048;
+        if ((int)size >= 11) return 1024;
+        if ((int)size >= 10) return 512;
+        if ((int)size >= 9) return 256;
+        if ((int)size >= 8) return 128;
+        if ((int)size >= 7) return 64;
+        if ((int)size >= 6) return 32;
+        if ((int)size >= 5) return 16;
+        if ((int)size >= 4) return 8;
+        if ((int)size >= 3) return 4;
+        if ((int)size >= 2) return 2;
+        else return 1;
     }
 }
 

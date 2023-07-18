@@ -96,11 +96,6 @@ public class Galaxy {
 
 
 
-
-
-
-
-
 //Класс космической ячейки
 public class CellS
 {
@@ -283,13 +278,6 @@ public class CellS
 
 
 
-
-
-
-
-
-
-
 //Класс комсического объекта (звезды или планеты или луны)
 public class SpaceObjData {
     //визуальная часть
@@ -310,7 +298,6 @@ public class SpaceObjData {
     public float bright; //яркость
     public float mass; //масса
     public float atmosphere; //плотность атмосферы
-    public float liting;
 
     /// <summary>
     /// Паттерн генерации планеты
@@ -400,11 +387,11 @@ public class SpaceObjData {
                 IniOrbitRadius();
 
                 //Это должна быть звезда, выбираем из 5 размеров от 13-17 порядка
-                int massPower = (int)((randMass * 1000) % 5) + 10;
+                int massPower = (int)((randMass * 1000) % 5) + 13;
                 this.mass = Calc.GetSizeInt((Size)massPower);
 
                 //Размер
-                int sizePower = (int)((randSize * 1000) % 5) + 10;
+                int sizePower = (int)((randSize * 1000) % 5) + 13;
                 this.size = (Size)sizePower;
 
                 iniData(Calc.GetSizeInt(size), mass);
@@ -419,7 +406,7 @@ public class SpaceObjData {
                 color = new Color(Random.Range(0.5f, 1), Random.Range(0.5f, 1), Random.Range(0.5f, 1));
 
                 //Размер
-                int sizePower = (int)(((randSize * 1000) % startSize - 3) + 3); //размер меньше 3-го порядка не нужен
+                int sizePower = (int)(((randSize * 1000) % startSize - 3) + 3); //размер меньше 7-го порядка не нужен
                 this.size = (Size)sizePower;
 
                 IniOrbitRadius();
@@ -511,17 +498,17 @@ public class SpaceObjData {
         //Для каждого размера свои правила
         //Если размер
 
-        if(size >= Calc.GetSizeInt(Size.s8192o)) ini17();
-        else if (size >= Calc.GetSizeInt(Size.s4096o)) ini16();
-        else if (size >= Calc.GetSizeInt(Size.s2048o)) ini15();
-        else if (size >= Calc.GetSizeInt(Size.s1024o)) ini14();
-        else if (size >= Calc.GetSizeInt(Size.s512o)) ini13();
-        else if (size >= Calc.GetSizeInt(Size.s256o)) ini12();
-        else if (size >= Calc.GetSizeInt(Size.s128o)) ini11();
-        else if (size >= Calc.GetSizeInt(Size.s64o)) ini10();
-        else if (size >= Calc.GetSizeInt(Size.s32o)) ini09();
-        else if (size >= Calc.GetSizeInt(Size.s16o)) ini08();
-        else if (size >= Calc.GetSizeInt(Size.s8o)) ini07();
+        if(size >= Calc.GetSizeInt(Size.s65536)) ini17();
+        else if (size >= Calc.GetSizeInt(Size.s32768)) ini16();
+        else if (size >= Calc.GetSizeInt(Size.s16384)) ini15();
+        else if (size >= Calc.GetSizeInt(Size.s8192)) ini14();
+        else if (size >= Calc.GetSizeInt(Size.s4096)) ini13();
+        else if (size >= Calc.GetSizeInt(Size.s2048)) ini12();
+        else if (size >= Calc.GetSizeInt(Size.s1024)) ini11();
+        else if (size >= Calc.GetSizeInt(Size.s512)) ini10();
+        else if (size >= Calc.GetSizeInt(Size.s256)) ini09();
+        else if (size >= Calc.GetSizeInt(Size.s128)) ini08();
+        else if (size >= Calc.GetSizeInt(Size.s64)) ini07();
 
         void ini17()
         {
@@ -876,7 +863,7 @@ public class SpaceObjData {
         //возвращяем нулевую текстуру
         if (MainTextures[0] == null)
         {
-            MainTextures[0] = new SpaceObjMap(this, Size.s1o);
+            MainTextures[0] = new SpaceObjMap(this, Size.s1);
         }
         return MainTextures[0].texture;
     }
@@ -985,19 +972,22 @@ public class SpaceObjMap {
 //
 public enum Size
 {
-    s1o = 1,
-    s2o = 2,
-    s4o = 3,
-    s8o = 4,
-    s16o = 5,
-    s32o = 6,
-    s64o = 7,
-    s128o = 8,
-    s256o = 9,
-    s512o = 10,
-    s1024o = 11,
-    s2048o = 12,
-    s4096o = 13,
-    s8192o = 14
+    s1 = 1,
+    s2 = 2,
+    s4 = 3,
+    s8 = 4,
+    s16 = 5,
+    s32 = 6,
+    s64 = 7,
+    s128 = 8,
+    s256 = 9,
+    s512 = 10,
+    s1024 = 11,
+    s2048 = 12,
+    s4096 = 13,
+    s8192 = 14,
+    s16384 = 15,
+    s32768 = 16,
+    s65536 = 17
 }
 

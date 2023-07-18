@@ -23,7 +23,7 @@ public class RedactorBiomeGenerator : MonoBehaviour
     [Header("Parameters")]
     [SerializeField]
     float[,] heightMap;
-    Size quarityMap = Size.s1o;
+    Size quarityMap = Size.s1;
     [SerializeField]
     MeshRenderer PlanetPlane;
     MeshFilter PlanetPlaneFilter;
