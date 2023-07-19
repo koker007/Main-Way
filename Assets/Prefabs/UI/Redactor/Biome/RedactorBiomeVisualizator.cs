@@ -11,7 +11,7 @@ public class RedactorBiomeVisualizator : MonoBehaviour
 
     RawImage renderTexture;
 
-    float[,] heightMapAll;
+    public float[,] heightMapAll;
 
     // Start is called before the first frame update
     void Start()
@@ -40,7 +40,7 @@ public class RedactorBiomeVisualizator : MonoBehaviour
     }
 
     void SetPlanetHeightMap() {
-        Size quality = Size.s64;
+        Size quality = Size.s128;
 
         if (RedactorBiomeCTRL.main.planetData == null)
             return;

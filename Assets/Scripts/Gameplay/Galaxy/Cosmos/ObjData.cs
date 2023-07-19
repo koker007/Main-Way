@@ -101,10 +101,10 @@ namespace Cosmos
             //Начальный размер 
             float scale = Calc.GetSeedNum(cell.galaxy.Seed, (int)perlinGen) % 5 + 1;
             float freq = 1;
-            float offsetX = Calc.GetSeedNum(cell.galaxy.Seed, (int)perlinGen * 10);
-            float offsetY = Calc.GetSeedNum(cell.galaxy.Seed, (int)perlinGen * 100);
-            float offsetZ = Calc.GetSeedNum(cell.galaxy.Seed, (int)perlinGen * 1000);
-            int octaves = (int)Calc.GetSeedNum(cell.galaxy.Seed, (int)perlinGen * 10000) % 6 + 1; //Максимум до 6 октав
+            float offsetX = Calc.GetSeedNum(cell.galaxy.Seed, (int)(perlinGen * 10));
+            float offsetY = Calc.GetSeedNum(cell.galaxy.Seed, (int)(perlinGen * 100));
+            float offsetZ = Calc.GetSeedNum(cell.galaxy.Seed, (int)(perlinGen * 1000));
+            int octaves = (int)Calc.GetSeedNum(cell.galaxy.Seed, (int)(perlinGen * 10000)) % 6 + 1; //Максимум до 6 октав
 
             GraficData.Perlin dataPerlinLoc = new GraficData.Perlin(scale, freq, offsetX, offsetY, offsetZ, octaves, false);
             dataPerlinLoc.Calculate();
@@ -208,9 +208,9 @@ namespace Cosmos
             float offsetY = Mathf.Pow(data.GetPerlinFromIndex(333), data.GetPerlinFromIndex(281) + data.GetPerlinFromIndex(255));
             float offsetZ = Mathf.Pow(data.GetPerlinFromIndex(304), data.GetPerlinFromIndex(110) + data.GetPerlinFromIndex(304));
 
-            float scale = 1.0f / this.sizePixel * 4000;
+            float scale = 1.0f / this.sizePixel * 8000;
 
-            map = GenMap(width, height, scale, scale, scale, 2, offsetX, offsetY, offsetZ, 1, false, false);
+            map = GenMap(width, height, scale, scale, scale, 5, offsetX, offsetY, offsetZ, 5, false, false);
         }
 
         //Сгенерировать участок карты размером 32 на 32
@@ -227,13 +227,15 @@ namespace Cosmos
             //Узнаем сколько блоков в одном текселе
             this.sizePixel = sizePlanet / height;
 
-            float offsetX = Mathf.Pow(data.GetPerlinFromIndex(130), data.GetPerlinFromIndex(105) + data.GetPerlinFromIndex(373));
-            float offsetY = Mathf.Pow(data.GetPerlinFromIndex(333), data.GetPerlinFromIndex(281) + data.GetPerlinFromIndex(255));
-            float offsetZ = Mathf.Pow(data.GetPerlinFromIndex(304), data.GetPerlinFromIndex(110) + data.GetPerlinFromIndex(304));
+            float offsetX = Mathf.Pow(data.GetPerlinFromIndex(130), Mathf.Pow(data.GetPerlinFromIndex(105), data.GetPerlinFromIndex(373))) * 1000;
+            float offsetY = Mathf.Pow(data.GetPerlinFromIndex(333), Mathf.Pow(data.GetPerlinFromIndex(281), data.GetPerlinFromIndex(255))) * 1000;
+            float offsetZ = Mathf.Pow(data.GetPerlinFromIndex(304), Mathf.Pow(data.GetPerlinFromIndex(110), data.GetPerlinFromIndex(304))) * 1000;
 
-            float scale = 1.0f / this.sizePixel * 4000;
+            float sizeContinent =  0.75f + (float)((data.GetPerlinFromIndex(159) * 1000) % 0.5f);
 
-            map = GenPart(width, height, scale, scale, scale, 5, offsetX, offsetY, offsetZ, 5, false, false, partPos.x, partPos.y);
+            float scale = (sizePlanet * sizeContinent) / sizePixel;
+
+            map = GenPart(width, height, scale, scale, scale, 2, offsetX, offsetY, offsetZ, 10, false, false, partPos.x, partPos.y);
         }
 
         float[,] GenMap(int mapSizeX, int mapSizeY, float ScaleX, float ScaleY, float ScaleZ, float Freq, float OffSetX, float OffSetY, float OffSetZ, int Octaves, bool TimeX, bool TimeZ) {

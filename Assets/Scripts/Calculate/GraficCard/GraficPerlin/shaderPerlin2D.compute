@@ -118,6 +118,12 @@ float perlin(float3 p, float frequency)
     float freq = frequency;
     float result = 0;
 
+    float noise1 = 0;
+    float noise2 = 0;
+    float noise3 = 0;
+    float noise4 = 0;
+    float noise5 = 0;
+
     for (int _octNum = 0; _octNum < _octaves; _octNum++)
     {
 
@@ -160,9 +166,44 @@ float perlin(float3 p, float frequency)
 
         float noise = lerp(noiseXY, noiseZ, t.z);
 
-        noise /= (_octNum + 1.0f);
+        noise /= (_octNum*4.0f + 1.0f);
 
-        result += noise;
+        if(_octNum == 1){
+            noise1 = noise;
+        }
+        else if(_octNum == 2){
+            noise2 = noise;
+        }
+        else if(_octNum == 3){
+            noise3 = noise;
+        }
+        else if(_octNum == 4){
+            noise4 = noise;
+        }
+        else if(_octNum == 5){
+            noise5 = noise;
+        }
+
+        if(abs(result) >= 0.04f * _octNum || noise*2 < result){
+
+            result += noise;
+        }
+
+        if((_octNum == 2 || _octNum == 3) && result >= 0.3f){
+            result += noise*3;
+        }
+
+        if(_octNum == 3 && result >= 0.4f){
+            result -= noise*2;
+        }
+
+        //if(_octNum == 2 && result <= -0.1f){
+        //    result += noise;
+        //}
+
+        //if(_octNum == 5 && noise3 < 0.0f){
+        //    result =  0.3f;
+        //}
 
         freq *= 2.0f;
 

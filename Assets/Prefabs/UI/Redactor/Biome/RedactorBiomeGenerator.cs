@@ -31,6 +31,10 @@ public class RedactorBiomeGenerator : MonoBehaviour
     [SerializeField]
     MeshRenderer PlanetLiquid;
     MeshFilter PlanetLiquidFilter;
+    [SerializeField]
+    MeshRenderer PlanetGroundZero;
+    MeshFilter PlanetGroundZeroFilter;
+
     PlanetData planetData;
 
 
@@ -39,8 +43,7 @@ public class RedactorBiomeGenerator : MonoBehaviour
     {
         main = this;
         iniCamera();
-        iniPlanetPlane();
-        iniPlanetLiquid();
+        IniPlanetVisualPlane();
     }
     // Update is called once per frame
     void Update()
@@ -63,19 +66,37 @@ public class RedactorBiomeGenerator : MonoBehaviour
     {
         camera = gameObject.GetComponentInChildren<Camera>();
     }
-    void iniPlanetPlane() {
-        if (PlanetPlane == null)
-            return;
 
-        PlanetPlaneFilter = PlanetPlane.GetComponent <MeshFilter>();
+    void IniPlanetVisualPlane() {
+        iniPlanetPlane();
+        iniPlanetLiquid();
+        iniPlanetZeroGround();
+
+        void iniPlanetPlane()
+        {
+            if (PlanetPlane == null)
+                return;
+
+            PlanetPlaneFilter = PlanetPlane.GetComponent<MeshFilter>();
+        }
+
+
+        void iniPlanetLiquid()
+        {
+            if (PlanetLiquid == null)
+                return;
+
+            PlanetLiquidFilter = PlanetLiquid.GetComponent<MeshFilter>();
+        }
+
+        void iniPlanetZeroGround()
+        {
+            if (PlanetGroundZero == null)
+                return;
+
+            PlanetGroundZeroFilter = PlanetGroundZero.GetComponent<MeshFilter>();
+        }
     }
-    void iniPlanetLiquid() {
-        if (PlanetLiquid == null)
-            return;
-
-        PlanetLiquidFilter = PlanetLiquid.GetComponent<MeshFilter>();
-    }
-
 
     void TestCamera() {
         if (camera == null)
@@ -119,6 +140,7 @@ public class RedactorBiomeGenerator : MonoBehaviour
 
         ReGeneratePlanetPlane();
         ReGeneratePlanetLiquid();
+        ReGeneratePlanetGroundZero();
 
         void ReGeneratePlanetPlane() {
             if (!PlanetPlane || !PlanetPlaneFilter || planetData == null)
@@ -132,8 +154,10 @@ public class RedactorBiomeGenerator : MonoBehaviour
 
             PlanetPlaneFilter.mesh = mesh;
 
-            float scale = Calc.GetSizeInt(quarityMap);
-            PlanetPlane.gameObject.transform.localScale = new Vector3(scale, Calc.GetSizeInt(planetData.size), scale);
+            int SizePlanet = Calc.GetSizeInt(planetData.size);
+            int SizeMapPixel = Calc.GetSizeInt(quarityMap);
+            float scale = SizePlanet / SizeMapPixel;
+            PlanetPlane.gameObject.transform.localScale = new Vector3(scale, SizePlanet/2, scale);
 
             Vector3[] GetVertices() {
                 List<Vector3> vertices = new List<Vector3>();
@@ -188,13 +212,64 @@ public class RedactorBiomeGenerator : MonoBehaviour
             PlanetLiquidFilter.mesh = mesh;
 
             float scale = Calc.GetSizeInt(quarityMap);
+            PlanetLiquid.gameObject.transform.localPosition = new Vector3(0, 0.5f, 0);
 
             Vector3[] GetVertices()
             {
                 List<Vector3> vertices = new List<Vector3>();
 
-                int xMax = heightMap.GetLength(0) - 1;
-                int yMax = heightMap.GetLength(1) - 1;
+                int xMax = heightMap.GetLength(0);
+                int yMax = heightMap.GetLength(1);
+
+                vertices.Add(new Vector3(0, 0, 0));
+                vertices.Add(new Vector3(0, 0, yMax));
+                vertices.Add(new Vector3(xMax, 0, yMax));
+                vertices.Add(new Vector3(xMax, 0, 0));
+
+                return vertices.ToArray();
+            }
+            int[] GetTriangles()
+            {
+                List<int> triangles = new List<int>();
+
+                int vert00 = 0;
+                int vert01 = 1;
+                int vert11 = 2;
+                int vert10 = 3;
+
+                triangles.Add(vert00);
+                triangles.Add(vert01);
+                triangles.Add(vert11);
+
+                triangles.Add(vert11);
+                triangles.Add(vert10);
+                triangles.Add(vert00);
+
+                return triangles.ToArray();
+            }
+        }
+        void ReGeneratePlanetGroundZero()
+        {
+            if (!PlanetGroundZero || !PlanetGroundZeroFilter)
+                return;
+
+            Mesh mesh = new Mesh();
+            mesh.vertices = GetVertices();
+            mesh.triangles = GetTriangles();
+
+            mesh.RecalculateNormals();
+
+            PlanetGroundZeroFilter.mesh = mesh;
+
+            float scale = Calc.GetSizeInt(quarityMap);
+            PlanetGroundZero.gameObject.transform.localPosition = new Vector3(0, 0.0f, 0);
+
+            Vector3[] GetVertices()
+            {
+                List<Vector3> vertices = new List<Vector3>();
+
+                int xMax = heightMap.GetLength(0);
+                int yMax = heightMap.GetLength(1);
 
                 vertices.Add(new Vector3(0, 0, 0));
                 vertices.Add(new Vector3(0, 0, yMax));

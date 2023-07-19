@@ -103,6 +103,8 @@ public class RedactorBiomeCTRL : MonoBehaviour
         TestOpenGenerator();
 
         CreatePlanet();
+
+        ChangePlanet();
     }
 
     static public void SetBiome(BiomeData biomeData) {
@@ -399,18 +401,28 @@ public class RedactorBiomeCTRL : MonoBehaviour
         if (planetData != null)
             return;
 
-        CellS cellS = new CellS(new Vector3(0,0,0), 0.987654321f, GalaxyCtrl.galaxy);
+        CellS cellS = new CellS(new Vector3(UnityEngine.Random.Range(0, 15), UnityEngine.Random.Range(0, 15), UnityEngine.Random.Range(0, 15)), UnityEngine.Random.Range(0.0f, 1.0f), GalaxyCtrl.galaxy);
 
         StarData starData = new StarData(cellS);
         starData.GenData(null, UnityEngine.Random.Range(0.0f, 1.0f));
         starData.GenChilds(Calc.GetSizeInt(Size.s65536) * 10, UnityEngine.Random.Range(0.0f, 1.0f));
 
         foreach (PlanetData planetData in starData.childs) {
-            if (planetData == null || planetData.size < Size.s1024)
+            if (planetData == null || (int)planetData.size < (int)Size.s1024)
                 continue;
 
             this.planetData = planetData;
+            RedactorBiomeVisualizator.MAIN.heightMapAll = null;
             break;
         }
+    }
+
+    public void ChangePlanet() {
+        if (!Input.GetKeyDown(KeyCode.P))
+            return;
+
+        planetData = null;
+
+        CreatePlanet();
     }
 }
