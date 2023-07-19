@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using System.Diagnostics;
+using Cosmos;
 
 //Gererate the example biome, use chanks
 public class RedactorBiomeGenerator : MonoBehaviour
@@ -30,6 +31,7 @@ public class RedactorBiomeGenerator : MonoBehaviour
     [SerializeField]
     MeshRenderer PlanetLiquid;
     MeshFilter PlanetLiquidFilter;
+    PlanetData planetData;
 
 
     // Start is called before the first frame update
@@ -105,10 +107,10 @@ public class RedactorBiomeGenerator : MonoBehaviour
         
     }
 
-    static public void SetHeightMap(float[,] heightMap, Size quarity) {
+    static public void SetHeightMap(float[,] heightMap, Size quarity, PlanetData planetData) {
         main.heightMap = heightMap;
         main.quarityMap = quarity;
-
+        main.planetData = planetData;
     }
 
     void Generate() {
@@ -119,7 +121,7 @@ public class RedactorBiomeGenerator : MonoBehaviour
         ReGeneratePlanetLiquid();
 
         void ReGeneratePlanetPlane() {
-            if (!PlanetPlane || !PlanetPlaneFilter)
+            if (!PlanetPlane || !PlanetPlaneFilter || planetData == null)
                 return;
 
             Mesh mesh = new Mesh();
@@ -131,7 +133,7 @@ public class RedactorBiomeGenerator : MonoBehaviour
             PlanetPlaneFilter.mesh = mesh;
 
             float scale = Calc.GetSizeInt(quarityMap);
-            PlanetPlane.gameObject.transform.localScale = new Vector3(scale, scale, scale);
+            PlanetPlane.gameObject.transform.localScale = new Vector3(scale, Calc.GetSizeInt(planetData.size), scale);
 
             Vector3[] GetVertices() {
                 List<Vector3> vertices = new List<Vector3>();
@@ -186,7 +188,6 @@ public class RedactorBiomeGenerator : MonoBehaviour
             PlanetLiquidFilter.mesh = mesh;
 
             float scale = Calc.GetSizeInt(quarityMap);
-            PlanetLiquid.gameObject.transform.localScale = new Vector3(scale, scale, scale);
 
             Vector3[] GetVertices()
             {

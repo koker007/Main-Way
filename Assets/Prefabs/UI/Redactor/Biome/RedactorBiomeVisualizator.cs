@@ -11,6 +11,8 @@ public class RedactorBiomeVisualizator : MonoBehaviour
 
     RawImage renderTexture;
 
+    float[,] heightMapAll;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -30,7 +32,7 @@ public class RedactorBiomeVisualizator : MonoBehaviour
         RedactorBiomeGenerator.TestOpen();
         TestRenderTexture();
 
-        //SetPlanetHeightMap();
+        SetPlanetHeightMap();
     }
 
     void TestRenderTexture() {
@@ -39,7 +41,39 @@ public class RedactorBiomeVisualizator : MonoBehaviour
 
     void SetPlanetHeightMap() {
         Size quality = Size.s64;
-        //float[,] heightMap = RedactorBiomeCTRL.main.planetData.GetHeightMap((int)quality);
-        //RedactorBiomeGenerator.SetHeightMap(heightMap, quality);
+
+        if (RedactorBiomeCTRL.main.planetData == null)
+            return;
+
+        //√енерируем глобальную карту высот если ее нет
+        if (heightMapAll == null)
+        {
+            Cosmos.HeightMap[,] heightMaps = RedactorBiomeCTRL.main.planetData.GetHeightMap(quality);
+
+            //ќпередел€емс€ с размером карты высот
+            heightMapAll = new float[heightMaps.GetLength(0) * Chank.Size, heightMaps.GetLength(1) * Chank.Size];
+
+            //ѕеребираем все чанки
+            for (int chx = 0; chx < heightMaps.GetLength(0); chx++)
+            {
+                for (int chy = 0; chy < heightMaps.GetLength(1); chy++)
+                {
+                    float[,] chank = heightMaps[chx, chy].map;
+
+                    //–асчитываем глобальную позицию и добавл€ем данные
+                    for (int x = 0; x < chank.GetLength(0); x++)
+                    {
+                        int globalPosX = chx * Chank.Size + x;
+                        for (int y = 0; y < chank.GetLength(1); y++)
+                        {
+                            int globalPosY = chy * Chank.Size + y;
+                            heightMapAll[globalPosX, globalPosY] = chank[x, y];
+                        }
+                    }
+                }
+            }
+        }
+
+        RedactorBiomeGenerator.SetHeightMap(heightMapAll, quality, RedactorBiomeCTRL.main.planetData);
     }
 }

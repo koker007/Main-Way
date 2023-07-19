@@ -6,7 +6,9 @@ namespace Cosmos
 {
     public class PlanetData : ObjData
     {
-        HeightMap[] heightMaps;
+        //Чанки карты высот
+        HeightMap[][,] heightMaps;
+
 
         PatternPlanet pattern;
 
@@ -29,7 +31,7 @@ namespace Cosmos
                 int needTextures = (int)size;
 
                 //Создали массив текстур
-                heightMaps = new HeightMap[needTextures];
+                heightMaps = new HeightMap[needTextures][,];
             }
 
             void GenStandart() {
@@ -97,9 +99,39 @@ namespace Cosmos
             }
         }
 
-        public override float[,] GetHeightMap()
+        public override HeightMap[,] GetHeightMap(Size quarity)
         {
-            throw new System.NotImplementedException();
+            int q = (int)quarity;
+
+            //Создаем массив если он пуст
+            if (heightMaps[q] == null) {
+                //Определяемся с количеством чанков в данном качестве
+                int height = Calc.GetSizeInt(quarity);
+                int width = height * 2;
+
+                int chankXMax = width / Chank.Size;
+                int chankYMax = height / Chank.Size;
+
+                heightMaps[q] = new HeightMap[chankXMax, chankYMax];
+            }
+
+
+            //Проверяем что карта высот полная
+            //Если требуется карта высот то возвратить в любом случае
+            //Генерируем
+            for (int x = 0; x < heightMaps[q].GetLength(0); x++) {
+                for (int y = 0; y < heightMaps[q].GetLength(1); y++) {
+                    if (heightMaps[q][x, y] != null)
+                        continue;
+
+                    heightMaps[q][x, y] = new HeightMap(this, quarity, new Vector2Int(x, y));
+
+                    //Запоминаем время генерации
+                    SpaceObjMap.timeLastGen = Time.time;
+                }
+            }
+
+            return heightMaps[q];
         }
 
         public override Texture2D GetMainTexture(Size quality)

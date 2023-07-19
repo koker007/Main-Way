@@ -28,7 +28,7 @@ public class RedactorBiomeCTRL : MonoBehaviour
     SliderCTRL sliderRules;
 
     //Данные планеты в которой происходит генерация биома
-    public ObjData planetData;
+    public PlanetData planetData;
 
     //Данные биома
     public BiomeData biomeData;
@@ -95,13 +95,14 @@ public class RedactorBiomeCTRL : MonoBehaviour
 
         changeBiome += updateUI;
 
-        CreatePlanet();
     }
 
     // Update is called once per frame
     void Update()
     {
         TestOpenGenerator();
+
+        CreatePlanet();
     }
 
     static public void SetBiome(BiomeData biomeData) {
@@ -395,7 +396,21 @@ public class RedactorBiomeCTRL : MonoBehaviour
     }
 
     public void CreatePlanet() {
-        //CellS cellS = new CellS(new Vector3(0,0,0), 0.987654321f, GalaxyCtrl.galaxy);
-        //planetData = new SpaceObjData(cellS);
+        if (planetData != null)
+            return;
+
+        CellS cellS = new CellS(new Vector3(0,0,0), 0.987654321f, GalaxyCtrl.galaxy);
+
+        StarData starData = new StarData(cellS);
+        starData.GenData(null, UnityEngine.Random.Range(0.0f, 1.0f));
+        starData.GenChilds(Calc.GetSizeInt(Size.s65536) * 10, UnityEngine.Random.Range(0.0f, 1.0f));
+
+        foreach (PlanetData planetData in starData.childs) {
+            if (planetData == null || planetData.size < Size.s1024)
+                continue;
+
+            this.planetData = planetData;
+            break;
+        }
     }
 }

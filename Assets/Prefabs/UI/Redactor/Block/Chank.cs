@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class Chank
 {
-    //Если мзменять размер чанка то кратное 2; то есть 10 - 20 - 40 - 80 - 160
-    const int MaxSize = 10;
+    //Если мзменять размер чанка то кратное 2;
+    public const int Size = 32;
 
-    public uint[,,] BlocksID = new uint[MaxSize, MaxSize, MaxSize];
+    public uint[,,] BlocksID = new uint[Size, Size, Size];
 
 }
