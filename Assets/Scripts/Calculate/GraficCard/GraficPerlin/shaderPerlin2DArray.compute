@@ -33,7 +33,7 @@ float _value;
 int _ArrayMax;
 
 float perlin(float3 p, float frequency);
-float map(int idX, int idY);
+float map(int idX, int idY, int arrayNum);
 
 
 [numthreads(32,32,1)]
@@ -42,9 +42,9 @@ void CSMain (uint3 id : SV_DispatchThreadID)
      
      for(int arrayNum = 0; arrayNum < _ArrayMax; arrayNum++){
 
-         float dataID = arrayNum * 32*32 + 32*id.x + id.y;
+         float dataID = 32*id.x*_ArrayMax + id.y*_ArrayMax + arrayNum;
 
-         float dataMap = map(id.x, id.y);
+         float dataMap = map(id.x, id.y, arrayNum);
 
 
          datas[dataID].result = dataMap;
@@ -113,7 +113,7 @@ float perlin(float3 p, float frequency)
     return result;
 }
 
-float map(int idX, int idY){
+float map(int idX, int idY, int arrayNum){
 
     //Need calc perlin
 
@@ -127,7 +127,7 @@ float map(int idX, int idY){
 
     float x = _factorX * idX + _offsetX;
     float y = _factorY * idY + _offsetY;
-    float z = _factorZ * 0 + _offsetZ;
+    float z = arrayNum * 74603.16627f + _offsetZ;
 
     float pixelXCoofRegion = 1.0f / _repeatX;
     float pixelYCoofRegion = 1.0f / _repeatY;

@@ -3464,6 +3464,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShaderPerlin2D: {fileID: 7200000, guid: e7f6696d2ed19bd4ebccab28085e997d, type: 3}
+  ShaderPerlin2DArray: {fileID: 7200000, guid: 0b826767d91967345a08660df106ac2f, type: 3}
 --- !u!114 &259411733
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14502,9 +14503,9 @@ MonoBehaviour:
   m_UVRect:
     serializedVersion: 2
     x: 0
-    y: 0
+    y: 0.5
     width: 1
-    height: 1
+    height: 2
 --- !u!222 &865369062
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -18496,7 +18497,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7176533566875976478, guid: d7b2deb1b6f117c4b92abfc7b1942566, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0.00007343292
+      value: 0.00006484985
       objectReference: {fileID: 0}
     - target: {fileID: 7417510024086745306, guid: d7b2deb1b6f117c4b92abfc7b1942566, type: 3}
       propertyPath: m_AnchorMax.x

@@ -149,7 +149,7 @@ namespace Cosmos
             {
                 return TextureMaps[(int)quality];
             }
-            Debug.Log("PlanetSize " + quality);
+            Debug.Log("PlanetSize " + size);
 
             //Создаем массив
             int q = (int)quality;
@@ -185,7 +185,7 @@ namespace Cosmos
             int q = (int)quality - 1;
 
             //Генерируем биомы
-            biomesMaps[q][chankPos.x, chankPos.y] ??= new BiomeMaps(this, quality, chankPos, 3);
+            biomesMaps[q][chankPos.x, chankPos.y] ??= new BiomeMaps(this, quality, chankPos, 6);
 
             //Биомы есть теперь создаем текстуру
 
@@ -283,8 +283,20 @@ namespace Cosmos
 
         static public PlanetData GetRandomPlanet() {
 
-            PlanetData result = new PlanetData(GalaxyCtrl.galaxy.cells[0,0,0]);
-            result.GenData(null, Random.RandomRange(0, 1.0f));
+            StarData starData = new StarData(GalaxyCtrl.galaxy.cells[Random.Range(0,15), Random.Range(0, 15), Random.Range(0, 15)]);
+            starData.GenData(null, Random.Range(0, 1.0f));
+            starData.GenChilds(500000, Random.Range(0, 1.0f));
+
+            PlanetData result = null;
+
+            foreach (ObjData objData in starData.childs) {
+                PlanetData planetData = objData as PlanetData;
+                if (planetData == null)
+                    continue;
+
+                result = planetData;
+                break;
+            }
 
             return result;
         }
