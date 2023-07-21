@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
+using Cosmos;
 
 public abstract class BiomeData
 {
@@ -390,5 +391,158 @@ public abstract class BiomeData
                 }
             }
         }
+    }
+}
+
+public class BiomeMaps {
+    public const float factor = 0.875170906246f;
+
+    public float[,,] maps;
+
+    //какой размер одного пикселя в блоках
+    int sizePixel = 65536;
+
+    //Сгенерировать участок карты размером 32 на 32
+    public BiomeMaps(ObjData data, Size sizeTexture, Vector2Int partPos, int ArrayMax)
+    {
+        //Создаем текстуру размером 32 32 = 1024 пикселей
+
+        //Находим размер всей поверхности планеты
+        int height = Calc.GetSizeInt(data.size) / Calc.GetSizeInt(sizeTexture);
+        int width = height * 2;
+
+        //получаем размер планеты
+        int sizePlanet = Calc.GetSizeInt(data.size);
+
+        //Узнаем сколько блоков в одном текселе
+        this.sizePixel = Calc.GetSizeInt(sizeTexture);
+
+        float offsetX = Mathf.Pow(data.GetPerlinFromIndex(130 + ArrayMax), Mathf.Pow(data.GetPerlinFromIndex(105+ ArrayMax), data.GetPerlinFromIndex(373+ ArrayMax))) * 1000;
+        float offsetY = Mathf.Pow(data.GetPerlinFromIndex(333 + ArrayMax), Mathf.Pow(data.GetPerlinFromIndex(281+ ArrayMax), data.GetPerlinFromIndex(255+ ArrayMax))) * 1000;
+        float offsetZ = Mathf.Pow(data.GetPerlinFromIndex(304 + ArrayMax), Mathf.Pow(data.GetPerlinFromIndex(110+ ArrayMax), data.GetPerlinFromIndex(304+ ArrayMax))) * 1000;
+
+        float sizeContinent = 0.75f + (float)((data.GetPerlinFromIndex(159) * 1000) % 0.5f);
+
+        float scale = (sizePlanet * sizeContinent) / sizePixel * 0.8f;
+
+        maps = GenPart(width, height, scale, scale, scale, 2, offsetX, offsetY, offsetZ, 3, false, false, partPos.x, partPos.y, ArrayMax);
+    }
+
+    float[,,] GenMap(int mapSizeX, int mapSizeY, float ScaleX, float ScaleY, float ScaleZ, float Freq, float OffSetX, float OffSetY, float OffSetZ, int Octaves, bool TimeX, bool TimeZ, int ArrayMax)
+    {
+        //Создаем новый массив
+        float[,,] arrayMap = new float[mapSizeX, mapSizeY, ArrayMax];
+
+        //Ищем фактор чанка
+        float FactorChankX = (factor / ScaleX) * Chank.Size;
+        float FactorChankY = (factor / ScaleY) * Chank.Size;
+        float FactorChankZ = (factor / ScaleZ) * Chank.Size;
+
+        //Определяем количество чанков и запоминаем остаток если он есть
+        int chankXMax = mapSizeX / Chank.Size;
+        int chankXremain = mapSizeX % Chank.Size;
+        if (chankXremain > 0)
+            chankXMax++;
+
+        int chankYMax = mapSizeY / Chank.Size;
+        int chankYremain = mapSizeY % Chank.Size;
+        if (chankYremain > 0)
+            chankYMax++;
+
+        //Генерируем каждый чанк
+        for (int chankX = 0; chankX < chankXMax; chankX++)
+        {
+            int chankPixelStartX = chankX * Chank.Size;
+
+            for (int chankY = 0; chankY < chankYMax; chankY++)
+            {
+                int chankPixelStartY = chankY * Chank.Size;
+
+                float offSetX = OffSetX + FactorChankX * chankX;
+                float offSetY = OffSetY + FactorChankY * chankY;
+                float offSetZ = OffSetZ;
+
+                if (TimeZ)
+                    offSetZ += Time.time * 0.1f;
+
+                if (TimeX)
+                    offSetX += Time.time * 0.1f;
+
+                float[,,] partMap = GenPart(mapSizeX, mapSizeY, ScaleX, ScaleY, ScaleZ, Freq, offSetX, OffSetY, OffSetZ, Octaves, TimeX, TimeZ, chankX, chankY, ArrayMax);
+
+                //Если крайний чанк с остатком
+                int maxX = 32;
+                int maxY = 32;
+                if (chankX == chankXMax - 1 && chankXremain > 0)
+                    maxX = chankXremain;
+                if (chankY == chankYMax - 1 && chankYremain > 0)
+                    maxY = chankYremain;
+
+                //Запихиваем данные в текстуру
+                for (int x = 0; x < maxX; x++)
+                {
+                    int posMapX = chankPixelStartX + x;
+                    for (int y = 0; y < maxY; y++)
+                    {
+                        int posMapY = chankPixelStartY + y;
+
+                        for (int z = 0; z < partMap.GetLength(2); z++) {
+                            arrayMap[posMapX, posMapY, z] = partMap[x, y, z];
+                        }
+                    }
+                }
+            }
+        }
+        return arrayMap;
+    }
+    float[,,] GenPart(int mapSizeX, int mapSizeY, float ScaleX, float ScaleY, float ScaleZ, float Freq, float OffSetX, float OffSetY, float OffSetZ, int Octaves, bool TimeX, bool TimeZ, int chankX, int chankY, int ArrayMax)
+    {
+        //Определяем количество чанков
+        int chankXMax = mapSizeX / Chank.Size;
+        int chankXremain = mapSizeX % Chank.Size;
+        if (chankXremain > 0)
+            chankXMax++;
+
+        int chankYMax = mapSizeY / Chank.Size;
+        int chankYremain = mapSizeY % Chank.Size;
+        if (chankYremain > 0)
+            chankYMax++;
+
+        //Если требуемый чанк не правильный - исключение
+        if (chankX < 0 ||
+            chankX >= chankXMax ||
+            chankY < 0 ||
+            chankY >= chankYMax)
+        {
+            throw new System.ArgumentOutOfRangeException();
+        }
+
+        //Создаем новый массив
+        //float[,,] arrayPart = new float[Chank.Size, Chank.Size];
+
+        //Ищем фактор чанка
+        float FactorChankX = (factor / ScaleX) * Chank.Size;
+        float FactorChankY = (factor / ScaleY) * Chank.Size;
+        float FactorChankZ = (factor / ScaleZ) * Chank.Size;
+
+        float offSetX = OffSetX * ArrayMax + FactorChankX * chankX;
+        float offSetY = OffSetY * ArrayMax + FactorChankY * chankY;
+        float offSetZ = OffSetZ;
+
+        if (TimeZ)
+            offSetZ += Time.time * 0.1f;
+
+        if (TimeX)
+            offSetX += Time.time * 0.1f;
+
+        float regionX = (chankX * Chank.Size) / (float)mapSizeX;
+        float regionY = (chankY * Chank.Size) / (float)mapSizeY;
+
+        GraficData.Perlin2DArray dataPerlin2DArray = new GraficData.Perlin2DArray(ScaleX, ScaleY, ScaleZ, Freq, offSetX, offSetY, offSetZ, Octaves, mapSizeX, mapSizeY, regionX, regionY, ArrayMax);
+        dataPerlin2DArray.Calculate();
+
+        //Запихиваем копируем данные в массив
+
+        return dataPerlin2DArray.result;
     }
 }

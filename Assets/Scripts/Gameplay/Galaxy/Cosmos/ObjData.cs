@@ -25,6 +25,7 @@ namespace Cosmos
         public int radiusGravity;
         public int radiusVoid;
 
+        private float locPerlin = 0;
         public float[,,] perlin; //Перлин
 
         public Color color;
@@ -41,6 +42,7 @@ namespace Cosmos
         public virtual void GenData(ObjData parent, float perlin)
         {
             this.parent = parent;
+            this.locPerlin = perlin;
 
             randMass = 0;
             randSize = 0;
@@ -78,6 +80,9 @@ namespace Cosmos
         /// <returns></returns>
         public float GetPerlinFromIndex(int indexMax512)
         {
+            if (perlin == null) {
+                GenPerlinLoc(locPerlin);
+            }
 
             int perlinX = indexMax512 % this.perlin.GetLength(0);
             int perlinY = indexMax512 / this.perlin.GetLength(0);

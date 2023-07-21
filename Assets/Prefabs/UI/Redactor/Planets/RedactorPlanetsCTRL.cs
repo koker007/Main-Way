@@ -151,38 +151,16 @@ public class RedactorPlanetsCTRL : MonoBehaviour
     void UpdatePlanetData()
     {
         //Если данные есть - выходим
-        if (planetData != null)
+        if (planetData != null && !Input.GetKeyDown(KeyCode.P))
             return;
 
-        //Если данных планеты нет, создаем 
+        planetData = PlanetData.GetRandomPlanet();
 
-        CellS cellS = GalaxyCtrl.galaxy.cells[0, 0, 0];
-        //Создаем в нулевой ячейке указанную звезду
-
-        cellS.pos = new Vector3(0.5f, 0.5f, 0.5f);
-        cellS.mainObjs = new PlanetData(cellS);
-        cellS.mainObjs.size = Size.s65536;
-        cellS.mainObjs.radiusChildZone = 500000;
-
-        //Создаем планету
-        cellS.mainObjs.childs = new List<ObjData>();
-
-        cellS.mainObjs.childs.Add(new PlanetData(cellS));
-        planetData = cellS.mainObjs.childs[0] as PlanetData;
         if (planetData == null) {
             Debug.LogError("Planet data is null");
             return;
         }
 
-        float seed = Random.Range(0.0f, 100);
-
-        //Берем рандомный размер
-        planetData.size = (Size)Random.Range(sliderMinSize.slider.value, sliderMaxSize.slider.value);
-
-        //Создаем объект по паттерну
-        planetData.GenData(cellS.mainObjs, seed);
-
-        planetData.GenPerlinLoc(seed);
     }
     void UpdatePatternData() {
         if (patternPlanet != null)
