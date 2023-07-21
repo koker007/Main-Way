@@ -12,6 +12,11 @@ public abstract class BiomeData
     public string name;
     public string mod;
 
+    /// <summary>
+    /// Основной цвет биома
+    /// </summary>
+    public string color;
+
     //Список ID блоков в этом биоме и их правила генерации
     public List<GenRule> genRules = new List<GenRule>();
 

@@ -38,7 +38,7 @@ public class RedactorPlanetMap : MonoBehaviour
     //Пытаемся обновить карту
     void UpdatePlanet() {
         //если в редакторе нет данных планеты, выходим
-        if (redactor.planetObjData == null)
+        if (redactor.planetData == null)
             return;
 
         TestAtmosphere();
@@ -46,14 +46,14 @@ public class RedactorPlanetMap : MonoBehaviour
 
         //Проверяем атмосферу
         void TestAtmosphere() {
-            imageAtmosphere.color = redactor.planetObjData.color;
+            imageAtmosphere.color = redactor.planetData.color;
             RectTransform rectTransform = imageAtmosphere.gameObject.GetComponent<RectTransform>();
-            rectTransform.offsetMax = new Vector2(redactor.planetObjData.atmosphere, redactor.planetObjData.atmosphere);
-            rectTransform.offsetMin = new Vector2(-redactor.planetObjData.atmosphere, -redactor.planetObjData.atmosphere);
+            rectTransform.offsetMax = new Vector2(redactor.planetData.atmosphere, redactor.planetData.atmosphere);
+            rectTransform.offsetMin = new Vector2(-redactor.planetData.atmosphere, -redactor.planetData.atmosphere);
         }
 
         void TestMap() {
-            imageMap.texture = redactor.planetObjData.GetMainTexture((Size)quarity.slider.value);
+            imageMap.texture = redactor.planetData.GetMainTexture((Size)quarity.slider.value);
         }
     }
 }

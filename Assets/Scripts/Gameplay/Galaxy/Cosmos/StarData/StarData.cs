@@ -5,7 +5,7 @@ using Cosmos;
 
 namespace Cosmos
 {
-    public class StarData : ObjData
+    public class StarData : ObjData, IGetMainTexture
     {
         //Массив карт высот
         HeightMap[] heightMaps;
@@ -19,7 +19,7 @@ namespace Cosmos
             throw new System.NotImplementedException();
         }
 
-        public override Texture2D GetMainTexture(Size quality)
+        public Texture2D GetMainTexture(Size quality)
         {
             throw new System.NotImplementedException();
         }

@@ -4,11 +4,11 @@ using UnityEngine;
 
 namespace Cosmos
 {
-    public class PlanetData : ObjData
+    public class PlanetData : ObjData, IGetMainTexture
     {
         //Чанки карты высот
         HeightMap[][,] heightMaps;
-
+        float[,][,] biomesMaps;
 
         PatternPlanet pattern;
 
@@ -134,9 +134,11 @@ namespace Cosmos
             return heightMaps[q];
         }
 
-        public override Texture2D GetMainTexture(Size quality)
+        public Texture2D GetMainTexture(Size quality)
         {
             throw new System.NotImplementedException();
         }
     }
+
+
 }

@@ -64,12 +64,7 @@ namespace Cosmos
             randSize /= 2;
 
         }
-        /// <summary>
-        /// ѕолучить текстуру поверхности мира, указанного качества
-        /// </summary>
-        /// <param name="quarity"></param>
-        /// <returns></returns>
-        public abstract Texture2D GetMainTexture(Size quality);
+
         /// <summary>
         /// ѕолучить чанк карты высот данного мира
         /// </summary>

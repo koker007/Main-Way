@@ -38,7 +38,7 @@ public class RedactorPlanetsCTRL : MonoBehaviour
     PatternPlanet patternPlanet;
 
     //Объект на примере которого смотрим паттерн (данные)
-    public ObjData planetObjData;
+    public PlanetData planetData;
 
 
     string strMaxSize = "Max Size";
@@ -151,7 +151,7 @@ public class RedactorPlanetsCTRL : MonoBehaviour
     void UpdatePlanetData()
     {
         //Если данные есть - выходим
-        if (planetObjData != null)
+        if (planetData != null)
             return;
 
         //Если данных планеты нет, создаем 
@@ -168,17 +168,21 @@ public class RedactorPlanetsCTRL : MonoBehaviour
         cellS.mainObjs.childs = new List<ObjData>();
 
         cellS.mainObjs.childs.Add(new PlanetData(cellS));
-        planetObjData = cellS.mainObjs.childs[0];
+        planetData = cellS.mainObjs.childs[0] as PlanetData;
+        if (planetData == null) {
+            Debug.LogError("Planet data is null");
+            return;
+        }
 
         float seed = Random.Range(0.0f, 100);
 
         //Берем рандомный размер
-        planetObjData.size = (Size)Random.Range(sliderMinSize.slider.value, sliderMaxSize.slider.value);
+        planetData.size = (Size)Random.Range(sliderMinSize.slider.value, sliderMaxSize.slider.value);
 
         //Создаем объект по паттерну
-        planetObjData.GenData(cellS.mainObjs, seed);
+        planetData.GenData(cellS.mainObjs, seed);
 
-        planetObjData.GenPerlinLoc(seed);
+        planetData.GenPerlinLoc(seed);
     }
     void UpdatePatternData() {
         if (patternPlanet != null)
