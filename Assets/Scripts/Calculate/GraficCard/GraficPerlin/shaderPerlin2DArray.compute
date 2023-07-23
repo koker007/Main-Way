@@ -34,7 +34,7 @@ int _ArrayMax;
 
 float perlin(float3 p, float frequency);
 float map(int idX, int idY, int arrayNum);
-
+float map2(int idX, int idY, int arrayNum);
 
 [numthreads(32,32,1)]
 void CSMain (uint3 id : SV_DispatchThreadID)
@@ -44,7 +44,7 @@ void CSMain (uint3 id : SV_DispatchThreadID)
 
          float dataID = 32*id.x*_ArrayMax + id.y*_ArrayMax + arrayNum;
 
-         float dataMap = map(id.x, id.y, arrayNum);
+         float dataMap = map2(id.x, id.y, arrayNum);
 
 
          datas[dataID].result = dataMap;
@@ -178,6 +178,47 @@ float map(int idX, int idY, int arrayNum){
     }
 
     float perlinBlendY = (perlinBlendX *  (1 - intensiveY)) + (perlinBlend05X * intensiveY);
+
+    return perlinBlendY;
+
+}
+
+float map2(int idX, int idY, int arrayNum){
+
+    //Need calc perlin
+
+    //1 Grid definition
+    
+    
+    //2 dot product
+    
+    
+    //3 interpolation
+
+    float x = _factorX * idX + _offsetX;
+    float y = _factorY * idY + _offsetY;
+    float z = arrayNum * 74603.16627f + _offsetZ;
+
+    float pixelXCoofRegion = 1.0f / _repeatX;
+    float pixelYCoofRegion = 1.0f / _repeatY;
+    float regionXNow = _regionX + pixelXCoofRegion * idX;
+    float regionYNow = _regionY + pixelYCoofRegion * idY;
+
+    //N - normal //M - minus
+    float3 posNxNy = float3(x, y, z);
+    float3 posMxNy = float3(x - _repeatX*_factorX, y, z);
+    float3 posNxMy = float3(x, y - _repeatY*_factorY, z);
+    float3 posMxMy = float3(x - _repeatX*_factorX, y - _repeatY*_factorY, z);
+
+    float perlinNxNy = perlin(posNxNy, _frequency);
+    float perlinMxNy = perlin(posMxNy, _frequency);
+    float perlinNxMy = perlin(posNxMy, _frequency);
+    float perlinMxMy = perlin(posMxMy, _frequency);
+
+    float perlinBlendXNy = (perlinNxNy *  (1 - regionXNow)) + (perlinMxNy * regionXNow);
+    float perlinBlendXMy = (perlinNxMy *  (1 - regionXNow)) + (perlinMxMy * regionXNow);
+
+    float perlinBlendY = (perlinBlendXNy *  (1 - regionYNow)) + (perlinBlendXMy * regionYNow);
 
     return perlinBlendY;
 

@@ -409,7 +409,7 @@ public class BiomeMaps {
 
         //Находим размер всей поверхности планеты
         int height = Calc.GetSizeInt(data.size) / Calc.GetSizeInt(sizeTexture);
-        int width = height * 2;
+        int width = height;
 
         //получаем размер планеты
         int sizePlanet = Calc.GetSizeInt(data.size);

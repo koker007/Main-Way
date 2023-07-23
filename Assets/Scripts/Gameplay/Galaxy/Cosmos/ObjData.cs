@@ -219,7 +219,7 @@ namespace Cosmos
 
             //Находим размер всей поверхности планеты
             int height = Calc.GetSizeInt(sizeTexture);
-            int width = height * 2;
+            int width = height;
 
             //получаем размер планеты
             int sizePlanet = Calc.GetSizeInt(data.size);
@@ -231,7 +231,7 @@ namespace Cosmos
             float offsetY = Mathf.Pow(data.GetPerlinFromIndex(333), Mathf.Pow(data.GetPerlinFromIndex(281), data.GetPerlinFromIndex(255))) * 1000;
             float offsetZ = Mathf.Pow(data.GetPerlinFromIndex(304), Mathf.Pow(data.GetPerlinFromIndex(110), data.GetPerlinFromIndex(304))) * 1000;
 
-            float sizeContinent =  0.75f + (float)((data.GetPerlinFromIndex(159) * 1000) % 0.5f);
+            float sizeContinent =  0.5f + (float)((data.GetPerlinFromIndex(159) * 1000) % 0.25f);
 
             float scale = (sizePlanet * sizeContinent) / sizePixel;
 

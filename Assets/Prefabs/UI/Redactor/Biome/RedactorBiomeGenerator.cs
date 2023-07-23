@@ -146,7 +146,8 @@ public class RedactorBiomeGenerator : MonoBehaviour
             if (!PlanetPlane || !PlanetPlaneFilter || planetData == null)
                 return;
 
-            Mesh mesh = new Mesh();
+            Mesh mesh = PlanetPlaneFilter.mesh;
+            mesh ??= new Mesh();
             mesh.vertices = GetVertices();
             mesh.triangles = GetTriangles();
 

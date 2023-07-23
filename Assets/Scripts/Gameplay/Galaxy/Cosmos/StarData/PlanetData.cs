@@ -113,7 +113,7 @@ namespace Cosmos
             if (heightMaps[q] == null) {
                 //Определяемся с количеством чанков в данном качестве
                 int height = Calc.GetSizeInt(quarity);
-                int width = height * 2;
+                int width = height;
 
                 int chankXMax = width / Chank.Size;
                 int chankYMax = height / Chank.Size;
@@ -158,10 +158,10 @@ namespace Cosmos
             int sizeTexture = Calc.GetSizeInt(size) / Calc.GetSizeInt(quality);
 
             //Определяемся с количеством чанков в данном качестве
-            int chankXMax = (sizeTexture * 2) / Chank.Size;
-            int chankYMax = (sizeTexture) / Chank.Size;
+            int chankXMax = sizeTexture / Chank.Size;
+            int chankYMax = chankXMax;
 
-            TextureMaps[q] ??= new Texture2D(sizeTexture * 2, sizeTexture);
+            TextureMaps[q] ??= new Texture2D(sizeTexture, sizeTexture);
 
             for (int chankX = 0; chankX < chankXMax; chankX++) {
                 for (int chankY = 0; chankY < chankYMax; chankY++) {
@@ -251,7 +251,13 @@ namespace Cosmos
 
                     if (biomesMaps[q][chankPos.x, chankPos.y].maps.GetLength(2) == 1)
                     {
-                        TextureMaps[(int)quality].SetPixel(globalX, globalY, new Color(biomeZeroPower[x, y], biomeZeroPower[x, y], biomeZeroPower[x, y], 1));
+                        float intensive = biomeZeroPower[x, y];
+                        if (intensive * 20 % 2 > 1)
+                            intensive = 1;
+                        else
+                            intensive = 0;
+
+                        TextureMaps[(int)quality].SetPixel(globalX, globalY, new Color(intensive, intensive, intensive, 1));
                     }
                     else
                         TextureMaps[(int)quality].SetPixel(globalX, globalY, colors[biomeNum[x, y]]);

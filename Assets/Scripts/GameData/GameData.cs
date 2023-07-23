@@ -31,7 +31,7 @@ namespace GameData
         // Update is called once per frame
         void Update()
         {
-
+            TestGarbageCollector();
         }
         /*
         static public uint GetBlockID(string ModName, string BlockName)
@@ -113,6 +113,13 @@ namespace GameData
             }
         }
 
+
+        void TestGarbageCollector() {
+            if (!GarbageCollector.isTimeToClear())
+                return;
+
+            GarbageCollector.GC.Execute();
+        }
     }
 
 

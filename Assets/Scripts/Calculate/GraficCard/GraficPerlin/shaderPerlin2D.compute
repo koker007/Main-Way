@@ -60,51 +60,21 @@ void CSMain (uint3 id : SV_DispatchThreadID)
     float regionXNow = _regionX + pixelXCoofRegion * id.x;
     float regionYNow = _regionY + pixelYCoofRegion * id.y;
 
-    float3 posNormal = float3(x, y, z);
-    float3 posMinusSizeX = float3(x - _repeatX*_factorX, y, z);
+    //N - normal //M - minus
+    float3 posNxNy = float3(x, y, z);
+    float3 posMxNy = float3(x - _repeatX*_factorX, y, z);
+    float3 posNxMy = float3(x, y - _repeatY*_factorY, z);
+    float3 posMxMy = float3(x - _repeatX*_factorX, y - _repeatY*_factorY, z);
 
-    float perlinNormal = perlin(posNormal, _frequency);
-    float perlinMinusSizeX = perlin(posMinusSizeX, _frequency);
+    float perlinNxNy = perlin(posNxNy, _frequency);
+    float perlinMxNy = perlin(posMxNy, _frequency);
+    float perlinNxMy = perlin(posNxMy, _frequency);
+    float perlinMxMy = perlin(posMxMy, _frequency);
 
-    float perlinBlendX = (perlinNormal *  (1 - regionXNow)) + (perlinMinusSizeX * regionXNow);
+    float perlinBlendXNy = (perlinNxNy *  (1 - regionXNow)) + (perlinMxNy * regionXNow);
+    float perlinBlendXMy = (perlinNxMy *  (1 - regionXNow)) + (perlinMxMy * regionXNow);
 
-    //blend size/2
-    float x05 = x;
-    float x05M = x - _repeatX*_factorX;
-
-    if(regionXNow > 0.5f){
-       x05 -= (_repeatX*_factorX/2);
-       x05M -= (_repeatX*_factorX/2);
-    }
-    else {
-        x05 += (_repeatX*_factorX/2);
-        x05M += (_repeatX*_factorX/2);
-    }
-
-    float3 posMinusSize05X = float3(x05, y, z);
-    float3 posPlusSize05X = float3(x05M, y, z);
-
-    float perlinMinusSize05X = perlin(posMinusSize05X, _frequency);
-    float perlinPlusSize05X = perlin(posPlusSize05X, _frequency);
-
-    float blendCoof05 = regionXNow - 0.5f;
-    if(blendCoof05 <= 0)
-        blendCoof05 += 1.0f;
-
-    float perlinBlend05X = (perlinPlusSize05X *  blendCoof05) + (perlinMinusSize05X * (1 - blendCoof05));
-
-    float intensiveY = 0;
-
-    float polus = 0.5f;
-    if(regionYNow < polus){
-        intensiveY = (1 - (regionYNow/polus))/2;
-    }
-    else if(regionYNow > 1 - polus){
-        intensiveY = (1-((1 - regionYNow)/polus))/2;
-    }
-
-    float perlinBlendY = (perlinBlendX *  (1 - intensiveY)) + (perlinBlend05X * intensiveY);
-
+    float perlinBlendY = (perlinBlendXNy *  (1 - regionYNow)) + (perlinBlendXMy * regionYNow);
     //if(perlinBlendY < 0.5f)
     //    perlinBlendY = 0;
 
