@@ -25,6 +25,9 @@ namespace Cosmos
         public int radiusGravity;
         public int radiusVoid;
 
+        public Vector3 eilerFromParent; //ось вращения планеты вокруг родителя
+        public Vector3 axisVecLoc; //локальная ось вращения объекта
+
         private float locPerlin = 0;
         public float[,,] perlin; //Перлин
 

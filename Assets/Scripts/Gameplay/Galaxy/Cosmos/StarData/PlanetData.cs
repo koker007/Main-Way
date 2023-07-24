@@ -12,6 +12,8 @@ namespace Cosmos
         //ѕерлин биомов
         BiomeMaps[][,] biomesMaps;
         int[][,] biomeNum;
+        Texture2D textureShadow;
+        public Texture2D TextureShadow { get { return textureShadow; } }
 
         Texture2D[] TextureMaps;
 
@@ -266,6 +268,94 @@ namespace Cosmos
 
             
 
+        }
+
+        void UpdateTextureShadow() {
+            //≈сли нет текстуры - создаем
+            if (textureShadow == null) {
+                //качество текстуры зависит от размера планеты
+                int size = Calc.GetSizeInt(this.size) / 32;
+
+                textureShadow = new Texture2D(size * 2, size);
+                List<StarData> stars = cell.Stars;
+
+                //ѕроходимс€ по каждому пикселю
+                for (int pixX = 0; pixX < textureShadow.width; pixX++)
+                {
+                    float pixCoofX = (float)pixX / (float)textureShadow.width;
+
+                    for (int pixY = 0; pixY < textureShadow.height; pixY++)
+                    {
+                        float pixCoofY = (float)pixY / (float)textureShadow.height;
+
+                        float lightSum = 0;
+                        //перебираем все светила если их несколько
+                        foreach (StarData star in stars) {
+                            //¬ычисл€ем направление света на планету
+                            Vector3 vecLight = visual.transform.position - star.visual.transform.position;
+                            float distLight = vecLight.magnitude;
+                            vecLight.Normalize();
+
+                            //вычисла€ем позицию светила относительно звезды
+                            Vector2 sunPos = new Vector2();
+
+                            sunPos.y = Mathf.Atan2(vecLight.x, vecLight.y);
+                            sunPos.x = Mathf.Atan2(vecLight.y, Mathf.Sqrt(vecLight.x * vecLight.x + vecLight.z * vecLight.z));
+
+                            lightSum += GetLightingPixel(sunPos, new Vector2(pixCoofX, pixCoofY));
+                        }
+
+                        lightSum /= stars.Count;
+
+                        lightSum = 1 - lightSum;
+                        textureShadow.SetPixel(pixX, pixY, new Color(0, 0, 0, lightSum));
+                    }
+                }
+
+                textureShadow.Apply();
+                textureShadow.filterMode = FilterMode.Point;
+
+                float GetLightingPixel(Vector2 sunPos, Vector2 pixCoof) {
+                    //¬ычисл€ем освещенность пиксел€
+                    //≈сли коофицент больше 0.5 то это темна€ сторона солнца
+                    float lightingCoof = 0;
+
+                    float lightX = 1 - Mathf.Abs(sunPos.x - pixCoof.x);
+                    float lightXM = 1 - Mathf.Abs(sunPos.x - (pixCoof.x - 1));
+                    float lightXP = 1 - Mathf.Abs(sunPos.x - (pixCoof.x + 1));
+
+                    if (lightX < lightXM)
+                        lightX = lightXM;
+                    if (lightX < lightXP)
+                        lightX = lightXP;
+
+                    lightingCoof = lightX;
+
+                    float lightY = 1 - Mathf.Abs(sunPos.y - pixCoof.y);
+                    lightY += 0.25f;
+
+                    lightingCoof = lightX;
+                    if (lightY < lightX)
+                        lightingCoof = lightY;
+
+                    //”знаем освещение за пределами полюсов
+                    float lightYP = 1 - Mathf.Abs(sunPos.y - (1 + (1 - pixCoof.y)));
+                    float lightYM = 1 - Mathf.Abs(sunPos.y - pixCoof.y * -1);
+                    lightYP += 0.25f;
+                    lightYM += 0.25f;
+
+                    if (lightingCoof < lightYM)
+                        lightingCoof = lightYM;
+                    if (lightingCoof < lightYP)
+                        lightingCoof = lightYP;
+
+
+                    lightingCoof = lightingCoof - 0.7f;
+                    lightingCoof *= 5;
+
+                    return lightingCoof;
+                }
+            }
         }
 
         void iniBiomeMaps() {

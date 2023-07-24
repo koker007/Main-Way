@@ -111,6 +111,11 @@ public class CellS
     public ObjData mainObjs; //Базовый объект во круг которого существует звездная система
     public GalaxyObjCtrl visual; //Визуальная часть базового объекта
 
+    List<StarData> StarsInCell;
+    public List<StarData> Stars { get {
+            return StarsInCell ?? new List<StarData>();
+        } }
+
     float perlinGlobal; //Глобальный перлин благодаря которому сгенерируется локальный
     public float perlinGlob {
         get { return perlinGlobal; }
@@ -121,7 +126,7 @@ public class CellS
         this.galaxy = galaxy;
         this.pos = pos;
 
-
+        StarsInCell = new List<StarData>();
 
         //Запоминаем глобальный перлин этой ячейки
         perlinGlobal = perlin;
@@ -230,7 +235,10 @@ public class CellS
 
         //Запускаем генерацию планет относительно главной звезды
         mainObjs.GenChilds(distGenMax, perlinGlobal);
-        
+
+        iniAllStars(); //Добавляем все светила в список
+
+
         Debug.Log("Cell Gen: " + pos + " Planets:" + mainObjs.childs.Count);
 
         float GetDistToGen()
@@ -267,6 +275,37 @@ public class CellS
             Debug.Log("Generate Planets, Cell:" + pos + " Gen dist" + distPlanetMax);
 
             return distPlanetMax;
+        }
+
+        void iniAllStars() {
+
+            //Если в списке есть что-то выходим
+            if (StarsInCell != null || mainObjs == null)
+                return;
+
+            //Проверяем список
+            StarsInCell = new List<StarData>();
+
+            //Проверяем звезду и ее детей
+            TestStar(mainObjs);
+
+            void TestStar(ObjData objData) {
+                TestAdd(objData);
+
+                foreach (ObjData child in mainObjs.childs) {
+                    TestStar(child);
+                }
+            }
+
+            void TestAdd(ObjData objData) {
+                StarData starData = objData as StarData;
+
+                if (starData == null)
+                    return;
+
+                StarsInCell.Add(starData);
+            }
+
         }
     }
 

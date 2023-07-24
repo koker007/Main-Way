@@ -27,6 +27,8 @@ public class SpaceObjCtrl : MonoBehaviour
 
     [SerializeField]
     TerminatorCTRL terminator;
+    [SerializeField]
+    ShadowCTRL shadowCTRL;
 
     float timeTestOld = 0;
     float dist = 0;
