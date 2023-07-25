@@ -31,6 +31,8 @@ float _regionY; //from 0 to 1 region texture
 float _value;
 
 float perlin(float3 p, float frequency);
+float mapSquare(int idX, int idY);
+float mapPlanet(int idX, int idY);
 
 
 [numthreads(32,32,1)]
@@ -41,42 +43,7 @@ void CSMain (uint3 id : SV_DispatchThreadID)
 
     datas[dataID].result = dataID;
 
-    //Need calc perlin
-
-    //1 Grid definition
-    
-    
-    //2 dot product
-    
-    
-    //3 interpolation
-
-    float x = _factorX * id.x + _offsetX;
-    float y = _factorY * id.y + _offsetY;
-    float z = _factorZ * id.z + _offsetZ;
-
-    float pixelXCoofRegion = 1.0f / _repeatX;
-    float pixelYCoofRegion = 1.0f / _repeatY;
-    float regionXNow = _regionX + pixelXCoofRegion * id.x;
-    float regionYNow = _regionY + pixelYCoofRegion * id.y;
-
-    //N - normal //M - minus
-    float3 posNxNy = float3(x, y, z);
-    float3 posMxNy = float3(x - _repeatX*_factorX, y, z);
-    float3 posNxMy = float3(x, y - _repeatY*_factorY, z);
-    float3 posMxMy = float3(x - _repeatX*_factorX, y - _repeatY*_factorY, z);
-
-    float perlinNxNy = perlin(posNxNy, _frequency);
-    float perlinMxNy = perlin(posMxNy, _frequency);
-    float perlinNxMy = perlin(posNxMy, _frequency);
-    float perlinMxMy = perlin(posMxMy, _frequency);
-
-    float perlinBlendXNy = (perlinNxNy *  (1 - regionXNow)) + (perlinMxNy * regionXNow);
-    float perlinBlendXMy = (perlinNxMy *  (1 - regionXNow)) + (perlinMxMy * regionXNow);
-
-    float perlinBlendY = (perlinBlendXNy *  (1 - regionYNow)) + (perlinBlendXMy * regionYNow);
-    //if(perlinBlendY < 0.5f)
-    //    perlinBlendY = 0;
+    float perlinBlendY = mapPlanet(id.x, id.y);
 
     datas[dataID].result = perlinBlendY;
 
@@ -183,4 +150,92 @@ float perlin(float3 p, float frequency)
     result = clamp(result, 0, 1.0);
 
     return result;
+}
+
+float mapSquare(int idX, int idY){
+    float x = _factorX * idX + _offsetX;
+    float y = _factorY * idY + _offsetY;
+    float z = _factorZ * 0 + _offsetZ;
+
+    float pixelXCoofRegion = 1.0f / _repeatX;
+    float pixelYCoofRegion = 1.0f / _repeatY;
+    float regionXNow = _regionX + pixelXCoofRegion * idX;
+    float regionYNow = _regionY + pixelYCoofRegion * idY;
+
+    //N - normal //M - minus
+    float3 posNxNy = float3(x, y, z);
+    float3 posMxNy = float3(x - _repeatX*_factorX, y, z);
+    float3 posNxMy = float3(x, y - _repeatY*_factorY, z);
+    float3 posMxMy = float3(x - _repeatX*_factorX, y - _repeatY*_factorY, z);
+
+    float perlinNxNy = perlin(posNxNy, _frequency);
+    float perlinMxNy = perlin(posMxNy, _frequency);
+    float perlinNxMy = perlin(posNxMy, _frequency);
+    float perlinMxMy = perlin(posMxMy, _frequency);
+
+    float perlinBlendXNy = (perlinNxNy *  (1 - regionXNow)) + (perlinMxNy * regionXNow);
+    float perlinBlendXMy = (perlinNxMy *  (1 - regionXNow)) + (perlinMxMy * regionXNow);
+
+    float perlinBlendY = (perlinBlendXNy *  (1 - regionYNow)) + (perlinBlendXMy * regionYNow);
+
+    return perlinBlendY;
+}
+
+float mapPlanet(int idX, int idY){
+
+    float x = _factorX * idX + _offsetX;
+    float y = _factorY * idY + _offsetY;
+    float z = _factorZ * 0 + _offsetZ;
+
+    float pixelXCoofRegion = 1.0f / _repeatX;
+    float pixelYCoofRegion = 1.0f / _repeatY;
+    float regionXNow = _regionX + pixelXCoofRegion * idX;
+    float regionYNow = _regionY + pixelYCoofRegion * idY;
+
+    float3 posNormal = float3(x, y, z);
+    float3 posMinusSizeX = float3(x - _repeatX*_factorX, y, z);
+
+    float perlinNormal = perlin(posNormal, _frequency);
+    float perlinMinusSizeX = perlin(posMinusSizeX, _frequency);
+
+    float perlinBlendX = (perlinNormal *  (1 - regionXNow)) + (perlinMinusSizeX * regionXNow);
+
+    //blend size/2
+    float x05 = x;
+    float x05M = x - _repeatX*_factorX;
+
+    if(regionXNow > 0.5f){
+       x05 -= (_repeatX*_factorX/2);
+       x05M -= (_repeatX*_factorX/2);
+    }
+    else {
+        x05 += (_repeatX*_factorX/2);
+        x05M += (_repeatX*_factorX/2);
+    }
+
+    float3 posMinusSize05X = float3(x05, y, z);
+    float3 posPlusSize05X = float3(x05M, y, z);
+
+    float perlinMinusSize05X = perlin(posMinusSize05X, _frequency);
+    float perlinPlusSize05X = perlin(posPlusSize05X, _frequency);
+
+    float blendCoof05 = regionXNow - 0.5f;
+    if(blendCoof05 <= 0)
+        blendCoof05 += 1.0f;
+
+    float perlinBlend05X = (perlinPlusSize05X *  blendCoof05) + (perlinMinusSize05X * (1 - blendCoof05));
+
+    float intensiveY = 0;
+
+    float polus = 0.5f;
+    if(regionYNow < polus){
+        intensiveY = (1 - (regionYNow/polus))/2;
+    }
+    else if(regionYNow > 1 - polus){
+        intensiveY = (1-((1 - regionYNow)/polus))/2;
+    }
+
+    float perlinBlendY = (perlinBlendX *  (1 - intensiveY)) + (perlinBlend05X * intensiveY);
+
+    return perlinBlendY;
 }

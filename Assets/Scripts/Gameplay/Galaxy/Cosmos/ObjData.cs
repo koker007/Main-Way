@@ -222,7 +222,7 @@ namespace Cosmos
 
             //Находим размер всей поверхности планеты
             int height = Calc.GetSizeInt(sizeTexture);
-            int width = height;
+            int width = height * 2;
 
             //получаем размер планеты
             int sizePlanet = Calc.GetSizeInt(data.size);

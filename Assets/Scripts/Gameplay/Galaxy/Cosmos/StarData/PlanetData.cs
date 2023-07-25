@@ -115,7 +115,7 @@ namespace Cosmos
             if (heightMaps[q] == null) {
                 //Определяемся с количеством чанков в данном качестве
                 int height = Calc.GetSizeInt(quarity);
-                int width = height;
+                int width = height * 2;
 
                 int chankXMax = width / Chank.Size;
                 int chankYMax = height / Chank.Size;

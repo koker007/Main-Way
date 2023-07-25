@@ -44,7 +44,7 @@ void CSMain (uint3 id : SV_DispatchThreadID)
 
          float dataID = 32*id.x*_ArrayMax + id.y*_ArrayMax + arrayNum;
 
-         float dataMap = map2(id.x, id.y, arrayNum);
+         float dataMap = map(id.x, id.y, arrayNum);
 
 
          datas[dataID].result = dataMap;
