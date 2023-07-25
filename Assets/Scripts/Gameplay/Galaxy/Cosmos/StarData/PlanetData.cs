@@ -160,10 +160,10 @@ namespace Cosmos
             int sizeTexture = Calc.GetSizeInt(size) / Calc.GetSizeInt(quality);
 
             //Определяемся с количеством чанков в данном качестве
-            int chankXMax = sizeTexture / Chank.Size;
-            int chankYMax = chankXMax;
+            int chankYMax = sizeTexture / Chank.Size;
+            int chankXMax = chankYMax * 2;
 
-            TextureMaps[q] ??= new Texture2D(sizeTexture, sizeTexture);
+            TextureMaps[q] ??= new Texture2D(sizeTexture * 2, sizeTexture);
 
             for (int chankX = 0; chankX < chankXMax; chankX++) {
                 for (int chankY = 0; chankY < chankYMax; chankY++) {
