@@ -4,7 +4,7 @@ using UnityEngine;
 using System.IO;
 using Cosmos;
 
-public abstract class BiomeData
+public class BiomeData
 {
     //Биом проинициализирован или нет
     bool isInicialized = false;
@@ -17,6 +17,21 @@ public abstract class BiomeData
     /// Основной цвет биома
     /// </summary>
     public string color;
+
+    //Коофиценты изменения приоритета биомов в зависимости от расположения на карте планеты
+    public float coofPolus; //Коофицент полюсов
+    public float coofZeroX; //Коофицент нулевой координаты экватора, например для планет с приливным захватом
+    public float coofHeightMax; //Коофицент максимальной высоты биома
+    public float coofHeightMin; //Коофицент минимальной высоты биома
+    public SeaPriority seaPriority; //Биом подводный, надводный
+
+    public enum SeaPriority {
+        everywhere = 0,
+        onlyUnderSea = 1,
+        onlyOverSea = 2
+    }
+
+
 
     //Список ID блоков в этом биоме и их правила генерации
     public List<GenRule> genRules = new List<GenRule>();
