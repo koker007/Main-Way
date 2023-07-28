@@ -186,8 +186,18 @@ namespace Cosmos
 
             int q = (int)quality - 1;
 
+            //Создаем биомы пустышки
+            BiomeData[] biomeDatas = new BiomeData[6];
+            for (int num = 0; num < biomeDatas.Length; num++) {
+                biomeDatas[num] = new BiomeData();
+                if (num == 3) {
+                    biomeDatas[num].coofPolus = -0.5f;
+                    biomeDatas[num].coofZeroX = 0.5f;
+                }
+            }
+
             //Генерируем биомы
-            biomesMaps[q][chankPos.x, chankPos.y] ??= new BiomeMaps(this, quality, chankPos, 6);
+            biomesMaps[q][chankPos.x, chankPos.y] ??= new BiomeMaps(this, quality, chankPos, biomeDatas);
 
             //Биомы есть теперь создаем текстуру
 

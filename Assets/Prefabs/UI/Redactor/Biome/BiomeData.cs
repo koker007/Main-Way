@@ -418,9 +418,9 @@ public class BiomeMaps {
     int sizePixel = 65536;
 
     //Сгенерировать участок карты размером 32 на 32
-    public BiomeMaps(ObjData data, Size sizeTexture, Vector2Int partPos, int ArrayMax)
+    public BiomeMaps(ObjData data, Size sizeTexture, Vector2Int partPos, BiomeData[] biomeData)
     {
-        //Создаем текстуру размером 32 32 = 1024 пикселей
+        //Создаем текстуру
 
         //Находим размер всей поверхности планеты
         int height = Calc.GetSizeInt(data.size) / Calc.GetSizeInt(sizeTexture);
@@ -432,21 +432,21 @@ public class BiomeMaps {
         //Узнаем сколько блоков в одном текселе
         this.sizePixel = Calc.GetSizeInt(sizeTexture);
 
-        float offsetX = Mathf.Pow(data.GetPerlinFromIndex(130 + ArrayMax), Mathf.Pow(data.GetPerlinFromIndex(105+ ArrayMax), data.GetPerlinFromIndex(373+ ArrayMax))) * 1000;
-        float offsetY = Mathf.Pow(data.GetPerlinFromIndex(333 + ArrayMax), Mathf.Pow(data.GetPerlinFromIndex(281+ ArrayMax), data.GetPerlinFromIndex(255+ ArrayMax))) * 1000;
-        float offsetZ = Mathf.Pow(data.GetPerlinFromIndex(304 + ArrayMax), Mathf.Pow(data.GetPerlinFromIndex(110+ ArrayMax), data.GetPerlinFromIndex(304+ ArrayMax))) * 1000;
+        float offsetX = Mathf.Pow(data.GetPerlinFromIndex(130), Mathf.Pow(data.GetPerlinFromIndex(105), data.GetPerlinFromIndex(373))) * 1000;
+        float offsetY = Mathf.Pow(data.GetPerlinFromIndex(333), Mathf.Pow(data.GetPerlinFromIndex(281), data.GetPerlinFromIndex(255))) * 1000;
+        float offsetZ = Mathf.Pow(data.GetPerlinFromIndex(304), Mathf.Pow(data.GetPerlinFromIndex(110), data.GetPerlinFromIndex(304))) * 1000;
 
         float sizeContinent = 0.75f + (float)((data.GetPerlinFromIndex(159) * 1000) % 0.5f);
 
         float scale = (sizePlanet * sizeContinent) / sizePixel * 0.8f;
 
-        maps = GenPart(width, height, scale, scale, scale, 2, offsetX, offsetY, offsetZ, 3, false, false, partPos.x, partPos.y, ArrayMax);
+        maps = GenPart(width, height, scale, scale, scale, 2, offsetX, offsetY, offsetZ, 3, false, false, partPos.x, partPos.y, biomeData);
     }
 
-    float[,,] GenMap(int mapSizeX, int mapSizeY, float ScaleX, float ScaleY, float ScaleZ, float Freq, float OffSetX, float OffSetY, float OffSetZ, int Octaves, bool TimeX, bool TimeZ, int ArrayMax)
+    float[,,] GenMap(int mapSizeX, int mapSizeY, float ScaleX, float ScaleY, float ScaleZ, float Freq, float OffSetX, float OffSetY, float OffSetZ, int Octaves, bool TimeX, bool TimeZ, BiomeData[] biomeData)
     {
         //Создаем новый массив
-        float[,,] arrayMap = new float[mapSizeX, mapSizeY, ArrayMax];
+        float[,,] arrayMap = new float[mapSizeX, mapSizeY, biomeData.Length];
 
         //Ищем фактор чанка
         float FactorChankX = (factor / ScaleX) * Chank.Size;
@@ -483,7 +483,7 @@ public class BiomeMaps {
                 if (TimeX)
                     offSetX += Time.time * 0.1f;
 
-                float[,,] partMap = GenPart(mapSizeX, mapSizeY, ScaleX, ScaleY, ScaleZ, Freq, offSetX, OffSetY, OffSetZ, Octaves, TimeX, TimeZ, chankX, chankY, ArrayMax);
+                float[,,] partMap = GenPart(mapSizeX, mapSizeY, ScaleX, ScaleY, ScaleZ, Freq, offSetX, OffSetY, OffSetZ, Octaves, TimeX, TimeZ, chankX, chankY, biomeData);
 
                 //Если крайний чанк с остатком
                 int maxX = 32;
@@ -510,7 +510,7 @@ public class BiomeMaps {
         }
         return arrayMap;
     }
-    float[,,] GenPart(int mapSizeX, int mapSizeY, float ScaleX, float ScaleY, float ScaleZ, float Freq, float OffSetX, float OffSetY, float OffSetZ, int Octaves, bool TimeX, bool TimeZ, int chankX, int chankY, int ArrayMax)
+    float[,,] GenPart(int mapSizeX, int mapSizeY, float ScaleX, float ScaleY, float ScaleZ, float Freq, float OffSetX, float OffSetY, float OffSetZ, int Octaves, bool TimeX, bool TimeZ, int chankX, int chankY, BiomeData[] biomeDatas)
     {
         //Определяем количество чанков
         int chankXMax = mapSizeX / Chank.Size;
@@ -540,8 +540,8 @@ public class BiomeMaps {
         float FactorChankY = (factor / ScaleY) * Chank.Size;
         float FactorChankZ = (factor / ScaleZ) * Chank.Size;
 
-        float offSetX = OffSetX * ArrayMax + FactorChankX * chankX;
-        float offSetY = OffSetY * ArrayMax + FactorChankY * chankY;
+        float offSetX = OffSetX * biomeDatas.Length + FactorChankX * chankX;
+        float offSetY = OffSetY * biomeDatas.Length + FactorChankY * chankY;
         float offSetZ = OffSetZ;
 
         if (TimeZ)
@@ -553,11 +553,54 @@ public class BiomeMaps {
         float regionX = (chankX * Chank.Size) / (float)mapSizeX;
         float regionY = (chankY * Chank.Size) / (float)mapSizeY;
 
-        GraficData.Perlin2DArray dataPerlin2DArray = new GraficData.Perlin2DArray(ScaleX, ScaleY, ScaleZ, Freq, offSetX, offSetY, offSetZ, Octaves, mapSizeX, mapSizeY, regionX, regionY, ArrayMax);
+        //Вычисляем перлин на шейдере
+        GraficData.Perlin2DArray dataPerlin2DArray = new GraficData.Perlin2DArray(ScaleX, ScaleY, ScaleZ, Freq, offSetX, offSetY, offSetZ, Octaves, mapSizeX, mapSizeY, regionX, regionY, biomeDatas.Length);
         dataPerlin2DArray.Calculate();
 
-        //Запихиваем копируем данные в массив
+        //Смещение биомов
+        CalcCoofBiome();
 
+        //Запихиваем копируем данные в массив
         return dataPerlin2DArray.result;
+
+        
+        //Вычислить смещение с учетом требований биомов
+        void CalcCoofBiome() {
+            //Проходимся по каждому пикселю
+            for (int x = 0; x < dataPerlin2DArray.result.GetLength(0); x++) {
+                float regionPixX = regionX + (x / (float)mapSizeX);
+                for (int y = 0; y < dataPerlin2DArray.result.GetLength(1); y++) {
+                    float regionPixY = regionY + (y / (float)mapSizeY);
+                    for (int bioNum = 0; bioNum < dataPerlin2DArray.result.GetLength(2); bioNum++) {
+                        //Считаем смещение по полюсам
+                        //На полюсах надо увеличить на экваторе уменьшить
+                        float coofPolus = 0;
+
+                        //выше экватора
+                        if (regionPixY > 0.5f) 
+                            coofPolus = ((regionPixY - 0.5f) * 4 - 1) * biomeDatas[bioNum].coofPolus;
+                        //ниже экватора
+                        else if (regionPixY <= 0.5f) {
+                            coofPolus = ((0.5f - regionPixY) * 4 - 1) * biomeDatas[bioNum].coofPolus;
+                        }
+
+                        //Считаем смещение по экватору
+                        float coofX = 0;
+                        if (regionPixX > 0.5f)
+                            coofX = ((regionPixX - 0.5f) * 4 - 1) * biomeDatas[bioNum].coofZeroX;
+                        else if (regionPixX <= 0.5f)
+                        {
+                            coofX = ((0.5f - regionPixX) * 4 - 1) * biomeDatas[bioNum].coofZeroX;
+                        }
+
+                        //Умножаем на коофицент изменения
+                        float coofSum = coofPolus + coofX;
+                        coofSum /= 2;
+
+                        dataPerlin2DArray.result[x, y, bioNum] += coofSum;
+                    }
+                }
+            }
+        }
     }
 }
