@@ -21,6 +21,7 @@ public class BiomeData
     //Коофиценты изменения приоритета биомов в зависимости от расположения на карте планеты
     public float coofPolus; //Коофицент полюсов
     public float coofZeroX; //Коофицент нулевой координаты экватора, например для планет с приливным захватом
+    public float coofHeight; //Коофицент высоты
     public float coofHeightMax; //Коофицент максимальной высоты биома
     public float coofHeightMin; //Коофицент минимальной высоты биома
     public SeaPriority seaPriority; //Биом подводный, надводный
@@ -418,7 +419,7 @@ public class BiomeMaps {
     int sizePixel = 65536;
 
     //Сгенерировать участок карты размером 32 на 32
-    public BiomeMaps(ObjData data, Size sizeTexture, Vector2Int partPos, BiomeData[] biomeData)
+    public BiomeMaps(ObjData data, Size sizeTexture, Vector2Int partPos, BiomeData[] biomeData, HeightMap heightMap)
     {
         //Создаем текстуру
 
@@ -440,10 +441,10 @@ public class BiomeMaps {
 
         float scale = (sizePlanet * sizeContinent) / sizePixel * 0.8f;
 
-        maps = GenPart(width, height, scale, scale, scale, 2, offsetX, offsetY, offsetZ, 3, false, false, partPos.x, partPos.y, biomeData);
+        maps = GenPart(width, height, scale, scale, scale, 2, offsetX, offsetY, offsetZ, 3, false, false, partPos.x, partPos.y, biomeData, heightMap);
     }
 
-    float[,,] GenMap(int mapSizeX, int mapSizeY, float ScaleX, float ScaleY, float ScaleZ, float Freq, float OffSetX, float OffSetY, float OffSetZ, int Octaves, bool TimeX, bool TimeZ, BiomeData[] biomeData)
+    float[,,] GenMap(int mapSizeX, int mapSizeY, float ScaleX, float ScaleY, float ScaleZ, float Freq, float OffSetX, float OffSetY, float OffSetZ, int Octaves, bool TimeX, bool TimeZ, BiomeData[] biomeData, HeightMap heightMap)
     {
         //Создаем новый массив
         float[,,] arrayMap = new float[mapSizeX, mapSizeY, biomeData.Length];
@@ -483,7 +484,7 @@ public class BiomeMaps {
                 if (TimeX)
                     offSetX += Time.time * 0.1f;
 
-                float[,,] partMap = GenPart(mapSizeX, mapSizeY, ScaleX, ScaleY, ScaleZ, Freq, offSetX, OffSetY, OffSetZ, Octaves, TimeX, TimeZ, chankX, chankY, biomeData);
+                float[,,] partMap = GenPart(mapSizeX, mapSizeY, ScaleX, ScaleY, ScaleZ, Freq, offSetX, OffSetY, OffSetZ, Octaves, TimeX, TimeZ, chankX, chankY, biomeData, heightMap);
 
                 //Если крайний чанк с остатком
                 int maxX = 32;
@@ -510,7 +511,7 @@ public class BiomeMaps {
         }
         return arrayMap;
     }
-    float[,,] GenPart(int mapSizeX, int mapSizeY, float ScaleX, float ScaleY, float ScaleZ, float Freq, float OffSetX, float OffSetY, float OffSetZ, int Octaves, bool TimeX, bool TimeZ, int chankX, int chankY, BiomeData[] biomeDatas)
+    float[,,] GenPart(int mapSizeX, int mapSizeY, float ScaleX, float ScaleY, float ScaleZ, float Freq, float OffSetX, float OffSetY, float OffSetZ, int Octaves, bool TimeX, bool TimeZ, int chankX, int chankY, BiomeData[] biomeDatas, HeightMap heightMap)
     {
         //Определяем количество чанков
         int chankXMax = mapSizeX / Chank.Size;
@@ -576,6 +577,23 @@ public class BiomeMaps {
                         //На полюсах надо увеличить на экваторе уменьшить
                         float coofPolus = 0;
 
+                        //Поправка на высоту
+                        float coofHeight = 0;
+                        if (biomeDatas[bioNum].seaPriority == BiomeData.SeaPriority.everywhere)
+                            coofHeight = (heightMap.map[x, y] - 0.5f) * 2;
+                        else if (biomeDatas[bioNum].seaPriority == BiomeData.SeaPriority.onlyOverSea)
+                            coofHeight = (heightMap.map[x, y] - 0.5f) * 2;
+                        else if (biomeDatas[bioNum].seaPriority == BiomeData.SeaPriority.onlyUnderSea)
+                            coofHeight = (heightMap.map[x, y] - 0.5f) * -2;
+
+                        coofHeight *= biomeDatas[bioNum].coofHeight;
+
+
+                        if (biomeDatas[bioNum].seaPriority == BiomeData.SeaPriority.onlyOverSea && heightMap.map[x, y] < 0.5f ||
+                            biomeDatas[bioNum].seaPriority == BiomeData.SeaPriority.onlyUnderSea && heightMap.map[x, y] > 0.5f)
+                            coofHeight = 0;
+                        
+
                         //выше экватора
                         if (regionPixY > 0.5f) 
                             coofPolus = ((regionPixY - 0.5f) * 4 - 1) * biomeDatas[bioNum].coofPolus;
@@ -594,8 +612,7 @@ public class BiomeMaps {
                         }
 
                         //Умножаем на коофицент изменения
-                        float coofSum = coofPolus + coofX;
-                        coofSum /= 2;
+                        float coofSum = coofPolus + coofX + coofHeight;
 
                         dataPerlin2DArray.result[x, y, bioNum] += coofSum;
                     }

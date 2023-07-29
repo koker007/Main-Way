@@ -109,19 +109,9 @@ namespace Cosmos
 
         public override HeightMap[,] GetHeightMap(Size quarity)
         {
-            int q = (int)quarity;
+            iniHeightMaps();
 
-            //Создаем массив если он пуст
-            if (heightMaps[q] == null) {
-                //Определяемся с количеством чанков в данном качестве
-                int height = Calc.GetSizeInt(quarity);
-                int width = height * 2;
-
-                int chankXMax = width / Chank.Size;
-                int chankYMax = height / Chank.Size;
-
-                heightMaps[q] = new HeightMap[chankXMax, chankYMax];
-            }
+            int q = (int)quarity -1;
 
 
             //Проверяем что карта высот полная
@@ -182,6 +172,7 @@ namespace Cosmos
         }
 
         void GenTexturePart(Size quality, Vector2Int chankPos) {
+            iniHeightMaps();
             iniBiomeMaps();
 
             int q = (int)quality - 1;
@@ -190,14 +181,19 @@ namespace Cosmos
             BiomeData[] biomeDatas = new BiomeData[6];
             for (int num = 0; num < biomeDatas.Length; num++) {
                 biomeDatas[num] = new BiomeData();
-                if (num == 3) {
-                    biomeDatas[num].coofPolus = -0.5f;
-                    biomeDatas[num].coofZeroX = 0.5f;
+                if (num == 0) {
+                    biomeDatas[num].seaPriority = BiomeData.SeaPriority.onlyOverSea;
+                    biomeDatas[num].coofHeight = 0.5f;
+                    biomeDatas[num].coofPolus = 0.2f;
+                    //biomeDatas[num].coofZeroX = 0.5f;
                 }
             }
 
+            //Создаем карту высот если нет
+            heightMaps[q][chankPos.x, chankPos.y] ??= new HeightMap(this, quality, chankPos);
+
             //Генерируем биомы
-            biomesMaps[q][chankPos.x, chankPos.y] ??= new BiomeMaps(this, quality, chankPos, biomeDatas);
+            biomesMaps[q][chankPos.x, chankPos.y] ??= new BiomeMaps(this, quality, chankPos, biomeDatas, heightMaps[q][chankPos.x, chankPos.y]);
 
             //Биомы есть теперь создаем текстуру
 
@@ -237,7 +233,7 @@ namespace Cosmos
                 colors[num] = Color.black;
 
                 if (num == 0)
-                    colors[num] = Color.blue;
+                    colors[num] = Color.white;
                 else if (num == 1)
                     colors[num] = Color.cyan;
                 else if (num == 2)
@@ -249,8 +245,6 @@ namespace Cosmos
                 else if (num == 5)
                     colors[num] = Color.red;
                 else if (num == 6)
-                    colors[num] = Color.white;
-                else if (num == 7)
                     colors[num] = Color.yellow;
 
             }
@@ -272,7 +266,13 @@ namespace Cosmos
                         TextureMaps[(int)quality].SetPixel(globalX, globalY, new Color(intensive, intensive, intensive, 1));
                     }
                     else
-                        TextureMaps[(int)quality].SetPixel(globalX, globalY, colors[biomeNum[x, y]]);
+                    {
+                        Color color = colors[biomeNum[x, y]] * (heightMaps[q][chankPos.x, chankPos.y].map[x, y] * 2 - 0.5f);
+                        if (heightMaps[q][chankPos.x, chankPos.y].map[x, y] < 0.5f)
+                            color = Color.blue * (heightMaps[q][chankPos.x, chankPos.y].map[x, y] * 2 - 0.5f);
+
+                        TextureMaps[(int)quality].SetPixel(globalX, globalY, new Color(color.r, color.g, color.b));
+                    }
                 }
             }
 
@@ -367,7 +367,22 @@ namespace Cosmos
                 }
             }
         }
+        void iniHeightMaps() {
+            heightMaps ??= new HeightMap[(int)size][,];
 
+            for (int qualityNum = 0; qualityNum < heightMaps.Length; qualityNum++) {
+                if (heightMaps[qualityNum] != null)
+                    continue;
+
+                int sizeMaps = Calc.GetSizeInt(size) / Calc.GetSizeInt((Size)qualityNum + 1);
+
+                //Определяемся с количеством чанков в данном качестве
+                int chankXMax = (sizeMaps * 2) / Chank.Size;
+                int chankYMax = (sizeMaps) / Chank.Size;
+
+                heightMaps[qualityNum] = new HeightMap[chankXMax, chankYMax];
+            }
+        }
         void iniBiomeMaps() {
             biomesMaps ??= new BiomeMaps[(int)size][,];
 

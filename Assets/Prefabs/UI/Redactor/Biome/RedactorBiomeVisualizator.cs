@@ -40,14 +40,17 @@ public class RedactorBiomeVisualizator : MonoBehaviour
     }
 
     void SetPlanetHeightMap() {
-        Size quality = Size.s128;
-
+        
         if (RedactorBiomeCTRL.main.planetData == null)
             return;
+
+        Size quality = Calc.GetSize(Calc.GetSizeInt(RedactorBiomeCTRL.main.planetData.size) / Chank.Size);
 
         //Генерируем глобальную карту высот если ее нет
         if (heightMapAll == null)
         {
+            Debug.Log(RedactorBiomeCTRL.main.planetData.size);
+
             Cosmos.HeightMap[,] heightMaps = RedactorBiomeCTRL.main.planetData.GetHeightMap(quality);
 
             //Опеределяемся с размером карты высот
@@ -74,6 +77,6 @@ public class RedactorBiomeVisualizator : MonoBehaviour
             }
         }
 
-        RedactorBiomeGenerator.SetHeightMap(heightMapAll, quality, RedactorBiomeCTRL.main.planetData);
+        RedactorBiomeGenerator.SetHeightMap(heightMapAll, RedactorBiomeCTRL.main.planetData);
     }
 }

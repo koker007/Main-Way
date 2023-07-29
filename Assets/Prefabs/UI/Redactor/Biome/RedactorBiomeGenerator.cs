@@ -24,7 +24,6 @@ public class RedactorBiomeGenerator : MonoBehaviour
     [Header("Parameters")]
     [SerializeField]
     float[,] heightMap;
-    Size quarityMap = Size.s1;
     [SerializeField]
     MeshRenderer PlanetPlane;
     MeshFilter PlanetPlaneFilter;
@@ -128,13 +127,15 @@ public class RedactorBiomeGenerator : MonoBehaviour
         
     }
 
-    static public void SetHeightMap(float[,] heightMap, Size quarity, PlanetData planetData) {
+    static public void SetHeightMap(float[,] heightMap, PlanetData planetData) {
         main.heightMap = heightMap;
-        main.quarityMap = quarity;
         main.planetData = planetData;
     }
 
     void Generate() {
+
+        if (planetData == null)
+            return;
 
         RandomizeHeightMap();
 
@@ -150,14 +151,16 @@ public class RedactorBiomeGenerator : MonoBehaviour
             mesh ??= new Mesh();
             mesh.vertices = GetVertices();
             mesh.triangles = GetTriangles();
+            mesh.uv = GetUV();
 
             mesh.RecalculateNormals();
 
             PlanetPlaneFilter.mesh = mesh;
 
+            SetTexture();
+
             int SizePlanet = Calc.GetSizeInt(planetData.size);
-            int SizeMapPixel = Calc.GetSizeInt(quarityMap);
-            float scale = SizePlanet / SizeMapPixel;
+            float scale = SizePlanet / Chank.Size;
             PlanetPlane.gameObject.transform.localScale = new Vector3(scale, SizePlanet/2, scale);
 
             Vector3[] GetVertices() {
@@ -172,6 +175,21 @@ public class RedactorBiomeGenerator : MonoBehaviour
                 }
 
                 return vertices.ToArray();
+            }
+            Vector2[] GetUV() {
+                List<Vector2> UVs = new List<Vector2>();
+
+                for (int y = 0; y < heightMap.GetLength(1); y++)
+                {
+                    float coofY = (float)y / heightMap.GetLength(1);
+                    for (int x = 0; x < heightMap.GetLength(0); x++)
+                    {
+                        float coofX = (float)x / heightMap.GetLength(0);
+                        UVs.Add(new Vector2(coofX, coofY));
+                    }
+                }
+
+                return UVs.ToArray();
             }
             int[] GetTriangles() {
                 List<int> triangles = new List<int>();
@@ -199,6 +217,11 @@ public class RedactorBiomeGenerator : MonoBehaviour
                 
                 return triangles.ToArray();
             }
+
+
+            void SetTexture(){
+                PlanetPlane.material.mainTexture = planetData.GetMainTexture(Calc.GetSize(Chank.Size));
+            }
         }
         void ReGeneratePlanetLiquid() {
             if (!PlanetLiquid || !PlanetLiquidFilter)
@@ -212,7 +235,7 @@ public class RedactorBiomeGenerator : MonoBehaviour
 
             PlanetLiquidFilter.mesh = mesh;
 
-            float scale = Calc.GetSizeInt(quarityMap);
+            float scale = Calc.GetSizeInt(planetData.size) / Chank.Size;
             PlanetLiquid.gameObject.transform.localPosition = new Vector3(0, 0.5f, 0);
 
             Vector3[] GetVertices()
@@ -262,7 +285,7 @@ public class RedactorBiomeGenerator : MonoBehaviour
 
             PlanetGroundZeroFilter.mesh = mesh;
 
-            float scale = Calc.GetSizeInt(quarityMap);
+            float scale = Calc.GetSizeInt(planetData.size) / Chank.Size;
             PlanetGroundZero.gameObject.transform.localPosition = new Vector3(0, 0.0f, 0);
 
             Vector3[] GetVertices()
