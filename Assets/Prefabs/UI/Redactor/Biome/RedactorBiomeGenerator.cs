@@ -36,6 +36,13 @@ public class RedactorBiomeGenerator : MonoBehaviour
 
     PlanetData planetData;
 
+    [Header("CameraControls")]
+    [SerializeField]
+    float CameraHeight = 10;
+    Vector3 CameraPosNeed = new Vector3();
+    Quaternion CameraRotNeed = new Quaternion();
+    float CameraSpeed = 0;
+    float CameraHeightMin = 10;
 
     // Start is called before the first frame update
     void Start()
@@ -47,8 +54,11 @@ public class RedactorBiomeGenerator : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        TestInput();
+
         Generate();
         TestCamera();
+        TestCameraMove();
 
         TestClose();
     }
@@ -337,5 +347,128 @@ public class RedactorBiomeGenerator : MonoBehaviour
 
         }
 
+    }
+
+    void TestInput() {
+
+        if (planetData == null)
+            return;
+
+        bool moving = false;
+
+        Vector3 MoveVec = new Vector3();
+
+        //Forvard
+        if (Input.GetKey(KeyCode.W)) {
+            moving = true;
+
+            MoveVec += camera.transform.forward;
+        }
+        //Back
+        if (Input.GetKey(KeyCode.S)) {
+            moving = true;
+
+            MoveVec -= camera.transform.forward;
+        }
+        //Left
+        if (Input.GetKey(KeyCode.A)) {
+            moving = true;
+
+            MoveVec -= camera.transform.right;
+        }
+        //Right
+        if (Input.GetKey(KeyCode.D)) {
+            moving = true;
+
+            MoveVec += camera.transform.right;
+        }
+
+        if (moving)
+        {
+            CameraSpeed += CameraSpeed * Time.unscaledDeltaTime + Time.unscaledDeltaTime;
+
+            MoveVec.y = 0;
+            MoveVec.Normalize();
+
+            CameraPosNeed += MoveVec * CameraSpeed;
+        }
+        else {
+            CameraSpeed = 0;
+        }
+
+        float planetSize = Calc.GetSizeInt(planetData.size);
+        float CameraHeightMax = planetSize;
+
+        if (Input.mouseScrollDelta.y != 0) {
+            CameraHeight += Input.mouseScrollDelta.y * CameraHeight * 0.1f;
+            if (CameraHeight < CameraHeightMin)
+                CameraHeight = CameraHeightMin;
+            else if (CameraHeight > CameraHeightMax)
+                CameraHeight = CameraHeightMax;
+        }
+
+        //Проверка границ
+        if (CameraPosNeed.x < 0)
+            CameraPosNeed.x = 0;
+        else if (CameraPosNeed.x > (heightMap.GetLength(0) -1) * Chank.Size * (planetSize / 1024))
+            CameraPosNeed.x = (heightMap.GetLength(0) -1) * Chank.Size * (planetSize / 1024);
+
+        if (CameraPosNeed.z < 0)
+            CameraPosNeed.z = 0;
+        else if (CameraPosNeed.z > (heightMap.GetLength(1) -1) * Chank.Size * (planetSize/1024))
+            CameraPosNeed.z = (heightMap.GetLength(1) -1) * Chank.Size * (planetSize / 1024);
+
+        //Проверка требуемой высоты
+        Vector2Int indexHeightMap = new Vector2Int((int)CameraPosNeed.x, (int)CameraPosNeed.z)/Chank.Size/ (int)(planetSize / 1024);
+
+        //Проверка высоты с соседними ячейками
+        int distTest = 1;
+        float heightNeed = 0;
+
+        for (int x = -distTest; x <= distTest; x++) {
+            int xNow = indexHeightMap.x + x;
+            if (xNow < 0 || xNow >= heightMap.GetLength(0))
+                continue;
+            for (int y = -distTest; y <= distTest; y++) {
+                int yNow = indexHeightMap.y + y;
+                if (yNow < 0 || yNow >= heightMap.GetLength(1))
+                    continue;
+
+                float heightThis = heightMap[xNow, yNow];
+                if (heightNeed < heightThis)
+                    heightNeed = heightThis;
+            }
+        }
+
+
+        heightNeed = (heightNeed * planetSize) / 2 + CameraHeight;
+        CameraPosNeed.y = heightNeed;
+    }
+
+    /// <summary>
+    /// Принимает смещение мыши и прибавляет к текущему вращению камеры
+    /// </summary>
+    /// <param name="vecRot"></param>
+    static public void SetRotate(Vector2 vecRot) {
+        //Вытаскиваем вращение камеры
+        Quaternion rotNow = main.camera.transform.localRotation;
+        Vector3 rotEuler = rotNow.eulerAngles;
+        rotEuler.x += vecRot.y;
+        rotEuler.y += vecRot.x;
+
+        //Ограничиваем по верх низ
+        if (rotEuler.x > 90 && rotEuler.x < 180)
+            rotEuler.x = 90;
+        else if (rotEuler.x < -90 && rotEuler.x > -180 ||
+            rotEuler.x > 180 && rotEuler.x < 270)
+            rotEuler.x = -90;
+
+        rotNow.eulerAngles = rotEuler;
+        main.camera.transform.localRotation = rotNow;
+
+
+    }
+    void TestCameraMove() {
+        camera.transform.localPosition += (CameraPosNeed - camera.transform.localPosition) * Time.unscaledDeltaTime * 10;
     }
 }
