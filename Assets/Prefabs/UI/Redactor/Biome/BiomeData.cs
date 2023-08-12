@@ -91,6 +91,8 @@ public class BiomeData
         }
     }
 
+
+
     public static string GetDataPath(string mod, string name)
     {
         //Создаем путь к папке биома
@@ -414,12 +416,14 @@ public class BiomeMaps {
     public const float factor = 0.875170906246f;
 
     public float[,,] maps;
+    public int[,] winers;
+    public float[,] winersIntensive;
 
     //какой размер одного пикселя в блоках
     int sizePixel = 65536;
 
     //Сгенерировать участок карты размером 32 на 32
-    public BiomeMaps(ObjData data, Size sizeTexture, Vector2Int partPos, BiomeData[] biomeData, HeightMap heightMap)
+    public BiomeMaps(ObjData data, Size sizeTexture, Vector2Int partPos, BiomeTypeSurface[] biomeData, HeightMap heightMap)
     {
         //Создаем текстуру
 
@@ -442,9 +446,11 @@ public class BiomeMaps {
         float scale = (sizePlanet * sizeContinent) / sizePixel * 0.8f;
 
         maps = GenPart(width, height, scale, scale, scale, 2, offsetX, offsetY, offsetZ, 3, false, false, partPos.x, partPos.y, biomeData, heightMap);
+
+        CalcWiners();
     }
 
-    float[,,] GenMap(int mapSizeX, int mapSizeY, float ScaleX, float ScaleY, float ScaleZ, float Freq, float OffSetX, float OffSetY, float OffSetZ, int Octaves, bool TimeX, bool TimeZ, BiomeData[] biomeData, HeightMap heightMap)
+    float[,,] GenMap(int mapSizeX, int mapSizeY, float ScaleX, float ScaleY, float ScaleZ, float Freq, float OffSetX, float OffSetY, float OffSetZ, int Octaves, bool TimeX, bool TimeZ, BiomeTypeSurface[] biomeData, HeightMap heightMap)
     {
         //Создаем новый массив
         float[,,] arrayMap = new float[mapSizeX, mapSizeY, biomeData.Length];
@@ -511,7 +517,7 @@ public class BiomeMaps {
         }
         return arrayMap;
     }
-    float[,,] GenPart(int mapSizeX, int mapSizeY, float ScaleX, float ScaleY, float ScaleZ, float Freq, float OffSetX, float OffSetY, float OffSetZ, int Octaves, bool TimeX, bool TimeZ, int chankX, int chankY, BiomeData[] biomeDatas, HeightMap heightMap)
+    float[,,] GenPart(int mapSizeX, int mapSizeY, float ScaleX, float ScaleY, float ScaleZ, float Freq, float OffSetX, float OffSetY, float OffSetZ, int Octaves, bool TimeX, bool TimeZ, int chankX, int chankY, BiomeTypeSurface[] biomeDatas, HeightMap heightMap)
     {
         //Определяем количество чанков
         int chankXMax = mapSizeX / Chank.Size;
@@ -619,5 +625,31 @@ public class BiomeMaps {
                 }
             }
         }
+    }
+
+    //Вычислить номер победителей
+    void CalcWiners() {
+        winers = new int[maps.GetLength(0), maps.GetLength(1)];
+        winersIntensive = new float[maps.GetLength(0), maps.GetLength(1)];
+
+        for (int x = 0; x < winers.GetLength(0); x++) {
+            for (int y = 0; y < winers.GetLength(1); y++) {
+
+                float lastWinerIntensive = 0;
+
+                for (int biomeNum = 0; biomeNum < maps.GetLength(2); biomeNum++) {
+                    if (maps[x, y, biomeNum] < lastWinerIntensive)
+                        continue;
+
+                    //Запоминаем насколько сильно текущий биом преобладает над проигравшим
+                    //Это надо чтобы сгладить границы между биомами
+                    winersIntensive[x, y] = maps[x, y, biomeNum] - lastWinerIntensive;
+
+                    lastWinerIntensive = maps[x, y, biomeNum];
+                    winers[x, y] = biomeNum;
+                }
+            }
+        }
+
     }
 }

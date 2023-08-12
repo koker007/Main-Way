@@ -9,12 +9,20 @@ public class RedactorBiomeVisualizator : MonoBehaviour, IPointerEnterHandler, IP
     static private RedactorBiomeVisualizator main;
 
     public bool isMouseOver = false;
-
     static public RedactorBiomeVisualizator MAIN { get { return main; }  }
 
     RawImage renderTexture;
 
     public float[,] heightMapAll;
+
+    [SerializeField]
+    TranslaterComp PlanetSize;
+    [SerializeField]
+    TranslaterComp PlanetSizeResult;
+    [SerializeField]
+    TranslaterComp CameraPosition;
+    [SerializeField]
+    TranslaterComp CameraPositionResult;
 
     // Start is called before the first frame update
     void Start()
@@ -31,6 +39,7 @@ public class RedactorBiomeVisualizator : MonoBehaviour, IPointerEnterHandler, IP
     // Update is called once per frame
     void Update()
     {
+
         //Включить генератор если выключен
         RedactorBiomeGenerator.TestOpen();
         TestRenderTexture();
@@ -38,6 +47,8 @@ public class RedactorBiomeVisualizator : MonoBehaviour, IPointerEnterHandler, IP
         SetPlanetHeightMap();
 
         TestMouseRotate();
+
+        UpdateTextInfo();
     }
 
     void TestRenderTexture() {
@@ -56,7 +67,7 @@ public class RedactorBiomeVisualizator : MonoBehaviour, IPointerEnterHandler, IP
         {
             Debug.Log(RedactorBiomeCTRL.main.planetData.size);
 
-            Cosmos.HeightMap[,] heightMaps = RedactorBiomeCTRL.main.planetData.GetHeightMap(quality);
+            Cosmos.HeightMap[,] heightMaps = RedactorBiomeCTRL.main.planetData.GetHeightMaps(quality);
 
             //Опеределяемся с размером карты высот
             heightMapAll = new float[heightMaps.GetLength(0) * Chank.Size, heightMaps.GetLength(1) * Chank.Size];
@@ -92,7 +103,7 @@ public class RedactorBiomeVisualizator : MonoBehaviour, IPointerEnterHandler, IP
         bool mouseClick = Input.GetMouseButton(0);
 
         //Если мышь не наведена на эту панель или кнопка мыши не нажата
-        if (!isMouseOver || !mouseClick) {
+        if (!mouseClick) {
             //Возвращаем управление мыши
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
@@ -107,24 +118,21 @@ public class RedactorBiomeVisualizator : MonoBehaviour, IPointerEnterHandler, IP
             }
 
             //Проверяем смещение из центра
-            int mouseX = (int)Input.mousePosition.x + 1;
-            int mouseY = (int)Input.mousePosition.y - 2;
+            float mouseX = Input.GetAxis("Mouse X") * 5;
+            float mouseY = Input.GetAxis("Mouse Y") * 5;
 
-            int screenCenterX = (int)(Screen.width / 2f);
-            int screenCenterY = (int)(Screen.height / 2f);
-
-            float deltaX = mouseX - screenCenterX;
-            float deltaY = mouseY - screenCenterY;
-
-            if (Mathf.Abs(deltaX) < 1)
-                deltaX = 0;
-            if (Mathf.Abs(deltaY) < 1)
-                deltaY = 0;
-
-            RedactorBiomeGenerator.SetRotate(new Vector2(deltaX, -deltaY));
-
-            Debug.Log("mouseX " + mouseX + " mouseY " + mouseY + "screenCenterX " + screenCenterX + " screenCenterY " + screenCenterY);
+            RedactorBiomeGenerator.SetRotate(new Vector2(mouseX, -mouseY));
         }
+    }
+
+    void UpdateTextInfo() {
+        Cosmos.PlanetData planetData = RedactorBiomeCTRL.main.planetData;
+        if (planetData == null)
+            return;
+
+        PlanetSizeResult.SetText("" + Calc.GetSizeInt(planetData.size));
+
+        CameraPositionResult.SetText("" + RedactorBiomeGenerator.cameraPositionNeed);
     }
     public void OnPointerEnter(PointerEventData eventData)
     {

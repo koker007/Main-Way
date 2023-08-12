@@ -182,7 +182,7 @@ public class RedactorPlanetsCTRL : MonoBehaviour
 
 
         //создаем новый паттерн
-        patternPlanet = new PatternPlanet("", terms, parameters, new List<NoisePlanetData>());
+        patternPlanet = new PatternPlanet("", terms, parameters);
     }
 
     void updateTextAll() {

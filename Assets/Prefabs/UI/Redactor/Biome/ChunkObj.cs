@@ -12,6 +12,8 @@ public class ChunkObj : MonoBehaviour
     [SerializeField]
     Mesh meshBlockTLiquid;
 
+    Chank chankData;
+
     // Start is called before the first frame update
     void Start()
     {

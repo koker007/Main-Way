@@ -17,7 +17,7 @@ namespace Cosmos
 
         Texture2D[] TextureMaps;
 
-        PatternPlanet pattern;
+        public PatternPlanet pattern;
 
         public PlanetData(CellS cell)
         {
@@ -107,7 +107,7 @@ namespace Cosmos
             }
         }
 
-        public override HeightMap[,] GetHeightMap(Size quarity)
+        public override HeightMap[,] GetHeightMaps(Size quarity)
         {
             iniHeightMaps();
 
@@ -122,14 +122,46 @@ namespace Cosmos
                     if (heightMaps[q][x, y] != null)
                         continue;
 
-                    heightMaps[q][x, y] = new HeightMap(this, quarity, new Vector2Int(x, y));
-
-                    //Запоминаем время генерации
-                    SpaceObjMap.timeLastGen = Time.time;
+                    GenHeightMap(quarity, new Vector2Int(x,y));
                 }
             }
 
             return heightMaps[q];
+        }
+
+        /// <summary>
+        /// Получить карту высот указанного чанка - если нету, сгенерить
+        /// </summary>
+        /// <param name="quarity"></param>
+        /// <param name="chankPos"></param>
+        /// <returns></returns>
+        public HeightMap GetHeightMap(Size quarity, Vector2Int chankPos) {
+            iniHeightMaps();
+
+            int q = (int)quarity - 1;
+
+            //Если карта высот есть возвращаем ее
+            if (heightMaps[q][chankPos.x, chankPos.y] != null)
+                return heightMaps[q][chankPos.x, chankPos.y];
+
+            //Генерируем
+            GenHeightMap(quarity, chankPos);
+
+            return heightMaps[q][chankPos.x, chankPos.y];
+        }
+
+        /// <summary>
+        /// Перегенерировать карту высот указанного чанка
+        /// </summary>
+        /// <param name="quarity"></param>
+        /// <param name="chankPos"></param>
+        public void GenHeightMap(Size quarity, Vector2Int chankPos) {
+            int q = (int)quarity - 1;
+
+            heightMaps[q][chankPos.x, chankPos.y] = new HeightMap(this, quarity, new Vector2Int(chankPos.x, chankPos.y));
+
+            //Запоминаем время генерации
+            SpaceObjMap.timeLastGen = Time.time;
         }
 
         public Texture2D GetMainTexture(Size quality)
@@ -178,9 +210,9 @@ namespace Cosmos
             int q = (int)quality - 1;
 
             //Создаем биомы пустышки
-            BiomeData[] biomeDatas = new BiomeData[6];
+            BiomeTypeSurface[] biomeDatas = new BiomeTypeSurface[6];
             for (int num = 0; num < biomeDatas.Length; num++) {
-                biomeDatas[num] = new BiomeData();
+                biomeDatas[num] = new BiomeTypeSurface();
                 if (num == 0) {
                     biomeDatas[num].seaPriority = BiomeData.SeaPriority.onlyOverSea;
                     biomeDatas[num].coofHeight = 0.5f;
@@ -198,27 +230,8 @@ namespace Cosmos
             //Биомы есть теперь создаем текстуру
 
             //Храним номер биома победителя
-            int[,] biomeNum = new int[biomesMaps[q][chankPos.x, chankPos.y].maps.GetLength(0), biomesMaps[q][chankPos.x, chankPos.y].maps.GetLength(1)];
-            float[,] biomeZeroPower = new float[biomesMaps[q][chankPos.x, chankPos.y].maps.GetLength(0), biomesMaps[q][chankPos.x, chankPos.y].maps.GetLength(1)];
-
-            //Перебираем все биомы и в зависимости от силы биома выбираем цвет текстуры
-            for (int x = 0; x < biomesMaps[q][chankPos.x,chankPos.y].maps.GetLength(0); x++) {
-                for (int y = 0; y < biomesMaps[q][chankPos.x, chankPos.y].maps.GetLength(1); y++) {
-
-                    for (int arrayNum = 0; arrayNum < biomesMaps[q][chankPos.x, chankPos.y].maps.GetLength(2); arrayNum++) {
-
-                        //Если сила биома слабая
-                        if (biomeZeroPower[x,y] > biomesMaps[q][chankPos.x, chankPos.y].maps[x, y, arrayNum])
-                            continue;
-
-                        //запоминаем силу сильного биома
-                        biomeZeroPower[x,y] = biomesMaps[q][chankPos.x, chankPos.y].maps[x, y, arrayNum];
-                        //Запомнимаем номер биома победителя
-                        biomeNum[x,y] = arrayNum;
-
-                    }
-                }
-            }
+            int[,] biomeWinerNum = biomesMaps[q][chankPos.x, chankPos.y].winers;
+            float[,] biomeIntensive = biomesMaps[q][chankPos.x, chankPos.y].winersIntensive;
 
             //Заполняем текстуру
             TextureMaps ??= new Texture2D[(int)size];
@@ -249,15 +262,15 @@ namespace Cosmos
 
             }
 
-            for (int x = 0; x < biomeNum.GetLength(0); x++) {
-                int globalX = biomeNum.GetLength(0) * chankPos.x + x;
-                for (int y = 0; y < biomeNum.GetLength(1); y++)
+            for (int x = 0; x < biomeWinerNum.GetLength(0); x++) {
+                int globalX = biomeWinerNum.GetLength(0) * chankPos.x + x;
+                for (int y = 0; y < biomeWinerNum.GetLength(1); y++)
                 {
-                    int globalY = biomeNum.GetLength(1) * chankPos.y + y;
+                    int globalY = biomeWinerNum.GetLength(1) * chankPos.y + y;
 
                     if (biomesMaps[q][chankPos.x, chankPos.y].maps.GetLength(2) == 1)
                     {
-                        float intensive = biomeZeroPower[x, y];
+                        float intensive = biomeIntensive[x, y];
                         if (intensive * 20 % 2 > 1)
                             intensive = 1;
                         else
@@ -267,7 +280,7 @@ namespace Cosmos
                     }
                     else
                     {
-                        Color color = colors[biomeNum[x, y]] * (heightMaps[q][chankPos.x, chankPos.y].map[x, y] * 2 - 0.5f);
+                        Color color = colors[biomeWinerNum[x, y]] * (heightMaps[q][chankPos.x, chankPos.y].map[x, y] * 2 - 0.5f);
                         if (heightMaps[q][chankPos.x, chankPos.y].map[x, y] < 0.5f)
                             color = Color.blue * (heightMaps[q][chankPos.x, chankPos.y].map[x, y] * 2 - 0.5f);
 
@@ -400,6 +413,35 @@ namespace Cosmos
 
                 biomesMaps[qualityNum] = new BiomeMaps[chankXMax, chankYMax];
             }
+        }
+
+        /// <summary>
+        /// Получить указанный чанк биома
+        /// </summary>
+        /// <param name="quality"></param>
+        /// <param name="chankPos"></param>
+        /// <returns></returns>
+        public BiomeMaps GetBiomePart(Size quality, Vector2Int chankPos) {
+            iniHeightMaps();
+            iniBiomeMaps();
+
+            int q = (int)quality - 1;
+
+            if (pattern == null)
+                SetTestPattern();
+
+            //Создаем карту высот если нет
+            heightMaps[q][chankPos.x, chankPos.y] ??= new HeightMap(this, quality, chankPos);
+
+            //Генерируем биомы
+            biomesMaps[q][chankPos.x, chankPos.y] ??= new BiomeMaps(this, quality, chankPos, pattern.biomesSurface.ToArray(), heightMaps[q][chankPos.x, chankPos.y]);
+
+            return biomesMaps[q][chankPos.x, chankPos.y];
+        }
+
+        void SetTestPattern() {
+            pattern = PatternPlanet.GetTestPattern();
+            Debug.Log("Use a test planet pattern");
         }
 
         static public PlanetData GetRandomPlanet() {

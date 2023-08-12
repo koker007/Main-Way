@@ -12,6 +12,12 @@ public class PatternPlanet
     public Terms termsGenerate;
 
     /// <summary>
+    /// Список биомов на планете
+    /// </summary>
+    public List<BiomeTypeSurface> biomesSurface;
+    public List<BiomeTypeUnderground> biomesUnderground;
+
+    /// <summary>
     /// Условия генерации этого паттерна
     /// </summary>
     public class Terms
@@ -25,6 +31,7 @@ public class PatternPlanet
         public StarSpectre starSpectre;
         public TidalLocking tidalLocking;
     }
+
 
     public enum StarSpectre
     {
@@ -60,10 +67,6 @@ public class PatternPlanet
         public int AtmosphereMin;
     }
 
-    //Список шумов используемые в генерации планеты
-    public List<NoisePlanetData> listNoisesData = new List<NoisePlanetData>();
-
-
     /// <summary>
     /// Конструктор паттерна планеты
     /// </summary>
@@ -71,43 +74,35 @@ public class PatternPlanet
     /// <param name="terms"></param>
     /// <param name="parameters"></param>
     /// <param name="listNoisesData"></param>
-    public PatternPlanet(string name, Terms terms, Parameters parameters, List<NoisePlanetData> listNoisesData) {
+    public PatternPlanet(string name, Terms terms, Parameters parameters) {
         this.name = name;
         this.termsGenerate = terms;
         this.parameters = parameters;
-
-        this.listNoisesData = listNoisesData;
     }
 
-}
 
-/// <summary>
-/// Данные шума планеты
-/// </summary>
-public class NoisePlanetData : NoiseData
-{
-    public TypeNoise type;
+    static public PatternPlanet GetTestPattern() {
+        Terms terms = new Terms();
+        terms.sizeMin = Size.s1024;
+        terms.sizeMax = Size.s8192;
 
-    /// <summary>
-    /// Тип шума для того чтобы понять как его использовать
-    /// </summary>
-    public enum TypeNoise
-    {
-        heightMap = 0,
-        biomeMap = 1
-    }
+        terms.starSpectre = StarSpectre.NoMatter;
+        terms.temperatuteMin = 0;
+        terms.temperatureMax = Calc.GetSizeInt(Size.s65536);
 
-    public NoisePlanetData(NoiseData noiseData, TypeNoise type)
-    {
-        scaleX = noiseData.scaleX;
-        scaleY = noiseData.scaleY;
-        scaleZ = noiseData.scaleZ;
+        terms.tidalLocking = TidalLocking.NoMatter;
 
-        freq = noiseData.freq;
-        octaves = noiseData.octaves;
+        Parameters parameters = new Parameters();
+        parameters.AtmosphereMin = 0;
+        parameters.AtmosphereMax = Calc.GetSizeInt(Size.s65536);
 
-        polusFactor = noiseData.polusFactor;
+        parameters.LiquidLevelMin = 0;
+        parameters.LiquidLevelMax = 100;
 
-        this.type = type;
+        PatternPlanet pattern = new PatternPlanet("Test", terms, parameters);
+
+
+
+        return pattern;
     }
 }

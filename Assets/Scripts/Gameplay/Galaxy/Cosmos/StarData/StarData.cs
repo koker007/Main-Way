@@ -14,7 +14,7 @@ namespace Cosmos
             this.cell = cell;
         }
 
-        public override HeightMap[,] GetHeightMap(Size quarity)
+        public override HeightMap[,] GetHeightMaps(Size quarity)
         {
             throw new System.NotImplementedException();
         }

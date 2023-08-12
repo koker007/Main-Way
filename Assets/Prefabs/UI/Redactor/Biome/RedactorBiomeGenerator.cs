@@ -16,7 +16,10 @@ public class RedactorBiomeGenerator : MonoBehaviour
     [SerializeField]
     GameObject chanksParent;
     [SerializeField]
-    Camera camera;
+    Camera cameraPlane;
+    [SerializeField]
+    Camera cameraChanks;
+
 
     [SerializeField]
     GameObject chankPrefab;
@@ -40,6 +43,12 @@ public class RedactorBiomeGenerator : MonoBehaviour
     [SerializeField]
     float CameraHeight = 10;
     Vector3 CameraPosNeed = new Vector3();
+    float CamerHeightLast = 0;
+    static public Vector3 cameraPositionNeed { get {
+            Vector3 positionNeed = main.CameraPosNeed;
+            positionNeed.y = main.CamerHeightLast;
+            return positionNeed; } }
+
     Quaternion CameraRotNeed = new Quaternion();
     float CameraSpeed = 0;
     float CameraHeightMin = 10;
@@ -65,15 +74,15 @@ public class RedactorBiomeGenerator : MonoBehaviour
 
     static public RenderTexture GetRender() {
 
-        if (!main || !main.camera)
+        if (!main || !main.cameraPlane)
             return null;
 
-        return main.camera.targetTexture;
+        return main.cameraPlane.targetTexture;
     }
 
     void iniCamera()
     {
-        camera = gameObject.GetComponentInChildren<Camera>();
+        cameraPlane = gameObject.GetComponentInChildren<Camera>();
     }
 
     void IniPlanetVisualPlane() {
@@ -108,15 +117,15 @@ public class RedactorBiomeGenerator : MonoBehaviour
     }
 
     void TestCamera() {
-        if (camera == null)
+        if (cameraPlane == null)
             return;
 
         //проинициалзировать камеру
-        if (camera.targetTexture != null && camera.targetTexture.width != Screen.width && camera.targetTexture.height != Screen.height) {
-            camera.targetTexture = null;
+        if (cameraPlane.targetTexture != null && cameraPlane.targetTexture.width != Screen.width && cameraPlane.targetTexture.height != Screen.height) {
+            cameraPlane.targetTexture = null;
         }
 
-        camera.targetTexture ??= new RenderTexture(Screen.width, Screen.height, 32);
+        cameraPlane.targetTexture ??= new RenderTexture(Screen.width, Screen.height, 32);
     }
 
     static public void TestOpen() {
@@ -362,25 +371,25 @@ public class RedactorBiomeGenerator : MonoBehaviour
         if (Input.GetKey(KeyCode.W)) {
             moving = true;
 
-            MoveVec += camera.transform.forward;
+            MoveVec += cameraPlane.transform.forward;
         }
         //Back
         if (Input.GetKey(KeyCode.S)) {
             moving = true;
 
-            MoveVec -= camera.transform.forward;
+            MoveVec -= cameraPlane.transform.forward;
         }
         //Left
         if (Input.GetKey(KeyCode.A)) {
             moving = true;
 
-            MoveVec -= camera.transform.right;
+            MoveVec -= cameraPlane.transform.right;
         }
         //Right
         if (Input.GetKey(KeyCode.D)) {
             moving = true;
 
-            MoveVec += camera.transform.right;
+            MoveVec += cameraPlane.transform.right;
         }
 
         if (moving)
@@ -423,7 +432,7 @@ public class RedactorBiomeGenerator : MonoBehaviour
 
         //Проверка высоты с соседними ячейками
         int distTest = 1;
-        float heightNeed = 0;
+        CamerHeightLast = 0;
 
         for (int x = -distTest; x <= distTest; x++) {
             int xNow = indexHeightMap.x + x;
@@ -435,14 +444,14 @@ public class RedactorBiomeGenerator : MonoBehaviour
                     continue;
 
                 float heightThis = heightMap[xNow, yNow];
-                if (heightNeed < heightThis)
-                    heightNeed = heightThis;
+                if (CamerHeightLast < heightThis)
+                    CamerHeightLast = heightThis;
             }
         }
 
 
-        heightNeed = (heightNeed * planetSize) / 2 + CameraHeight;
-        CameraPosNeed.y = heightNeed;
+        CamerHeightLast = (CamerHeightLast * planetSize) / 2 + CameraHeight;
+        CameraPosNeed.y = CamerHeightLast;
     }
 
     /// <summary>
@@ -451,7 +460,7 @@ public class RedactorBiomeGenerator : MonoBehaviour
     /// <param name="vecRot"></param>
     static public void SetRotate(Vector2 vecRot) {
         //Вытаскиваем вращение камеры
-        Quaternion rotNow = main.camera.transform.localRotation;
+        Quaternion rotNow = main.cameraPlane.transform.localRotation;
         Vector3 rotEuler = rotNow.eulerAngles;
         rotEuler.x += vecRot.y;
         rotEuler.y += vecRot.x;
@@ -464,11 +473,11 @@ public class RedactorBiomeGenerator : MonoBehaviour
             rotEuler.x = -90;
 
         rotNow.eulerAngles = rotEuler;
-        main.camera.transform.localRotation = rotNow;
+        main.cameraPlane.transform.localRotation = rotNow;
 
 
     }
     void TestCameraMove() {
-        camera.transform.localPosition += (CameraPosNeed - camera.transform.localPosition) * Time.unscaledDeltaTime * 10;
+        cameraPlane.transform.localPosition += (CameraPosNeed - cameraPlane.transform.localPosition) * Time.unscaledDeltaTime * 10;
     }
 }

@@ -74,7 +74,7 @@ namespace Cosmos
         /// Получить чанк карты высот данного мира
         /// </summary>
         /// <returns></returns>
-        public abstract HeightMap[,] GetHeightMap(Size quarity);
+        public abstract HeightMap[,] GetHeightMaps(Size quarity);
 
         /// <summary>
         /// Получить перлин на основе индекса

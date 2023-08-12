@@ -18,6 +18,8 @@ public class TranslaterComp : MonoBehaviour
     bool defaultTextUse = true;
     string defaultText = "";
 
+    bool isNeedUpdate = true;
+
     void Start()
     {
         iniText();
@@ -51,7 +53,7 @@ public class TranslaterComp : MonoBehaviour
     //проверить требуетс€ ли обновление перевода дл€ этого текста
     void TestUpdateInvoke() {
         //¬ыполн€ть только если этот объект еще существует
-        if (gameObject == null) 
+        if (gameObject == null && !isNeedUpdate) 
             return;
 
         //провер€ем нужно ли мен€ть текст
@@ -67,6 +69,13 @@ public class TranslaterComp : MonoBehaviour
         if (defaultTextUse)
             textStr = Language.GetTextFromKey(key, defaultText);
         else textStr = Language.GetTextFromKey(key);
+
+        SetText(textStr);
+    }
+
+    public void SetText(string textStr, bool needUpdate = true) {
+        if (needUpdate)
+            isNeedUpdate = needUpdate;
 
         //≈сли есть какой-то текст
         if (textStr != null && textStr != "")

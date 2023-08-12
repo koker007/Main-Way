@@ -43,7 +43,8 @@ public class GraficChankPlanet : MonoBehaviour
         int sizeOfGenRules = Marshal.SizeOf(typeof(BiomeData.GenRule));
 
         //Чанк в котором надо хранить данные
-        Chank chank = new Chank();
+        Chank chank = new Chank(Size.s1, new Vector3Int(0,0,0), null);        //Веременная Пустышка
+
         //Заряжаем буфер данными. первое количество данных, второе размер одной данной в битах
         ComputeBuffer bufferBlocksIDs = new ComputeBuffer(chank.BlocksID.Length, sizeOfBlockID);
         bufferBlocksIDs.SetData(chank.BlocksID);
