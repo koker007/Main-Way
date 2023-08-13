@@ -380,19 +380,25 @@ public class RedactorBiomeCTRL : MonoBehaviour
         int blockID = GameData.Blocks.GetBlockID(modName, blockName);
         int ruleNum = (int)sliderRules.slider.value;
 
-        biomeData.genRules[ruleNum].blockID = blockID;
+        BiomeData.GenRule genRule = biomeData.genRules[ruleNum];
+        genRule.blockID = blockID;
+        biomeData.genRules[ruleNum] = genRule;
 
         changeBiome();
     }
     public void SetSelectRuleParameters(float scaleAll, int octaves, int freq, Vector3 scale) {
         int ruleNum = (int)sliderRules.slider.value;
 
-        biomeData.genRules[ruleNum].scaleAll = scaleAll;
-        biomeData.genRules[ruleNum].octaves = octaves;
-        biomeData.genRules[ruleNum].scaleX = scale.x;
-        biomeData.genRules[ruleNum].scaleY = scale.y;
-        biomeData.genRules[ruleNum].scaleZ = scale.z;
-        biomeData.genRules[ruleNum].freq = freq;
+        BiomeData.GenRule genRule = biomeData.genRules[ruleNum];
+
+        genRule.scaleAll = scaleAll;
+        genRule.octaves = octaves;
+        genRule.scaleX = scale.x;
+        genRule.scaleY = scale.y;
+        genRule.scaleZ = scale.z;
+        genRule.freq = freq;
+
+        biomeData.genRules[ruleNum] = genRule;
 
         changeBiome();
     }

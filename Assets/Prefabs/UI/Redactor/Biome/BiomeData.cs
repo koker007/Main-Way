@@ -44,16 +44,52 @@ public class BiomeData
     }
 
     //одно правило генерации блока
-    public class GenRule {
-        public int blockID = 0;
+    public struct GenRule {
+        static int sizeOf;
+        public static int SizeOf { get { return GetSize(); } }
+
+        public int blockID;// = 0;
 
         //Perlin
-        public float scaleAll = 16;
-        public float scaleX = 1;
-        public float scaleY = 1;
-        public float scaleZ = 1;
-        public float freq = 3;
-        public int octaves = 1;
+        public float scaleAll;// = 16;
+        public float scaleX;// = 1;
+        public float scaleY;// = 1;
+        public float scaleZ;// = 1;
+        public float freq;// = 3;
+        public int octaves;// = 1;
+
+        //Смещение по всем осям.
+        public float offsetX;// = 0;
+        public float offsetY;// = 0;
+        public float offsetZ;// = 0;
+
+        //Финальное изменение интенсивности (от -0.2 до 0.2)
+        public float intensive;// = 0;
+
+        static int GetSize() {
+            if (sizeOf > 0)
+                return sizeOf;
+
+            int size = 0;
+            size += sizeof(int); //blockID
+
+            size += sizeof(float); //scaleAll
+            size += sizeof(float); //scaleX
+            size += sizeof(float); //scaleY
+            size += sizeof(float); //scaleZ
+
+            size += sizeof(float); //freq
+            size += sizeof(int); //octaves
+
+            size += sizeof(float); //offsetX
+            size += sizeof(float); //offsetY
+            size += sizeof(float); //offsetZ
+
+            size += sizeof(float); //intensive
+
+            sizeOf = size;
+            return sizeOf;
+        }
     }
 
     //Набор правил для генерации одного конкретного блока

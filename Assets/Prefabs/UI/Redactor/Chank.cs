@@ -100,8 +100,11 @@ public class Chank
             return;
         }
 
+        int sizePlanet = Calc.GetSizeInt(planetData.size);
+        int sizeBlock = Calc.GetSizeInt(this.sizeBlock);
+
         //≈сли шума нет, то шумим
-        biomesNoiseSurface[biomeNum] = planetData.pattern.biomesSurface[biomeNum].GetBiomeNoise(index, sizeBlock);
+        biomesNoiseSurface[biomeNum] = planetData.pattern.biomesSurface[biomeNum].GetBiomeNoise(index, sizeBlock, sizePlanet);
 
         //Ёто биом поверхности, необходимо сделать поправку на высоту
 

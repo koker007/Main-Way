@@ -18,11 +18,21 @@ public class BiomeTypeSurface: BiomeData
     /// <param name="sizeBlock"></param>
     /// <param name=""></param>
     /// <returns></returns>
-    public float[,,,] GetBiomeNoise(Vector3Int chankIndex, Size sizeBlock) {
-        float[,,,] result = new float[0,0,0,0];
+    public float[,,,] GetBiomeNoise(Vector3Int chankIndex, int sizeBlock, int PlanetSize) {
+
+        int mapSizeZ = PlanetSize / sizeBlock;
+        int mapSizeX = mapSizeZ * 2;
+        int mapSizeY = mapSizeZ / 2;
 
 
+        float regionX = (chankIndex.x * Chank.Size) / (float)mapSizeX;
+        float regionY = (chankIndex.y * Chank.Size) / (float)mapSizeY;
+        float regionZ = (chankIndex.z * Chank.Size) / (float)mapSizeZ;
 
-        return result;
+        //Создаем данные
+        GraficData.Perlin3DRules perlin3DArray = new GraficData.Perlin3DRules(genRules.ToArray(), mapSizeX, mapSizeY, mapSizeZ, regionX, regionY, regionZ);
+        perlin3DArray.Calculate();
+
+        return perlin3DArray.result;
      }
 }

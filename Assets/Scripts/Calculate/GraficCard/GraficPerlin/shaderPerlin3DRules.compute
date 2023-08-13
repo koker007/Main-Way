@@ -1,0 +1,242 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+
+int sizeShader;
+
+
+// Create a RenderTexture with enableRandomWrite flag and set it
+// with cs.SetTexture
+
+struct Data{
+    float result;
+};
+
+struct Rule {
+    int blockID;
+    float scaleAll;
+    float scaleX;
+    float scaleY;
+    float scaleZ;
+    float freq;
+    int octaves;
+    float offsetX;
+    float offsetY;
+    float offsetZ;
+    float intensive;
+};
+
+RWStructuredBuffer<Data> _datas;
+RWStructuredBuffer<Rule> _rules;
+
+float _factor;
+
+int _repeatX;
+int _repeatY;
+int _repeatZ; //if repeat zero is off //repeat in pixels
+float _regionX; //from 0 to 1 region texture
+float _regionY;
+float _regionZ; //from 0 to 1 region texture
+
+float _value;
+
+int _RulesMax;
+
+float perlin(float3 p, float frequency);
+float map(int idX, int idY, int idZ, int ruleNum);
+float mapTest(int idX, int idY, int idZ, int ruleNum);
+void calcForRule(int idX, int idZ, int ruleNum);
+
+[numthreads(32,1,32)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+     
+    //nyzno vichislit dla kazdogo pravila
+    for(int ruleNum = 0; ruleNum < _RulesMax; ruleNum++){
+        calcForRule(id.x, id.z, ruleNum);
+    }
+}
+
+float perlin(float3 p, int ruleNum)
+{
+    Rule rule = _rules[ruleNum];
+
+    float freq = rule.freq;
+    float result = 0;
+
+    for (int _octNum = 0; _octNum < rule.octaves; _octNum++)
+    {
+
+        float3 i = floor(p * freq);
+        float3 f = frac(p * freq);
+        float3 t = f * f * f * (f * (f * 6.0 - 15.0) + 10.0);
+        //plant of UP
+        float3 a = i + float3(0.0, 0.0, 0.0);
+        float3 b = i + float3(1.0, 0.0, 0.0);
+        float3 c = i + float3(0.0, 1.0, 0.0);
+        float3 d = i + float3(1.0, 1.0, 0.0);
+
+        float3 az = i + float3(0.0, 0.0, 1.0);
+        float3 bz = i + float3(1.0, 0.0, 1.0);
+        float3 cz = i + float3(0.0, 1.0, 1.0);
+        float3 dz = i + float3(1.0, 1.0, 1.0);
+
+        a = -1.0 + 2.0 * frac(sin( float3(dot(a, float3(127.1, 311.7, 233.5)), dot(a, float3(269.5, 183.3, 351.9)), dot(a, float3(111.1, 346.7, 59.1)))) *43758.5453123);
+        b = -1.0 + 2.0 * frac(sin( float3(dot(b, float3(127.1, 311.7, 233.5)), dot(b, float3(269.5, 183.3, 351.9)), dot(b, float3(111.1, 346.7, 59.1)))) *43758.5453123);
+        c = -1.0 + 2.0 * frac(sin( float3(dot(c, float3(127.1, 311.7, 233.5)), dot(c, float3(269.5, 183.3, 351.9)), dot(c, float3(111.1, 346.7, 59.1)))) *43758.5453123);
+        d = -1.0 + 2.0 * frac(sin( float3(dot(d, float3(127.1, 311.7, 233.5)), dot(d, float3(269.5, 183.3, 351.9)), dot(d, float3(111.1, 346.7, 59.1)))) *43758.5453123);
+
+        az = -1.0 + 2.0 * frac(sin(float3(dot(az, float3(127.1, 311.7, 233.5)), dot(az, float3(269.5, 183.3, 351.9)), dot(az, float3(111.1, 346.7, 59.1)))) * 43758.5453123);
+        bz = -1.0 + 2.0 * frac(sin(float3(dot(bz, float3(127.1, 311.7, 233.5)), dot(bz, float3(269.5, 183.3, 351.9)), dot(bz, float3(111.1, 346.7, 59.1)))) * 43758.5453123);
+        cz = -1.0 + 2.0 * frac(sin(float3(dot(cz, float3(127.1, 311.7, 233.5)), dot(cz, float3(269.5, 183.3, 351.9)), dot(cz, float3(111.1, 346.7, 59.1)))) * 43758.5453123);
+        dz = -1.0 + 2.0 * frac(sin(float3(dot(dz, float3(127.1, 311.7, 233.5)), dot(dz, float3(269.5, 183.3, 351.9)), dot(dz, float3(111.1, 346.7, 59.1)))) * 43758.5453123);
+
+        float A = dot(a, f - float3(0.0, 0.0, 0.0));
+        float B = dot(b, f - float3(1.0, 0.0, 0.0));
+        float C = dot(c, f - float3(0.0, 1.0, 0.0));
+        float D = dot(d, f - float3(1.0, 1.0, 0.0));
+
+        float Az = dot(az, f - float3(0.0, 0.0, 1.0));
+        float Bz = dot(bz, f - float3(1.0, 0.0, 1.0));
+        float Cz = dot(cz, f - float3(0.0, 1.0, 1.0));
+        float Dz = dot(dz, f - float3(1.0, 1.0, 1.0));
+
+        float noiseXY =lerp(lerp(A, B, t.x), lerp(C, D, t.x), t.y);
+        float noiseZ = lerp(lerp(Az, Bz, t.x), lerp(Cz, Dz, t.x), t.y);
+
+        float noise = lerp(noiseXY, noiseZ, t.z);
+
+        noise /= (_octNum*4.0f + 1.0f);
+
+        result += noise;
+
+        freq *= 2.0f;
+
+    }
+    result = result / 2 + 0.5f;
+
+    result = clamp(result, 0, 1.0);
+
+    return result;
+}
+
+float map(int idX, int idY, int idZ, int ruleNum){
+
+    //Need calc perlin
+
+    //1 Grid definition
+    
+    
+    //2 dot product
+    
+    
+    //3 interpolation
+
+    Rule rule = _rules[ruleNum];
+
+    float factorX = (_factor / rule.scaleX) * rule.scaleAll;
+    float factorY = (_factor / rule.scaleY) * rule.scaleAll;
+    float factorZ = (_factor / rule.scaleZ) * rule.scaleAll;
+
+    float x = factorX * idX + _regionX * factorX * _repeatX + rule.offsetX;
+    float y = factorY * idY + _regionY * factorY * _repeatY + rule.offsetY;
+    float z = factorZ * idZ + _regionZ * factorZ * _repeatZ + rule.offsetZ;
+
+    float pixelXCoofRegion = 1.0f / _repeatX;
+    float pixelZCoofRegion = 1.0f / _repeatZ;
+    float regionXNow = _regionX + pixelXCoofRegion * idX;
+    float regionZNow = _regionZ + pixelZCoofRegion * idZ;
+
+    float3 posNormal = float3(x, y, z);
+    float3 posMinusSizeX = float3(x - _repeatX*factorX, y, z);
+
+    float perlinNormal = perlin(posNormal, ruleNum);
+    float perlinMinusSizeX = perlin(posMinusSizeX, ruleNum);
+
+    float perlinBlendX = (perlinNormal *  (1 - regionXNow)) + (perlinMinusSizeX * regionXNow);
+
+    //blend size/2
+    float x05 = x;
+    float x05M = x - _repeatX*factorX;
+
+    if(regionXNow > 0.5f){
+       x05 -= (_repeatX*factorX/2);
+       x05M -= (_repeatX*factorX/2);
+    }
+    else {
+        x05 += (_repeatX*factorX/2);
+        x05M += (_repeatX*factorX/2);
+    }
+
+    float3 posMinusSize05X = float3(x05, y, z);
+    float3 posPlusSize05X = float3(x05M, y, z);
+
+    float perlinMinusSize05X = perlin(posMinusSize05X, ruleNum);
+    float perlinPlusSize05X = perlin(posPlusSize05X, ruleNum);
+
+    float blendCoof05 = regionXNow - 0.5f;
+    if(blendCoof05 <= 0)
+        blendCoof05 += 1.0f;
+
+    float perlinBlend05X = (perlinPlusSize05X *  blendCoof05) + (perlinMinusSize05X * (1 - blendCoof05));
+
+    float intensiveZ = 0;
+
+    float polus = 0.5f;
+    if(regionZNow < polus){
+        intensiveZ = (1 - (regionZNow/polus))/2;
+    }
+    else if(regionZNow > 1 - polus){
+        intensiveZ = (1-((1 - regionZNow)/polus))/2;
+    }
+
+    float perlinBlendY = (perlinBlendX *  (1 - intensiveZ)) + (perlinBlend05X * intensiveZ);
+
+    return perlinBlendY;
+
+}
+float mapTest(int idX, int idY, int idZ, int ruleNum){
+    Rule rule = _rules[ruleNum];
+
+    float factorX = (_factor / rule.scaleX) * rule.scaleAll;
+    float factorY = (_factor / rule.scaleY) * rule.scaleAll;
+    float factorZ = (_factor / rule.scaleZ) * rule.scaleAll;
+
+    float x = factorX * idX + _regionX * factorX * _repeatX + rule.offsetX;
+    float y = factorY * idY + rule.offsetY;
+    float z = factorZ * idZ + _regionZ * factorZ * _repeatZ + rule.offsetZ;
+
+    float pixelXCoofRegion = 1.0f / _repeatX;
+    float pixelYCoofRegion = 1.0f / _repeatZ;
+    float regionXNow = _regionX + pixelXCoofRegion * idX;
+    float regionYNow = _regionZ + pixelYCoofRegion * idY;
+
+    //N - normal //M - minus
+    float3 pos = float3(x, y, z);
+
+    float result = perlin(pos, ruleNum);
+
+    return result;
+}
+
+void calcForRule(int idX, int idZ, int ruleNum){
+    
+    Rule rule = _rules[ruleNum];
+
+    int indexX = idX * 32 * 32 * _RulesMax;
+    int indexZ = idZ * _RulesMax;
+
+    //all Y axis
+     for(int yNow = 0; yNow < 32; yNow++){
+
+         //float dataID = 32*id.x*_ArrayMax + id.y*_ArrayMax + arrayNum;
+         
+         int indexY = yNow * 32 * _RulesMax;
+
+         float dataID = indexX + indexY + indexZ + ruleNum;
+
+         float dataMap = map(idX, yNow, idZ, ruleNum);
+         dataMap += rule.intensive;
+
+         _datas[dataID].result = dataMap;
+     }
+}
