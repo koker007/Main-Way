@@ -4,22 +4,18 @@ using UnityEngine;
 /// <summary>
 /// Хранит данные чанка
 /// </summary>
-public class Chank
+public abstract class Chank
 {
     //Чанк всегда кубический и вмещает в себя 32 блока по высоте ширене и длине.
     public const int Size = 32;
 
-    public Size sizeBlock = global::Size.s1;
-    public Vector3Int index = new Vector3Int();
+    public Size sizeBlock = global::Size.s1; //размер одного блока в чанке
+    public Vector3Int index = new Vector3Int(); //индекс чанка
 
-    public int[,,] BlocksID = new int[Size, Size, Size];
-    Color[,,] Colors;
-    int[,,] BiomeNum;
+    public int[,,] BlocksID = new int[Size, Size, Size]; //ID Блоков
+    public Color[,,] Colors; //Цвета блоков
 
-    float[][,,,] biomesNoiseSurface;
-    float[][,,,] biomesNoiseUnderground;
-
-    PlanetData planetData;
+    protected PlanetData planetData;
 
 
     /// <summary>
@@ -32,125 +28,12 @@ public class Chank
         this.sizeBlock = sizeBlock;
         this.index = index;
         this.planetData = planetData;
-
-        //Создать пространство под шум поверхности
-        this.biomesNoiseSurface = new float[planetData.pattern.biomesSurface.Count][,,,];
-        //Создать пространство под шум подземлей
-        this.biomesNoiseUnderground = new float[planetData.pattern.biomesUnderground.Count][,,,];
     }
 
-    void GenerateColors() {
-        //Учитывая текущий размер чанка сгенерировать его
+    abstract public void Generate();
+    /// <summary>
+    /// Вычислить финальный цвет для блоков
+    /// </summary>
+    abstract protected void CalcColor();
 
-        //нужно узнать по каждому из блоков к какому биому он принадлежит
-
-        Vector2Int index2D = new Vector2Int(index.x, index.z);
-        int planetSize = Calc.GetSizeInt(planetData.size);
-
-        //Получаем информацию о высоте поверхности для каждого блока
-        HeightMap heightMap = planetData.GetHeightMap(sizeBlock, index2D);
-
-        //Получаем информацию биомов поверхности для каждого блока
-        BiomeMaps biomeMap = planetData.GetBiomePart(sizeBlock, index2D);
-
-        //На основе размера планеты преобразуем в высоту блоков
-        int[,] heightMapInt = new int[heightMap.map.GetLength(0), heightMap.map.GetLength(1)];
-        for (int x = 0; x < heightMapInt.GetLength(0); x++) {
-            for (int z = 0; z < heightMapInt.GetLength(1); z++) {
-                heightMapInt[x, z] = (int)(heightMap.map[x, z] * planetSize);
-            }
-        }
-
-        //Теперь знаем высоту выше которой начинается биом
-
-        Vector3Int worldPos = new Vector3Int();
-
-        //Перебираем координаты x z чанка
-        for (int x = 0; x < Size; x++) {
-            for (int z = 0; z < Size; z++) {
-
-                //Нужно определить по правилам какого биома генерируется область
-                //Смотрим в карту биома
-                int biomeNum = biomeMap.winers[x, z];
-                float biomeIntensive = biomeMap.winersIntensive[x, z];
-                //Знаем номер биома победителя
-                //Знаем интенсивность биома
-
-                //Вычисляем шумы поверхности
-                CalcNoisesSurface(biomeNum);
-                //Вычисляем шумы подземности
-                CalcNoisesUnderground(biomeNum);
-
-                int heightSurface = (int)(heightMap.map[x, z] * planetSize/2);
-
-                //Перебираем каждую высоту чанка
-                for (int y = 0; y < Size; y++) {
-
-                    //ищем блок победитель
-                    CalcWiner(new Vector3Int(x,y,z), biomeNum, heightSurface);
-                }
-                
-            }
-        }
-
-    }
-
-    void CalcNoisesSurface(int biomeNum) {
-        if (biomesNoiseSurface[biomeNum] != null) {
-            return;
-        }
-
-        int sizePlanet = Calc.GetSizeInt(planetData.size);
-        int sizeBlock = Calc.GetSizeInt(this.sizeBlock);
-
-        //Если шума нет, то шумим
-        biomesNoiseSurface[biomeNum] = planetData.pattern.biomesSurface[biomeNum].GetBiomeNoise(index, sizeBlock, sizePlanet);
-
-        //Это биом поверхности, необходимо сделать поправку на высоту
-
-    }
-    void CalcNoisesUnderground(int biomeNum)
-    {
-        if (biomesNoiseUnderground[biomeNum] != null)
-        {
-            return;
-        }
-
-        //Если шума нет, то шумим
-        //biomesNoiseUnderground[biomeNum] = planetData.pattern.biomesUnderground[biomeNum].GetBiomeNoise(index, sizeBlock);
-
-        //Это биом поверхности, необходимо сделать поправку на высоту
-
-    }
-
-    void CalcWiner(Vector3Int pos, int biomeNum, int heightSurface) {
-        
-        //Текущая высота, данного блока
-        int heightNow = (index.y * Chank.Size + pos.y) * Calc.GetSizeInt(sizeBlock);
-
-        //Перебираем все блоки в биоме
-        int blockWinerID = 0;
-        float noiseWiner = 0;
-
-        //Если высота выше поверхности
-        if (heightNow >= heightSurface)
-        {
-
-            //генерируем по правилам поверхностных биомов
-            for (int num = 0; num < biomesNoiseSurface[biomeNum].GetLength(3); num++)
-            {
-                if (biomesNoiseSurface[biomeNum][pos.x, pos.y, pos.z, num] < noiseWiner)
-                    continue;
-
-                noiseWiner = biomesNoiseSurface[biomeNum][pos.x, pos.y, pos.z, num];
-                blockWinerID = planetData.pattern.biomesSurface[biomeNum].genRules[num].blockID;
-            }
-        }
-        else {
-            //Генерируем по правилам подземных биомов
-
-        }
-
-        BlocksID[pos.x, pos.y, pos.z] = blockWinerID;
-    }
 }

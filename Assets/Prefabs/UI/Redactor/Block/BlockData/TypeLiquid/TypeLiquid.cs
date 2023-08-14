@@ -683,4 +683,9 @@ public class TypeLiquid: BlockData
             }
         }
     }
+
+    public override Color GetColor()
+    {
+        throw new System.NotImplementedException();
+    }
 }

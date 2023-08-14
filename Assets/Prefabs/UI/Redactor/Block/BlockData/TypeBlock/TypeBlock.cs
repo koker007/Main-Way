@@ -278,6 +278,50 @@ public class TypeBlock: BlockData
         wallDown.calcVertices();
     }
 
+    public override Color GetColor()
+    {
+        if (color != null)
+            return color;
+
+        //Расчитываем цвет блока
+        color = CalcColor(wallUp);
+
+        return color;
+
+        Color CalcColor(Wall wall)
+        {
+
+            Vector3 colorVec = new Vector3(0.5f, 0.5f, 0.5f);
+            int colorCount = 0;
+
+            for (int x = 0; x < wall.texture.width; x++)
+            {
+                for (int y = 0; y < wall.texture.height; y++)
+                {
+                    Color color = wall.texture.GetPixel(x, y);
+                    if (color.a < 1)
+                        continue;
+
+                    colorVec.x += color.r;
+                    colorVec.y += color.g;
+                    colorVec.z += color.b;
+
+                    colorCount++;
+                }
+            }
+
+
+            if (colorCount < 1)
+            {
+                colorCount = 1;
+            }
+
+            colorVec /= colorCount;
+
+            return new Color(colorVec.x, colorVec.y, colorVec.z);
+        }
+    }
+
     public override Mesh GetMesh(bool face, bool back, bool left, bool right, bool up, bool down)
     {
         Mesh meshResult = new Mesh();

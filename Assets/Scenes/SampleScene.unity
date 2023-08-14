@@ -3554,7 +3554,6 @@ GameObject:
   - component: {fileID: 259411733}
   - component: {fileID: 259411735}
   - component: {fileID: 259411736}
-  - component: {fileID: 259411737}
   - component: {fileID: 259411739}
   m_Layer: 0
   m_Name: GraficCalc
@@ -3689,19 +3688,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShaderPerlinLiquid: {fileID: 7200000, guid: f2aea033e82247a45b1b34e686cc0e38, type: 3}
---- !u!114 &259411737
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 259411727}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: edba7f71ea21c184581d3c3d07712a77, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ShaderGenChankPlanet: {fileID: 7200000, guid: 5858fdc43877cad48a209b9c5ec0e461, type: 3}
 --- !u!114 &259411738
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19640,7 +19626,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7176533566875976478, guid: d7b2deb1b6f117c4b92abfc7b1942566, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -0.000009536743
+      value: 0.00000667572
       objectReference: {fileID: 0}
     - target: {fileID: 7417510024086745306, guid: d7b2deb1b6f117c4b92abfc7b1942566, type: 3}
       propertyPath: m_AnchorMax.x
@@ -30626,7 +30612,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7176533566875976478, guid: d7b2deb1b6f117c4b92abfc7b1942566, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0.000061035156
+      value: 0.00048828125
       objectReference: {fileID: 0}
     - target: {fileID: 7417510024086745306, guid: d7b2deb1b6f117c4b92abfc7b1942566, type: 3}
       propertyPath: m_AnchorMax.x

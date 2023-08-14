@@ -322,6 +322,11 @@ namespace Cosmos
             }
 
         }
+
+        public override Chank GetChank(Size sizeOneBlock, Vector3Int index)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 
 

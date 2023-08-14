@@ -13,6 +13,9 @@ namespace Cosmos
         BiomeMaps[][,] biomesMaps;
         int[][,] biomeNum;
         Texture2D textureShadow;
+
+        ChankPlanet[][,,] chanks;
+
         public Texture2D TextureShadow { get { return textureShadow; } }
 
         Texture2D[] TextureMaps;
@@ -462,6 +465,44 @@ namespace Cosmos
             }
 
             return result;
+        }
+
+        public override Chank GetChank(Size sizeOneBlock, Vector3Int index)
+        {
+            iniChanks(sizeOneBlock);
+
+            int indexSize = (int)sizeOneBlock - 1;
+
+            //Проверяем что не выходим за границы массива
+            if (index.x < 0 || index.y < 0 || index.z < 0 ||
+                index.x >= chanks[indexSize].GetLength(0) ||
+                index.y >= chanks[indexSize].GetLength(1) ||
+                index.z >= chanks[indexSize].GetLength(2)) {
+                throw new System.NotImplementedException();
+            }
+
+            //Если чанка нету
+            if (chanks[indexSize][index.x, index.y, index.z] == null) {
+                chanks[indexSize][index.x, index.y, index.z] = new ChankPlanet(sizeOneBlock, index, this);
+            }
+
+            return chanks[indexSize][index.x, index.y, index.z];
+
+            //Инициализация полей под чанки
+            void iniChanks(Size sizeOneBlock) {
+                chanks ??= new ChankPlanet[(int)size][,,];
+
+                int indexSize = (int)sizeOneBlock - 1;
+                if (chanks[indexSize] == null) {
+                    int planetSizeInt = Calc.GetSizeInt(size);
+                    //Узнаем максимальное количество чанков
+                    int chankZMax = planetSizeInt / (Chank.Size * Calc.GetSizeInt(sizeOneBlock));
+                    int chankXMax = chankZMax * 2;
+                    int chankYMax = chankZMax / 2;
+
+                    chanks[indexSize] = new ChankPlanet[chankXMax, chankYMax, chankZMax];
+                }
+            }
         }
     }
 

@@ -285,4 +285,9 @@ public class TypeVoxel: BlockData
         existFromAlphaTexture();
 
     }
+
+    public override Color GetColor()
+    {
+        throw new System.NotImplementedException();
+    }
 }

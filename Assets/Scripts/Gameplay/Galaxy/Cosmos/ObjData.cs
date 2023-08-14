@@ -173,6 +173,11 @@ namespace Cosmos
 
             }
         }
+
+        //////////////////////////////////////////////////////////
+        ///Inside Object Data
+        //////////////////////////////////////////////////////////
+        public abstract Chank GetChank(Size sizeOneBlock, Vector3Int index);
     }
 
     public enum TidalLocking

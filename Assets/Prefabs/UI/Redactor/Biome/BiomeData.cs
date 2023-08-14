@@ -16,7 +16,7 @@ public class BiomeData
     /// <summary>
     /// Основной цвет биома
     /// </summary>
-    public string color;
+    public Color color;
 
     //Коофиценты изменения приоритета биомов в зависимости от расположения на карте планеты
     public float coofPolus; //Коофицент полюсов

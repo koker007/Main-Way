@@ -15,6 +15,10 @@ public abstract class BlockData
     //прозрачность
     TypeBlockTransparent transparentType = TypeBlockTransparent.NoTransparent;
     float transparentPower = 0.5f;
+    /// <summary>
+    /// Обший цвет блока
+    /// </summary>
+    protected Color color;
 
     //Рисовать соседские стены или нет
     public bool drawNeighbourWall = false;
@@ -37,7 +41,10 @@ public abstract class BlockData
         lighting = blockData.lighting;
 
         physics = blockData.physics;
+
     }
+
+    abstract public Color GetColor();
 
     public enum Type {
         block = 0,

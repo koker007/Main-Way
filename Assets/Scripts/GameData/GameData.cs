@@ -273,5 +273,15 @@ namespace GameData
             blockData[id] = data;
             countLoaded++;
         }
+
+        static public Color GetColor(int blockID) {
+            Color result = new Color(1,1,1,0);
+
+            BlockData block = GetData(blockID, 0);
+            
+
+
+            return result;
+        }
     }
 }
