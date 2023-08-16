@@ -4,7 +4,7 @@ using UnityEngine;
 using System.IO;
 using Cosmos;
 
-public class BiomeData
+public abstract class BiomeData
 {
     //Биом проинициализирован или нет
     bool isInicialized = false;
@@ -25,6 +25,13 @@ public class BiomeData
     public float coofHeightMax; //Коофицент максимальной высоты биома
     public float coofHeightMin; //Коофицент минимальной высоты биома
     public SeaPriority seaPriority; //Биом подводный, надводный
+
+    public enum Type {
+        Surface = 0,
+        Underground = 1,
+        Dwarf = 2,
+        Rings = 3
+    }
 
     public enum SeaPriority {
         everywhere = 0,
@@ -89,6 +96,26 @@ public class BiomeData
 
             sizeOf = size;
             return sizeOf;
+        }
+
+        static public GenRule GetTest() {
+            GenRule genRule = new GenRule();
+            genRule.blockID = 1;
+            genRule.freq = 2;
+
+            genRule.intensive = Random.Range(-0.1f, 0.1f);
+
+            genRule.octaves = Random.Range(2, 5);
+
+            genRule.scaleAll = Random.Range(0.5f, 1.5f);
+            genRule.scaleX = 32;
+            genRule.scaleY = 32;
+            genRule.scaleZ = 32;
+            genRule.offsetX = 32;
+            genRule.offsetY = 32;
+            genRule.offsetZ = 32;
+
+            return genRule;
         }
     }
 
@@ -446,6 +473,7 @@ public class BiomeData
             }
         }
     }
+
 }
 
 public class BiomeMaps {

@@ -59,6 +59,40 @@ public class BiomeTypeSurface: BiomeData
         return perlin3DArray.result;
      }
 
+    /// <summary>
+    /// получить тестовый биом, только дл€ редактора биомов
+    /// </summary>
+    /// <returns></returns>
+    static public BiomeTypeSurface GetTestBiome()
+    {
+        BiomeTypeSurface biome = new BiomeTypeSurface();
+
+        //цвет всегда серый но с разной интенсивностью\
+        float colorIntensive = Random.Range(0.25f, 0.75f);
+        biome.color = new Color(colorIntensive, colorIntensive, colorIntensive);
+        biome.coofHeightMax = 100;
+        biome.coofHeightMin = 0;
+
+        //–асположение биома
+        biome.coofPolus = Random.Range(-0.3f, 0.3f);
+        biome.coofZeroX = Random.Range(-0.1f, 0.1f);
+
+        biome.seaPriority = SeaPriority.everywhere;
+        
+        //поверхностное обрезание
+        biome.surfaceCutting = Random.Range(0.001f, 0.02f);
+        //ѕодземна€ продолжительность
+        biome.underHeightLenght = Random.Range(1, 20);
+
+        biome.genRules = new List<GenRule>();
+        for (int num = 0; num < 1; num++) {
+            GenRule genRule = GenRule.GetTest();
+            biome.genRules.Add(genRule);
+        }
+
+        return biome;
+    }
+
     void CorrectingHeight(ref float[,,,] noise, Vector3Int chankIndex, int blockSizeInt, PlanetData planetData) {
 
         Size BlockSize = Calc.GetSize(blockSizeInt);
@@ -86,10 +120,12 @@ public class BiomeTypeSurface: BiomeData
                         noiseCoof -= changeY * surfaceCutting * (intensive[x,z]+0.5f);
                     //ѕод поверхностью и ниже
                     else if(changeY < -underHeightLenght)
-                        noiseCoof = (changeY + underHeightLenght) * surfaceCutting * (intensive[x, z] + 0.5f);
+                        noiseCoof = (changeY + underHeightLenght) * surfaceCutting * (intensive[x, z] + 1f);
 
+                    float test = 0;
                     //ѕримен€ем сдвиг на все виды блоков дл€ текущей позиции
                     for (int blockIndex = 0; blockIndex < noise.GetLength(3); blockIndex++) {
+                        test = noise[x, y, z, blockIndex];
                         noise[x, y, z, blockIndex] += noiseCoof;
                     }
 

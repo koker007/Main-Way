@@ -162,6 +162,8 @@ public class RedactorBiomeGenerator : MonoBehaviour
         ReGeneratePlanetLiquid();
         ReGeneratePlanetGroundZero();
 
+        VisualizeChanks();
+
         void ReGeneratePlanetPlane() {
             if (!PlanetPlane || !PlanetPlaneFilter || planetData == null)
                 return;
@@ -356,6 +358,26 @@ public class RedactorBiomeGenerator : MonoBehaviour
 
         }
 
+        void VisualizeChanks() {
+
+            Size sizeVisualize = Size.s1;
+            int sizeVisualizeInt = Calc.GetSizeInt(sizeVisualize);
+            int chankSize = Chank.Size * sizeVisualizeInt;
+
+            //надо узнать текущее положение камеры на heightMap
+            Vector2Int posHeightMap = new Vector2Int();
+            //posHeightMap.x =  / heightMap.GetLength(0);
+
+            int SizePlanet = Calc.GetSizeInt(planetData.size);
+
+            Vector3Int chankPos = new Vector3Int(0,0,0);
+            chankPos.x = (int)(CameraPosNeed.x / chankSize);
+            chankPos.z = (int)(CameraPosNeed.z / chankSize);
+
+            chankPos.y = (int)(heightMap[posHeightMap.x, posHeightMap.y] * SizePlanet * 0.5f / chankSize + 1);
+
+            planetData.GetChank(sizeVisualize, chankPos);
+        }
     }
 
     void TestInput() {

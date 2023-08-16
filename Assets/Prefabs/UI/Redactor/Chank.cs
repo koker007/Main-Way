@@ -1,5 +1,6 @@
 using Cosmos;
 using UnityEngine;
+using Unity.Jobs;
 
 /// <summary>
 /// ’ранит данные чанка
@@ -9,6 +10,7 @@ public abstract class Chank
     //„анк всегда кубический и вмещает в себ€ 32 блока по высоте ширене и длине.
     public const int Size = 32;
 
+
     public Size sizeBlock = global::Size.s1; //размер одного блока в чанке
     public Vector3Int index = new Vector3Int(); //индекс чанка
 
@@ -17,6 +19,34 @@ public abstract class Chank
 
     protected PlanetData planetData;
 
+    /// <summary>
+    /// генераци€ чанка
+    /// </summary>
+    protected bool isStartGenerate = false;
+    protected bool isDoneGenerate = false;
+    protected struct JobGenerate : IJob
+    {
+        Chank chank;
+
+        public JobGenerate(Chank chank)
+        {
+            this.chank = chank;
+        }
+
+        public void Execute()
+        {
+            if (chank.isStartGenerate ||
+                chank.isDoneGenerate)
+                return;
+
+            chank.isStartGenerate = true;
+            chank.JobStartGenerate();
+            chank.isDoneGenerate = true;
+        }
+    }
+    abstract public void Generate();
+
+    //ѕотом, ниже, надо будет создать job system дл€ загрузки чанка
 
     /// <summary>
     /// —оздать чанк с указанным размером блоков, по указанному индексу, дл€ указанной планеты
@@ -30,7 +60,7 @@ public abstract class Chank
         this.planetData = planetData;
     }
 
-    abstract public void Generate();
+    abstract protected void JobStartGenerate();
     /// <summary>
     /// ¬ычислить финальный цвет дл€ блоков
     /// </summary>

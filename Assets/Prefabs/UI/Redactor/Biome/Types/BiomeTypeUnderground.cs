@@ -14,4 +14,8 @@ public class BiomeTypeUnderground : BiomeData
     public float tempGenMax = 100;
     public float tempGenMin = 0;
 
+    static public BiomeTypeUnderground GetTestBiome()
+    {
+        throw new System.NotImplementedException();
+    }
 }

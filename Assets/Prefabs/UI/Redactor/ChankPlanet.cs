@@ -11,13 +11,32 @@ public class ChankPlanet : Chank
 
     public ChankPlanet(Size sizeBlock, Vector3Int index, PlanetData planetData): base(sizeBlock, index, planetData) {
 
+        int countBiomesSurface = 0;
+        if (planetData.pattern.biomesSurface != null)
+            countBiomesSurface = planetData.pattern.biomesSurface.Count;
+
+        int countBiomesUnderground = 0;
+        if (planetData.pattern.biomesUnderground != null)
+            countBiomesUnderground = planetData.pattern.biomesUnderground.Count;
+
         //—оздать пространство под шум поверхности
-        this.biomesNoiseSurface = new float[planetData.pattern.biomesSurface.Count][,,,];
+        this.biomesNoiseSurface = new float[countBiomesSurface][,,,];
         //—оздать пространство под шум подземлей
-        this.biomesNoiseUnderground = new float[planetData.pattern.biomesUnderground.Count][,,,];
+        this.biomesNoiseUnderground = new float[countBiomesUnderground][,,,];
+
+        //Ќачать генерацию чанка
+        Generate();
     }
 
     public override void Generate()
+    {
+        if (isStartGenerate)
+            return;
+
+        JobGenerate jobGenerate = new JobGenerate(this);
+        jobGenerate.Execute();
+    }
+    protected override void JobStartGenerate()
     {
 
         //нужно узнать по каждому из блоков к какому биому он принадлежит
@@ -62,8 +81,6 @@ public class ChankPlanet : Chank
 
         //“еперь если размер чанка больше 1, то нужно еще заполнить цвет
         CalcColor();
-
-
     }
 
     void CalcNoisesSurface(int biomeNum)
@@ -161,4 +178,5 @@ public class ChankPlanet : Chank
             }
         }
     }
+
 }

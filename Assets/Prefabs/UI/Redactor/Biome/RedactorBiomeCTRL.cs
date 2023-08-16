@@ -30,6 +30,8 @@ public class RedactorBiomeCTRL : MonoBehaviour
     //Данные планеты в которой происходит генерация биома
     public PlanetData planetData;
 
+    //Паттерн планеты на которой создается биом
+    public PatternPlanet patternPlanet;
     //Данные биома
     public BiomeData biomeData;
 
@@ -420,6 +422,58 @@ public class RedactorBiomeCTRL : MonoBehaviour
             this.planetData = planetData;
             RedactorBiomeVisualizator.MAIN.heightMapAll = null;
             break;
+        }
+
+        patternPlanet ??= PatternPlanet.GetTestPattern();
+
+        ReCreatePatternPlanet();
+    }
+
+    void ReCreatePatternPlanet()
+    {
+        planetData.pattern = patternPlanet;
+
+        //Опустошаем биомы
+        patternPlanet.biomesSurface = new List<BiomeTypeSurface>();
+        patternPlanet.biomesUnderground = new List<BiomeTypeUnderground>();
+
+        ReLoadBiomes();
+    }
+    void ReLoadBiomes() {
+        //Обнулить все биомы
+        patternPlanet.biomesSurface = new List<BiomeTypeSurface>();
+        patternPlanet.biomesUnderground = new List<BiomeTypeUnderground>();
+
+        BiomeTypeSurface surface = biomeData as BiomeTypeSurface;
+        BiomeTypeUnderground underground = biomeData as BiomeTypeUnderground;
+        BiomeTypeDwarf dwarf = biomeData as BiomeTypeDwarf;
+        BiomeTypeRings rings = biomeData as BiomeTypeRings;
+
+        //Добавить редактируемый биом и десяток пустышек
+        if (sliderType.slider.value == (int)BiomeData.Type.Surface && surface != null)
+            CreateSurface();
+        else if (sliderType.slider.value == (int)BiomeData.Type.Underground && underground != null)
+            CreateUnderground();
+        else if (sliderType.slider.value == (int)BiomeData.Type.Dwarf && dwarf != null)
+            CreateDwarf();
+        else if (sliderType.slider.value == (int)BiomeData.Type.Rings && rings != null)
+            CreateRings();
+
+        void CreateSurface() {
+            patternPlanet.biomesSurface.Add(surface);
+            for (int num = 0; num < 5; num++)
+                patternPlanet.biomesSurface.Add(BiomeTypeSurface.GetTestBiome());
+        }
+        void CreateUnderground() {
+            patternPlanet.biomesUnderground.Add(underground);
+            for (int num = 0; num < 5; num++)
+                patternPlanet.biomesUnderground.Add(BiomeTypeUnderground.GetTestBiome());
+        }
+        void CreateDwarf() {
+            
+        }
+        void CreateRings() {
+            
         }
     }
 
