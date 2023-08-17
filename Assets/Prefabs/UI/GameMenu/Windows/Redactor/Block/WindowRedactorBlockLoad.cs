@@ -35,7 +35,7 @@ public class WindowRedactorBlockLoad : MonoBehaviour
 
     void iniSliderMod() {
         //Получаем все моды
-        string[] mods = Directory.GetDirectories(GameData.GameData.pathMod);
+        string[] mods = Directory.GetDirectories(Game.GameData.pathMod);
 
         if (mods == null ||
             mods.Length <= 0)

@@ -195,6 +195,10 @@ namespace Cosmos
         //какой размер одного пиксел€ в блоках
         int sizePixel = 65536;
         public float[,] map;
+        float meanValue = -1;
+        public float MeanValue { get {
+                return calcMeanValue();
+            } }
 
         //—генерировать карту
         public HeightMap(ObjData data, Size sizeTexture)
@@ -364,6 +368,24 @@ namespace Cosmos
                 }
             }
             return arrayPart;
+        }
+
+        /// <summary>
+        /// –асчитать средню высоту данной области
+        /// </summary>
+        float calcMeanValue() {
+            if (meanValue != -1)
+                return meanValue;
+
+            meanValue = 0;
+            for (int x = 0; x < map.GetLength(0); x++) {
+                for (int y = 0; y < map.GetLength(1); y++) {
+                    meanValue += map[x, y];
+                }
+            }
+            meanValue /= map.Length;
+
+            return meanValue;
         }
     }
 }

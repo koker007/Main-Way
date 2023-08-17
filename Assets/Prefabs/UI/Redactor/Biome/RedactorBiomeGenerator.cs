@@ -44,6 +44,9 @@ public class RedactorBiomeGenerator : MonoBehaviour
     float CameraHeight = 10;
     Vector3 CameraPosNeed = new Vector3();
     float CamerHeightLast = 0;
+
+    Vector3Int ChankPosGen = new Vector3Int(); 
+
     static public Vector3 cameraPositionNeed { get {
             Vector3 positionNeed = main.CameraPosNeed;
             positionNeed.y = main.CamerHeightLast;
@@ -162,7 +165,7 @@ public class RedactorBiomeGenerator : MonoBehaviour
         ReGeneratePlanetLiquid();
         ReGeneratePlanetGroundZero();
 
-        VisualizeChanks();
+        VisualizeChanksSurface();
 
         void ReGeneratePlanetPlane() {
             if (!PlanetPlane || !PlanetPlaneFilter || planetData == null)
@@ -358,25 +361,24 @@ public class RedactorBiomeGenerator : MonoBehaviour
 
         }
 
-        void VisualizeChanks() {
+        void VisualizeChanksSurface() {
 
             Size sizeVisualize = Size.s1;
             int sizeVisualizeInt = Calc.GetSizeInt(sizeVisualize);
             int chankSize = Chank.Size * sizeVisualizeInt;
 
-            //надо узнать текущее положение камеры на heightMap
-            Vector2Int posHeightMap = new Vector2Int();
-            //posHeightMap.x =  / heightMap.GetLength(0);
-
             int SizePlanet = Calc.GetSizeInt(planetData.size);
 
-            Vector3Int chankPos = new Vector3Int(0,0,0);
-            chankPos.x = (int)(CameraPosNeed.x / chankSize);
-            chankPos.z = (int)(CameraPosNeed.z / chankSize);
+            ChankPosGen.x = (int)(CameraPosNeed.x / chankSize);
+            ChankPosGen.z = (int)(CameraPosNeed.z / chankSize);
 
-            chankPos.y = (int)(heightMap[posHeightMap.x, posHeightMap.y] * SizePlanet * 0.5f / chankSize + 1);
+            //высоту необходимо узнать через карту высот
+            //Получаем карту высот текущего чанка
+            HeightMap heightMapChank = planetData.GetHeightMap(sizeVisualize, new Vector2Int(ChankPosGen.x, ChankPosGen.z));
 
-            planetData.GetChank(sizeVisualize, chankPos);
+            ChankPosGen.y = (int)(heightMapChank.MeanValue * SizePlanet * 0.5f / chankSize + 1);
+
+            planetData.GetChank(sizeVisualize, ChankPosGen);
         }
     }
 

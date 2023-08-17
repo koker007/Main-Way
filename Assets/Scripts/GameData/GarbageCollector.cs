@@ -5,7 +5,7 @@ using Unity.Jobs;
 using System;
 using System.Diagnostics;
 
-namespace GameData {
+namespace Game {
     public class GarbageCollector : IJob
     {
         static GarbageCollector main;

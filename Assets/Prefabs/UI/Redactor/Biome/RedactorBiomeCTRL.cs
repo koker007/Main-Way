@@ -90,7 +90,7 @@ public class RedactorBiomeCTRL : MonoBehaviour
     }
 
     // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
         main = this;
         inicialize();
@@ -114,6 +114,11 @@ public class RedactorBiomeCTRL : MonoBehaviour
             return;
 
         main.biomeData = biomeData;
+
+        if (main.planetData == null)
+            return;
+
+        main.planetData.ClearAllBuffer();
         changeBiome();
     }
 
@@ -368,7 +373,7 @@ public class RedactorBiomeCTRL : MonoBehaviour
     public BlockData GetSelectBlock() {
 
         //Выбираем выбранное правило
-        BlockData select = GameData.Blocks.GetData(biomeData.genRules[(int)sliderRules.slider.value].blockID, 0);
+        BlockData select = Game.Blocks.GetData(biomeData.genRules[(int)sliderRules.slider.value].blockID, 0);
 
         return select;
     }
@@ -379,7 +384,7 @@ public class RedactorBiomeCTRL : MonoBehaviour
 
     public void SetSelectBlock(string modName, string blockName) {
 
-        int blockID = GameData.Blocks.GetBlockID(modName, blockName);
+        int blockID = Game.Blocks.GetBlockID(modName, blockName);
         int ruleNum = (int)sliderRules.slider.value;
 
         BiomeData.GenRule genRule = biomeData.genRules[ruleNum];

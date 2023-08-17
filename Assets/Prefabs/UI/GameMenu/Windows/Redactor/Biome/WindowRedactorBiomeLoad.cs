@@ -32,7 +32,7 @@ public class WindowRedactorBiomeLoad : MonoBehaviour
     void iniSliderMod()
     {
         //Получаем все моды
-        string[] modsAll = Directory.GetDirectories(GameData.GameData.pathMod);
+        string[] modsAll = Directory.GetDirectories(Game.GameData.pathMod);
 
         List<string> mods = new List<string>();
 

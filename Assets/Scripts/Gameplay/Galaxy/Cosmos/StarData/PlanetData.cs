@@ -205,6 +205,11 @@ namespace Cosmos
 
 
         }
+        public void ClearAllBuffer() {
+            TextureMaps = null;
+            heightMaps = null;
+            biomesMaps = null;
+        }
 
         void GenTexturePart(Size quality, Vector2Int chankPos) {
             iniHeightMaps();
@@ -213,16 +218,18 @@ namespace Cosmos
             int q = (int)quality - 1;
 
             //Создаем биомы пустышки
-            BiomeTypeSurface[] biomeDatas = new BiomeTypeSurface[6];
+            BiomeTypeSurface[] biomeDatas = pattern.biomesSurface.ToArray();
+
+            /*
             for (int num = 0; num < biomeDatas.Length; num++) {
                 biomeDatas[num] = new BiomeTypeSurface();
                 if (num == 0) {
                     biomeDatas[num].seaPriority = BiomeData.SeaPriority.onlyOverSea;
                     biomeDatas[num].coofHeight = 0.5f;
                     biomeDatas[num].coofPolus = 0.2f;
-                    //biomeDatas[num].coofZeroX = 0.5f;
                 }
             }
+            */
 
             //Создаем карту высот если нет
             heightMaps[q][chankPos.x, chankPos.y] ??= new HeightMap(this, quality, chankPos);
@@ -283,9 +290,12 @@ namespace Cosmos
                     }
                     else
                     {
-                        Color color = colors[biomeWinerNum[x, y]] * (heightMaps[q][chankPos.x, chankPos.y].map[x, y] * 2 - 0.5f);
-                        if (heightMaps[q][chankPos.x, chankPos.y].map[x, y] < 0.5f)
-                            color = Color.blue * (heightMaps[q][chankPos.x, chankPos.y].map[x, y] * 2 - 0.5f);
+
+                        //Color color = colors[biomeWinerNum[x, y]] * (heightMaps[q][chankPos.x, chankPos.y].map[x, y] * 2 - 0.5f);
+                        //if (heightMaps[q][chankPos.x, chankPos.y].map[x, y] < 0.5f)
+                        //    color = Color.blue * (heightMaps[q][chankPos.x, chankPos.y].map[x, y] * 2 - 0.5f);
+                        int winer = biomeWinerNum[x, y];
+                        Color color = pattern.biomesSurface[winer].color;
 
                         TextureMaps[(int)quality].SetPixel(globalX, globalY, new Color(color.r, color.g, color.b));
                     }

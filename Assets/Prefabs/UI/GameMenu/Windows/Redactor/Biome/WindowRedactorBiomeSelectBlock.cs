@@ -138,7 +138,7 @@ public class WindowRedactorBiomeSelectBlock : MonoBehaviour
         void updateSliderMod()
         {
             //Получаем все моды
-            string[] mods = Directory.GetDirectories(GameData.GameData.pathMod);
+            string[] mods = Directory.GetDirectories(Game.GameData.pathMod);
 
             if (mods == null ||
                 mods.Length <= 0)
@@ -222,7 +222,7 @@ public class WindowRedactorBiomeSelectBlock : MonoBehaviour
             pathNew += path;
         }
 
-        blockDatas = GameData.Blocks.GetDatas(nameMod, nameBlock);
+        blockDatas = Game.Blocks.GetDatas(nameMod, nameBlock);
 
         
     }

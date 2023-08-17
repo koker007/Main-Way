@@ -2,12 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
+using Game.Space;
 
 //Отвечает за загрузку всех данных в игру
-namespace GameData
+namespace Game
 {
     public class GameData : MonoBehaviour
     {
+        static public GameData main;
         //Количество символов принадлежности к моду
         public const int charsMod = 3;
         //количество символов блока
@@ -18,11 +20,15 @@ namespace GameData
         static public string nameBlock = "Blocks"; //Имя папки блоков
         static public string nameRecipes = "Recipes"; //Имя папки рецептов крафтов
 
+        [SerializeField]
+        public ChankGO prefabChankGO;
+        [SerializeField]
+        public PlanetGO prefabPlanetGO;
 
         // Start is called before the first frame update
         void Start()
         {
-            //Debug.Log("char max " + (int)char.MaxValue);
+            main = this;
             Blocks.Ini();
 
             AllReload();
@@ -120,6 +126,7 @@ namespace GameData
 
             GarbageCollector.GC.Execute();
         }
+
     }
 
 

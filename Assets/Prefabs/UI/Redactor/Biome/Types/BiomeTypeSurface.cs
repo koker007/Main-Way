@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Cosmos;
-using System.Diagnostics;
 
 //Biome type surface
 //Определяет поведение генерации для
@@ -44,17 +43,8 @@ public class BiomeTypeSurface: BiomeData
         GraficData.Perlin3DRules perlin3DArray = new GraficData.Perlin3DRules(genRules.ToArray(), mapSizeX, mapSizeY, mapSizeZ, regionX, regionY, regionZ);
         perlin3DArray.Calculate();
 
-        Stopwatch stopwatch = new Stopwatch();
-
-        stopwatch.Start();
-
         //Поправка на высоту
         CorrectingHeight(ref perlin3DArray.result, chankIndex, blockSizeInt, planetData);
-
-        stopwatch.Stop();
-
-        UnityEngine.Debug.Log("GetBiomeNoise CorrectingHeight" +
-            " stopwatch: " + stopwatch.ElapsedMilliseconds);
 
         return perlin3DArray.result;
      }

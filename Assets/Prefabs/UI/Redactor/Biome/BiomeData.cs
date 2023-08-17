@@ -16,14 +16,14 @@ public abstract class BiomeData
     /// <summary>
     /// Основной цвет биома
     /// </summary>
-    public Color color;
+    public Color color = new Color(1.0f, 0, 0); //По умолчанию  крассный
 
     //Коофиценты изменения приоритета биомов в зависимости от расположения на карте планеты
-    public float coofPolus; //Коофицент полюсов
-    public float coofZeroX; //Коофицент нулевой координаты экватора, например для планет с приливным захватом
-    public float coofHeight; //Коофицент высоты
-    public float coofHeightMax; //Коофицент максимальной высоты биома
-    public float coofHeightMin; //Коофицент минимальной высоты биома
+    public float coofPolus = 0; //Коофицент полюсов
+    public float coofZeroX = 0; //Коофицент нулевой координаты экватора, например для планет с приливным захватом
+    public float coofHeight = 0; //Коофицент высоты
+    public float coofHeightMax = 100; //Коофицент максимальной высоты биома
+    public float coofHeightMin = 0; //Коофицент минимальной высоты биома
     public SeaPriority seaPriority; //Биом подводный, надводный
 
     public enum Type {
@@ -144,7 +144,7 @@ public abstract class BiomeData
             this.blockName = blockName;
 
             //Получаем ID блока
-            blockID = GameData.Blocks.GetBlockID(this.blockMod, this.blockName);
+            blockID = Game.Blocks.GetBlockID(this.blockMod, this.blockName);
 
             //if block not exist - exit
             if (blockID < 0)
@@ -159,7 +159,7 @@ public abstract class BiomeData
     public static string GetDataPath(string mod, string name)
     {
         //Создаем путь к папке биома
-        string path = GameData.GameData.pathMod + "/" + mod + "/" + StrC.biomes + "/" + name;
+        string path = Game.GameData.pathMod + "/" + mod + "/" + StrC.biomes + "/" + name;
 
         return path;
     }
@@ -240,7 +240,7 @@ public abstract class BiomeData
                     File.Delete(pathRule);
 
                 //Получаем имя блока
-                BlockData blockData = GameData.Blocks.GetData(genRule.blockID, 0);
+                BlockData blockData = Game.Blocks.GetData(genRule.blockID, 0);
                 if (blockData == null)
                 {
                     //Если блока нет значит пустота
@@ -430,7 +430,7 @@ public abstract class BiomeData
                     SetData(DataStr);
                 }
 
-                genRule.blockID = GameData.Blocks.GetBlockID(mod, name);
+                genRule.blockID = Game.Blocks.GetBlockID(mod, name);
 
                 //Правило создано, добавляем
                 ruleDatas.Add(genRule);

@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Cosmos;
-
+using System.Diagnostics;
 public class ChankPlanet : Chank
 {
 
@@ -92,10 +92,16 @@ public class ChankPlanet : Chank
 
         int sizeBlock = Calc.GetSizeInt(this.sizeBlock);
 
+
+        Stopwatch stopwatch = new Stopwatch();
+        stopwatch.Start();
+
         //Получаем шум биома поверхности
         biomesNoiseSurface[biomeNum] = planetData.pattern.biomesSurface[biomeNum].GetBiomeNoise(index, sizeBlock, planetData);
 
-
+        stopwatch.Stop();
+        UnityEngine.Debug.Log("GetBiomeNoise: " + biomeNum +
+            " stopwatch: " + stopwatch.ElapsedMilliseconds);
 
     }
     void CalcNoisesUnderground(int biomeNum)
@@ -171,7 +177,7 @@ public class ChankPlanet : Chank
 
                     //Смотрим по id блоку на его цвет
                     int BID = BlocksID[x, z, y];
-                    Color ColorBlock = GameData.Blocks.GetColor(BID);
+                    Color ColorBlock = Game.Blocks.GetColor(BID);
 
                     Colors[x, y, z] = Color.Lerp(ColorBlock, planetData.pattern.biomesSurface[biomeWinerSurface].color, interpolateCoof);
                 }
