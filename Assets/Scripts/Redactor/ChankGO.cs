@@ -36,6 +36,23 @@ namespace Game
                 return chankNew;
             }
 
+            public void Inicialize(Chank chank) {
+                data = chank;
+                //меняем размер на размер чанка
+                int sizeOneBlock = Calc.GetSizeInt(chank.sizeBlock);
+
+                transform.localScale = new Vector3(sizeOneBlock, sizeOneBlock, sizeOneBlock);
+            }
+            /// <summary>
+            /// Очистить чанк для дальнейшего использования
+            /// </summary>
+            public void Clear() {
+                data = null;
+
+                transform.localPosition = new Vector3(0, 0, 0);
+                transform.localScale = new Vector3(1, 1, 1);
+            }
+
             void Start()
             {
 

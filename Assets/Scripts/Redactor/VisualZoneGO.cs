@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Cosmos;
+using Unity.Jobs;
 
 namespace Game
 {
@@ -18,12 +19,65 @@ namespace Game
             static protected List<VisualZoneGO> buffer = new List<VisualZoneGO>();
             int bufferNum = 0;
 
+            protected ObjData data;
             protected ChankGO[][,,] chanks;
 
             //Пространство в котором сейчас находится игрок
             static protected VisualZoneGO now;
 
-            abstract public void Inizialize(PlanetData data, bool isNow = false);
+            abstract public void Inizialize(ObjData data, bool isNow = false);
+
+            /// <summary>
+            /// Почистить этот объект для использования другими
+            /// </summary>
+            virtual public void Clear() {
+                data = null;
+
+                if (chanks == null)
+                    return;
+
+                //Проходимся по всем чанкам и освобождаем их
+                for (int size = 0; size < chanks.Length; size++) {
+                    if (chanks[size] == null)
+                        continue;
+
+                    for (int x = 0; x < chanks.GetLength(0); x++) {
+                        for (int y = 0; y < chanks.GetLength(1); y++) {
+                            for (int z = 0; z < chanks.GetLength(2); z++) {
+                                if (chanks[size][x, y, z] == null)
+                                    continue;
+
+                                chanks[size][x, y, z].Clear();
+                                chanks[size][x, y, z] = null;
+                            }
+                        }
+                    }
+
+                    chanks[size] = null;
+                }
+                
+            }
+
+            protected struct JobGenerate : IJob
+            {
+                VisualZoneGO visualZone;
+                Size sizeGenMin;
+
+                public JobGenerate(VisualZoneGO Zone, Size sizeGenMin)
+                {
+                    this.visualZone = Zone;
+                    this.sizeGenMin = sizeGenMin;
+                }
+
+                public void Execute()
+                {
+                    visualZone.JobStartGenerate(sizeGenMin);
+                }
+            }
+
+            abstract public void JobStartGenerate(Size sizeGenMin);
+            abstract public void iniChanks();
+
 
             void Awake()
             {
@@ -31,9 +85,10 @@ namespace Game
                 buffer.Add(this);
             }
 
+
             protected void TransformWorld()
             {
-                //Основной мир всегда в нулевых координатах
+                //Основной мир всегда в нулевых координатах c размером 1к1
                 if (now == this)
                 {
                     transform.position = new Vector3();
@@ -51,7 +106,13 @@ namespace Game
 
                 Vector3 position = new Vector3(0, -5000, 0);
 
-                
+                //Справа
+                if (bufferNum % 2 == 0)
+                    position.x = (bufferNum / 2 + 1) * minizoneSizeMax;
+                //Слева
+                else position.x = (-bufferNum / 2 + 1) * minizoneSizeMax;
+
+                transform.position = position;
             }
 
             int GetBufferNum() {
