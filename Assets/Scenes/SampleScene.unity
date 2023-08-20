@@ -12267,6 +12267,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf53e8c34c8d04f4788cb3617b3b7b80, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  prefabChankGO: {fileID: 4798347426494085758, guid: 376f937754282854e82f616b618523a6, type: 3}
+  prefabPlanetGO: {fileID: 869996969284285609, guid: 88023f4346f4a8a43bfdc5f86e0df106, type: 3}
 --- !u!1001 &658636408
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -20229,7 +20231,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7176533566875976478, guid: d7b2deb1b6f117c4b92abfc7b1942566, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0.000036239624
+      value: 0.000039100647
       objectReference: {fileID: 0}
     - target: {fileID: 7417510024086745306, guid: d7b2deb1b6f117c4b92abfc7b1942566, type: 3}
       propertyPath: m_AnchorMax.x

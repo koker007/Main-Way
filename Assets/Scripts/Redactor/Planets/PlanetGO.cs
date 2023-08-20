@@ -9,7 +9,6 @@ namespace Game
     {
         public class PlanetGO : VisualZoneGO
         {
-
             static public PlanetGO GetPlanetGO()
             {
                 //Перебираем все чанки, ищем свободный
@@ -67,6 +66,9 @@ namespace Game
                 if (isNow)
                     now = this;
 
+                JobGenerate jobGenerate = new JobGenerate(this, data.size);
+                jobGenerate.Execute();
+
             }
 
             public override void JobStartGenerate(Size sizeGenMin)
@@ -104,6 +106,25 @@ namespace Game
                                     continue;
 
                                 chanks[size][x, y, z] = ChankGO.GetChankGO();
+                                if (size == 0)
+                                    chanks[size][x, y, z].transform.SetParent(ParentChanks1.transform);
+                                else if(size == 1)
+                                    chanks[size][x, y, z].transform.SetParent(ParentChanks2.transform);
+                                else if (size == 2)
+                                    chanks[size][x, y, z].transform.SetParent(ParentChanks4.transform);
+                                else if (size == 3)
+                                    chanks[size][x, y, z].transform.SetParent(ParentChanks8.transform);
+                                else if (size == 4)
+                                    chanks[size][x, y, z].transform.SetParent(ParentChanks8.transform);
+                                else if (size == 5)
+                                    chanks[size][x, y, z].transform.SetParent(ParentChanks16.transform);
+                                else if (size == 6)
+                                    chanks[size][x, y, z].transform.SetParent(ParentChanks32.transform);
+                                else if (size == 7)
+                                    chanks[size][x, y, z].transform.SetParent(ParentChanks64.transform);
+                                else if (size == 8)
+                                    chanks[size][x, y, z].transform.SetParent(ParentChanks128.transform);
+
                                 chanks[size][x, y, z].Inicialize(planetData.GetChank(sizeChank, new Vector3Int(x,y,z)));
                             }
                         }

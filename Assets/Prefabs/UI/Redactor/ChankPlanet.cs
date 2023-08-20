@@ -185,4 +185,50 @@ public class ChankPlanet : Chank
         }
     }
 
+    public override Color GetColor(Vector3Int pos, Placement placement = Placement.Current)
+    {
+        //По умолчанию прозрачный
+        Color result = new Color(1,1,1, 0);
+
+        switch (placement) {
+            case Placement.Current:
+                return Colors[pos.x, pos.y, pos.z];
+                break;
+
+            case Placement.Left:
+                if (pos.x > 0)
+                    return Colors[pos.x - 1, pos.y, pos.z];
+                break;
+
+            case Placement.Right:
+                if (pos.x < Size - 1)
+                    return Colors[pos.x + 1, pos.y, pos.z];
+                break;
+            case Placement.Downer:
+                if (pos.y > 0)
+                    return Colors[pos.x, pos.y - 1, pos.z];
+                break;
+            case Placement.Upper:
+                if (pos.y < Size - 1)
+                    return Colors[pos.x, pos.y + 1, pos.z];
+                break;
+            case Placement.Back:
+                if (pos.z > 0)
+                    return Colors[pos.x, pos.y, pos.z - 1];
+                break;
+            case Placement.Front:
+                if (pos.z < Size - 1)
+                    return Colors[pos.x, pos.y, pos.z + 1];
+                break;
+        }
+
+         
+
+        return result;
+    }
+
+    public override BlockData GetBlock(Vector3Int pos, Placement placement = Placement.Current)
+    {
+        throw new System.NotImplementedException();
+    }
 }

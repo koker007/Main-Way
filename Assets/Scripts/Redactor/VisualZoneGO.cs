@@ -25,6 +25,23 @@ namespace Game
             //ѕространство в котором сейчас находитс€ игрок
             static protected VisualZoneGO now;
 
+            [SerializeField]
+            protected GameObject ParentChanks1;
+            [SerializeField]
+            protected GameObject ParentChanks2;
+            [SerializeField]
+            protected GameObject ParentChanks4;
+            [SerializeField]
+            protected GameObject ParentChanks8;
+            [SerializeField]
+            protected GameObject ParentChanks16;
+            [SerializeField]
+            protected GameObject ParentChanks32;
+            [SerializeField]
+            protected GameObject ParentChanks64;
+            [SerializeField]
+            protected GameObject ParentChanks128;
+
             abstract public void Inizialize(ObjData data, bool isNow = false);
 
             /// <summary>

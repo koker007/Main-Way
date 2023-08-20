@@ -1,6 +1,7 @@
 using Cosmos;
 using UnityEngine;
 using Unity.Jobs;
+using System;
 
 /// <summary>
 /// Хранит данные чанка
@@ -15,9 +16,11 @@ public abstract class Chank
     public Vector3Int index = new Vector3Int(); //индекс чанка
 
     public int[,,] BlocksID = new int[Size, Size, Size]; //ID Блоков
+    public uint[,,] BlocksVariant = new uint[Size, Size, Size]; //Вариант блоков
     public Color[,,] Colors; //Цвета блоков
 
     protected PlanetData planetData;
+    public event Action isChange;
 
     /// <summary>
     /// генерация чанка
@@ -45,6 +48,20 @@ public abstract class Chank
         }
     }
     abstract public void Generate();
+
+    public enum Placement
+    {
+        Current = 0,
+        Left = 1,
+        Right = 2,
+        Downer = 3,
+        Upper = 4,
+        Back = 5,
+        Front = 6
+    }
+
+    abstract public Color GetColor(Vector3Int pos, Placement placement = Placement.Current);
+    abstract public BlockData GetBlock(Vector3Int pos, Placement placement = Placement.Current);
 
     //Потом, ниже, надо будет создать job system для загрузки чанка
 

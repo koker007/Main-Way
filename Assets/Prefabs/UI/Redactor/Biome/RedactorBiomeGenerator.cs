@@ -4,6 +4,7 @@ using UnityEngine;
 using System;
 using System.Diagnostics;
 using Cosmos;
+using Game.Space;
 
 //Gererate the example biome, use chanks
 public class RedactorBiomeGenerator : MonoBehaviour
@@ -38,6 +39,7 @@ public class RedactorBiomeGenerator : MonoBehaviour
     MeshFilter PlanetGroundZeroFilter;
 
     PlanetData planetData;
+    PlanetGO planetGO;
 
     [Header("CameraControls")]
     [SerializeField]
@@ -379,6 +381,13 @@ public class RedactorBiomeGenerator : MonoBehaviour
             ChankPosGen.y = (int)(heightMapChank.MeanValue * SizePlanet * 0.5f / chankSize + 1);
 
             planetData.GetChank(sizeVisualize, ChankPosGen);
+
+            if (planetGO == null)
+            {
+                planetGO = PlanetGO.GetPlanetGO();
+                planetGO.transform.SetParent(transform);
+                planetGO.Inizialize(planetData, true);
+            }
         }
     }
 
