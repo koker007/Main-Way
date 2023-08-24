@@ -35,9 +35,9 @@ namespace Game
 
                 //Узнаем размер планеты
                 int planetSize = Calc.GetSizeInt(planetData.size);
-
+                int chankSize = (int)Calc.GetSize(Chank.Size);
                 //Создаем место под все размерности
-                chanks = new ChankGO[(int)planetData.size][,,];
+                chanks = new ChankGO[(int)(planetData.size-chankSize)][,,];
 
                 //Расчитываем для каждой размерности
                 for (int sizeNow = 0; sizeNow < chanks.Length; sizeNow++)
@@ -80,7 +80,8 @@ namespace Game
 
                 //Перебираем все чанки c самого большого размера
                 bool isGenMax = false;
-                for (int num = chanks.Length - 1; num >= (int)(sizeGenMin - 1); num--)
+                int sizeGenInt = sizeGenMin - Calc.GetSize(Chank.Size);
+                for (int num = chanks.Length - 1; num >= (int)(sizeGenInt - 1); num--)
                 {
                     if (chanks[num].Length == 0)
                         continue;

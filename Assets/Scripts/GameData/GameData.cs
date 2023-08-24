@@ -285,10 +285,12 @@ namespace Game
             Color result = new Color(1,1,1,0);
 
             BlockData block = GetData(blockID, 0);
-            
 
+            //Если меньше 10 то это тестовые блоки
+            if(blockID < 10)
+               return result;
 
-            return result;
+            return block.GetColor();
         }
     }
 }

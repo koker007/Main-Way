@@ -18,13 +18,19 @@ namespace Game
             MeshRenderer meshRendererBasic;
 
             static class MeshData {
+                const int sizeXTextureColor = 180;
+                const int sizeYTextureColor = 183;
+
                 static readonly Vector3[] vertices32;
-                static readonly Vector2[] uvTexture;
+                static readonly Vector3[] normals32;
+
+                static readonly Vector2[] uvTexBlock;
                 static readonly Texture2D textureShadow;
 
                 static MeshData()
                 {
                     List<Vector3> vertices32List = new List<Vector3>();
+                    List<Vector3> normals32List = new List<Vector3>();
 
                     //Перебираем все позиции блоков
                     for (int z = 0; z < Chank.Size; z++)
@@ -55,22 +61,32 @@ namespace Game
                                 vertices32List.Add(LUF);
                                 vertices32List.Add(LDF);
 
+                                for(int num = 0; num < 4; num++)
+                                    normals32List.Add(Vector3.right);
+
                                 //низ или верх
                                 vertices32List.Add(LDB);
                                 vertices32List.Add(LDF);
                                 vertices32List.Add(RDF);
                                 vertices32List.Add(RDB);
 
+                                for (int num = 0; num < 4; num++)
+                                    normals32List.Add(Vector3.up);
+
                                 //зад и перед
                                 vertices32List.Add(RDB);
                                 vertices32List.Add(RUB);
                                 vertices32List.Add(LUB);
                                 vertices32List.Add(LDB);
+
+                                for (int num = 0; num < 4; num++)
+                                    normals32List.Add(Vector3.forward);
                             }
                         }
                     }
 
                     vertices32 = vertices32List.ToArray();
+                    normals32 = vertices32List.ToArray();
 
                     //Создаем базовые позиции основной текстуры
                     List<Vector2> uvTextureList = new List<Vector2>();
@@ -82,7 +98,7 @@ namespace Game
                     uvTextureList.Add(new Vector2(1, 0));
                     uvTextureList.Add(new Vector2(0, 0));
 
-                    uvTexture = uvTextureList.ToArray();
+                    uvTexBlock = uvTextureList.ToArray();
 
                     //Создаем текструру тени
                     textureShadow = new Texture2D(255, 1);
@@ -92,24 +108,27 @@ namespace Game
                     }
                     textureShadow.Apply();
                 }
-
-                static public void CalcMeshСolor(Chank data, out Mesh mesh, out Texture2DArray texture2DArray)
+                static public void CalcMeshColor2(Chank data, out Mesh mesh, out Texture2D texture2D)
                 {
                     mesh = new Mesh();
 
+                    List<Vector3> vert = new List<Vector3>();
+                    List<Vector3> normals = new List<Vector3>();
                     List<int> triangles = new List<int>();
-                    List<Vector2> uvTex = new List<Vector2>();
-                    List<Vector2> uvShadow = new List<Vector2>();
-                    List<Texture2D> texture2Ds = new List<Texture2D>();
+                    List<Vector2> textureUV = new List<Vector2>();
+
+
+                    Texture2D texture2Dnew = new Texture2D(sizeXTextureColor, sizeYTextureColor);
 
                     int vertSize = 4 * 3;
 
                     //Перебираем все блоки
-                    for (int x = 0; x < data.BlocksID.GetLength(0); x++)
+                    int blockNum = 0;
+                    for (int z = 0; z < data.BlocksID.GetLength(1); z++)
                     {
                         for (int y = 0; y < data.BlocksID.GetLength(1); y++)
                         {
-                            for (int z = 0; z < data.BlocksID.GetLength(2); z++)
+                            for (int x = 0; x < data.BlocksID.GetLength(0); x++, blockNum++)
                             {
                                 Vector3Int pos = new Vector3Int(x, y, z);
                                 Color colorThis = data.GetColor(pos);
@@ -119,89 +138,146 @@ namespace Game
 
                                 //получаем индекс для всех 12 вершин
 
-                                int X1 = (x + y * Chank.Size + z * Chank.Size * Chank.Size) * vertSize;
+                                int X1 = blockNum * vertSize;
                                 int X2 = X1 + 1;
                                 int X3 = X1 + 2;
                                 int X4 = X1 + 3;
 
                                 int Y1 = X1 + 4;
-                                int Y2 = Y1 + 1;
-                                int Y3 = Y1 + 2;
-                                int Y4 = Y1 + 3;
+                                int Y2 = X1 + 5;
+                                int Y3 = X1 + 6;
+                                int Y4 = X1 + 7;
 
                                 int Z1 = X1 + 8;
-                                int Z2 = Z1 + 1;
-                                int Z3 = Z1 + 2;
-                                int Z4 = Z1 + 3;
+                                int Z2 = X1 + 9;
+                                int Z3 = X1 + 10;
+                                int Z4 = X1 + 11;
+
+                                //Находим пиксель этого блока на текстуре
+                                char pixX = (char)(blockNum % texture2Dnew.width);
+                                char pixY = (char)(blockNum / texture2Dnew.width);
 
                                 //Проверяем стороны
                                 //делаем стенки этого блока
 
                                 //Если слева ничего и текущий цветоблок есть (достаточно не прозрачный)
                                 if (colorLeft.a <= 0.9f && colorThis.a > 0.9f)
-                                    AddPlane(X4, X3, X2, X2, X1, X3, colorThis);
+                                {
+                                    AddPlane(X1, X2, X3, X4, colorThis, false, pixX, pixY);
+                                }
                                 //Правая сторона левого куба
                                 else if (colorLeft.a > 0.9f && colorThis.a <= 0.9f)
-                                    AddPlane(X1, X2, X3, X3, X4, X1, colorLeft);
+                                {
+                                    int blockNumLeft = (x + y * Chank.Size + z * Chank.Size * Chank.Size);
+                                    char pixXL = (char)(blockNumLeft % texture2Dnew.width);
+                                    char pixYL = (char)(blockNumLeft / texture2Dnew.width);
+                                    AddPlane(X1, X2, X3, X4, colorLeft, true, pixXL, pixYL);
+                                }
 
                                 //Если снизу ничего и текущий цветоблок есть (достаточно не прозрачный)
                                 if (colorDown.a <= 0.9f && colorThis.a > 0.9f)
-                                    AddPlane(Y4, Y3, Y2, Y2, Y1, Y3, colorThis);
+                                {
+                                    AddPlane(Y1, Y2, Y3, Y4, colorThis, false, pixX, pixY);
+                                }
                                 //Верхняя сторона нижнего куба
                                 else if (colorDown.a > 0.9f && colorThis.a <= 0.9f)
-                                    AddPlane(Y1, Y2, Y3, Y3, Y4, Y1, colorDown);
+                                {
+                                    int blockNumDown = (x + y * Chank.Size + z * Chank.Size * Chank.Size);
+                                    char pixXD = (char)(blockNumDown % texture2Dnew.width);
+                                    char pixYD = (char)(blockNumDown / texture2Dnew.width);
+                                    AddPlane(Y1, Y2, Y3, Y4, colorDown, true, pixXD, pixYD);
+                                }
 
                                 //Если сзади ничего и текущий цветоблок есть (достаточно не прозрачный)
                                 if (colorBack.a <= 0.9f && colorThis.a > 0.9f)
-                                    AddPlane(Z4, Z3, Z2, Z2, Z1, Z3, colorThis);
+                                {
+                                    AddPlane(Z1, Z2, Z3, Z4, colorThis, false, pixX, pixY);
+                                }
                                 //Передняя сторона заднего куба
                                 else if (colorBack.a > 0.9f && colorThis.a <= 0.9f)
-                                    AddPlane(Z1, Z2, Z3, Z3, Z4, Z1, colorBack);
+                                {
+                                    int blockNumBack = (x + y * Chank.Size + z * Chank.Size * Chank.Size);
+                                    char pixXB = (char)(blockNumBack % texture2Dnew.width);
+                                    char pixYB = (char)(blockNumBack / texture2Dnew.width);
+                                    AddPlane(Z1, Z2, Z3, Z4, colorBack, true, pixXB, pixYB);
+                                }
 
                             }
                         }
                     }
 
-
-
-                    mesh.vertices = vertices32;
+                    mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
+                    mesh.vertices = vert.ToArray();
                     mesh.triangles = triangles.ToArray();
-                    mesh.uv = uvTex.ToArray();
+                    mesh.normals = normals.ToArray();
+                    //mesh.Optimize();
 
-                    texture2DArray = new Texture2DArray(1,1, texture2Ds.Count, TextureFormat.RGBA32, false, false);
-                    for (int num = 0; num < texture2Ds.Count; num++) {
-                        Graphics.CopyTexture(texture2Ds[num], 0, texture2DArray, num);
-                    }
+                    texture2Dnew.Apply();
+                    texture2Dnew.filterMode = FilterMode.Point;
+                    texture2D = texture2Dnew;
 
-                    void AddPlane(int P1, int P2, int P3, int P4, int P5, int P6, Color color) {
-                        //Значит делаем стенки этого блока
-                        triangles.Add(P1);
-                        triangles.Add(P2);
-                        triangles.Add(P3);
+                    void AddPlane(int P1, int P2, int P3, int P4, Color color, bool inside, char colorPixX, char colorPisY)
+                    {
+                        int vertNum1 = vert.Count;
+                        int vertNum2 = vertNum1 + 1;
+                        int vertNum3 = vertNum2 + 1;
+                        int vertNum4 = vertNum3 + 1;
 
-                        triangles.Add(P4);
-                        triangles.Add(P5);
-                        triangles.Add(P6);
+                        Vector3 vert1 = vertices32[P1];
+                        Vector3 vert2 = vertices32[P2];
+                        Vector3 vert3 = vertices32[P3];
+                        Vector3 vert4 = vertices32[P4];
 
-                        uvTex.Add(uvTexture[0]);
-                        uvTex.Add(uvTexture[1]);
-                        uvTex.Add(uvTexture[2]);
-                        uvTex.Add(uvTexture[3]);
-                        uvTex.Add(uvTexture[4]);
-                        uvTex.Add(uvTexture[5]);
+                        vert.Add(vertices32[P1]);
+                        vert.Add(vertices32[P2]);
+                        vert.Add(vertices32[P3]);
+                        vert.Add(vertices32[P4]);
 
-                        Texture2D texture = new Texture2D(1, 1);
-                        texture.SetPixel(0, 0, new Color(color.a, color.g, color.b));
-                        texture2Ds.Add(texture);
+                        //Вставляем цвет
+                        texture2Dnew.SetPixel(colorPixX, colorPisY, new Color(color.a, color.g, color.b));
 
-                        //Освещенность //Должно узнаваться у освещенности блока в настройках
-                        //0.0f-темно 1.0f-светло
-                        uvShadow.Add(new Vector2(1.0f, 0));
-                        uvShadow.Add(new Vector2(1.0f, 0));
-                        uvShadow.Add(new Vector2(1.0f, 0));
-                        uvShadow.Add(new Vector2(1.0f, 0));
-                        uvShadow.Add(new Vector2(1.0f, 0));
-                        uvShadow.Add(new Vector2(1.0f, 0));
+                        //Вычисляем текстурные координаты
+                        float posUVX = colorPixX / (float)texture2Dnew.width;
+                        float posUVY = colorPisY / (float)texture2Dnew.width;
+                        float posUVXP = posUVX + (1 / (float)texture2Dnew.width);
+                        float posUVYP = posUVY + (1 / (float)texture2Dnew.height);
+
+                        textureUV.Add(new Vector2(posUVX, posUVY));
+                        textureUV.Add(new Vector2(posUVX, posUVYP));
+                        textureUV.Add(new Vector2(posUVXP, posUVYP));
+                        textureUV.Add(new Vector2(posUVXP, posUVY));
+
+
+                        if (inside)
+                        {
+                            triangles.Add(vertNum1);
+                            triangles.Add(vertNum2);
+                            triangles.Add(vertNum3);
+
+                            triangles.Add(vertNum3);
+                            triangles.Add(vertNum4);
+                            triangles.Add(vertNum1);
+
+                            normals.Add(normals32[P1]);
+                            normals.Add(normals32[P2]);
+                            normals.Add(normals32[P3]);
+                            normals.Add(normals32[P4]);
+                        }
+                        else
+                        {
+                            triangles.Add(vertNum1);
+                            triangles.Add(vertNum4);
+                            triangles.Add(vertNum3);
+
+                            triangles.Add(vertNum3);
+                            triangles.Add(vertNum2);
+                            triangles.Add(vertNum1);
+
+                            normals.Add(normals32[P1] * -1);
+                            normals.Add(normals32[P2] * -1);
+                            normals.Add(normals32[P3] * -1);
+                            normals.Add(normals32[P4] * -1);
+                        }
                     }
                 }
             }
@@ -223,12 +299,15 @@ namespace Game
 
             void JobStartRedraw() {
 
-                Texture2DArray texture2DArray;
+                Texture2D texture2D;
                 Mesh mesh;
 
                 //Если размер биома больше 1 то рисуем по цвету
-                MeshData.CalcMeshСolor(data, out mesh, out texture2DArray);
+                MeshData.CalcMeshColor2(data, out mesh, out texture2D);
+
+                meshRendererBasic.materials[0].mainTexture = texture2D;
                 meshFilterBasic.mesh = mesh;
+                
 
                 //Если размер биома 1 то рисуем по блокам
             }
@@ -261,9 +340,13 @@ namespace Game
             public void Inicialize(Chank chank) {
                 data = chank;
                 //меняем размер на размер чанка
-                int sizeOneBlock = Calc.GetSizeInt(chank.sizeBlock);
+                int sizeBlock = Calc.GetSizeInt(chank.sizeBlock);
+                int sizeChank = sizeBlock * Chank.Size;
 
-                transform.localScale = new Vector3(sizeOneBlock, sizeOneBlock, sizeOneBlock);
+                transform.localScale = new Vector3(sizeBlock, sizeBlock, sizeBlock);
+
+                Vector3 position = chank.index * sizeChank;
+                transform.localPosition = position;
 
                 //перерисовать чанк
                 JobRedraw jobRedraw = new JobRedraw(this);

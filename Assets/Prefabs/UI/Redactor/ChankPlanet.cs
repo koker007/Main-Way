@@ -177,7 +177,9 @@ public class ChankPlanet : Chank
 
                     //Смотрим по id блоку на его цвет
                     int BID = BlocksID[x, z, y];
-                    Color ColorBlock = Game.Blocks.GetColor(BID);
+                    Color ColorBlock;// = Game.Blocks.GetColor(BID);
+
+                    ColorBlock = new Color(Random.Range(0.0f, 1.0f), Random.Range(0.0f, 1.0f), Random.Range(0.0f, 1.0f), Random.Range(0.0f, 1.0f));
 
                     Colors[x, y, z] = Color.Lerp(ColorBlock, planetData.pattern.biomesSurface[biomeWinerSurface].color, interpolateCoof);
                 }
