@@ -1,0 +1,176 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+
+// Create a RenderTexture with enableRandomWrite flag and set it
+// with cs.SetTexture
+//RWStructuredBuffer<float3> _vertices;
+RWStructuredBuffer<float3> _normals;
+RWStructuredBuffer<float2> _uv;
+RWStructuredBuffer<int> _triangles;
+
+RWStructuredBuffer<float4> _colors;
+
+//RWTexture2D<float4> Result;
+
+//Functions
+void calcBlock(uint3 id);
+
+void calcTriangles(uint3 id, int index);
+void calcNormal(uint3 id, int index);
+void calcUV(uint3 id, int index);
+
+[numthreads(32,32,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+	//check all 32 z positions
+	for(uint z = 0; z < 32; z++){
+		uint3 index = uint3(id.x, id.y, z);
+		calcBlock(index);
+	}
+}
+
+void calcBlock(uint3 id){
+
+	//int indexMax = 32*32*32;
+
+	//get global index
+	int index = id.z + id.y * 32 + id.x * 32 * 32;
+
+	int indexB = (id.z - 1) + id.y * 32 + id.x * 32 * 32;
+	int indexD = id.z + (id.y - 1) * 32 + id.x * 32 * 32;
+	int indexL = id.z + id.y * 32 + (id.x - 1) * 32 * 32;
+
+
+	float4 color = _colors[index];
+
+	//get color if Neibour exist
+	float4 colorL = float4(0.0f, 0.0f, 0.0f, 0.0f);
+	if(indexL >= 0){
+		colorL = _colors[indexL];
+	}
+	float4 colorD = float4(0.0f, 0.0f, 0.0f, 0.0f);
+	if(indexD >= 0){
+		colorD = _colors[indexD];
+	}
+	float4 colorB = float4(0.0f, 0.0f, 0.0f, 0.0f);
+	if(indexB >= 0){
+		colorB = _colors[indexB];
+	}
+
+	int num = id.x + id.y * 32 + id.z * 32 * 32;
+	int numVertStart = num * 4 * 3;
+	int numTrianStart = num * 3 * 2 * 3;
+
+	//Left, Down, Back
+	if(color.w > 0.9f)
+	{
+		//Left
+		if(indexL >= 0 && colorL.w <= 0.9f || indexL < 0){
+			_triangles[numTrianStart + 0] = numVertStart;
+			_triangles[numTrianStart + 1] = numVertStart + 3;
+			_triangles[numTrianStart + 2] = numVertStart + 2;
+			
+			_triangles[numTrianStart + 3] = numVertStart + 2;
+			_triangles[numTrianStart + 4] = numVertStart + 1;
+			_triangles[numTrianStart + 5] = numVertStart;
+
+			for(int num = 0; num < 4; num++)
+				_normals[numVertStart + num] = float3(-1.0f, 0.0f, 0.0f);
+		}
+		//Down
+		if(indexD >= 0 && colorD.w <= 0.9f || indexD < 0){
+			_triangles[numTrianStart + 6 + 0] = numVertStart + 4;
+			_triangles[numTrianStart + 6 + 1] = numVertStart + 4 + 3;
+			_triangles[numTrianStart + 6 + 2] = numVertStart + 4 + 2;
+			
+			_triangles[numTrianStart + 6 + 3] = numVertStart + 4 + 2;
+			_triangles[numTrianStart + 6 + 4] = numVertStart + 4 + 1;
+			_triangles[numTrianStart + 6 + 5] = numVertStart + 4;
+
+			for(int num = 0; num < 4; num++)
+				_normals[numVertStart + num + 4] = float3(0.0f, -1.0f, 0.0f);
+		}
+		//Back
+		if(indexB >= 0 && colorB.w <= 0.9f || indexB < 0){
+			_triangles[numTrianStart + 12 + 0] = numVertStart + 8;
+			_triangles[numTrianStart + 12 + 1] = numVertStart + 8 + 3;
+			_triangles[numTrianStart + 12 + 2] = numVertStart + 8 + 2;
+
+			_triangles[numTrianStart + 12 + 3] = numVertStart + 8 + 2;
+			_triangles[numTrianStart + 12 + 4] = numVertStart + 8 + 1;
+			_triangles[numTrianStart + 12 + 5] = numVertStart + 8;
+
+			for(int num = 0; num < 4; num++)
+				_normals[numVertStart + num + 8] = float3(0.0f, 0.0f, -1.0f);
+		}
+
+	}
+	//Neibour
+	else{
+		//Left
+		if(id.x > 0 && colorL.w > 0.9f){
+			_triangles[numTrianStart + 0] = numVertStart;
+			_triangles[numTrianStart + 1] = numVertStart + 1;
+			_triangles[numTrianStart + 2] = numVertStart + 2;
+
+			_triangles[numTrianStart + 3] = numVertStart + 2;
+			_triangles[numTrianStart + 4] = numVertStart + 3;
+			_triangles[numTrianStart + 5] = numVertStart;
+
+			for(int num = 0; num < 4; num++)
+				_normals[numVertStart + num] = float3(1.0f, 0.0f, 0.0f);
+		}
+		//Neibour Left chank
+		else if(id.x == 0){
+		
+		}
+		else{
+			for(int num = 0; num < 6; num++)
+				_triangles[numTrianStart + num] = 0;
+		}
+		//Down
+		if(id.y > 0 && colorD.w > 0.9f){
+			_triangles[numTrianStart + 6 + 0] = numVertStart + 4;
+			_triangles[numTrianStart + 6 + 1] = numVertStart + 4 + 1;
+			_triangles[numTrianStart + 6 + 2] = numVertStart + 4 + 2;
+			
+			_triangles[numTrianStart + 6 + 3] = numVertStart + 4 + 2;
+			_triangles[numTrianStart + 6 + 4] = numVertStart + 4 + 3;
+			_triangles[numTrianStart + 6 + 5] = numVertStart + 4;
+
+			for(int num = 0; num < 4; num++)
+				_normals[numVertStart + num + 4] = float3(0.0f, 1.0f, 0.0f);
+		}
+		//Neibour Down chank
+		else if(id.y == 0){
+		
+		}
+		else{
+			for(int num = 0; num < 6; num++)
+				_triangles[numTrianStart + num + 6] = 0;
+		}
+
+		//Back
+		if(id.z > 0 && colorB.w > 0.9f){
+			_triangles[numTrianStart + 12 + 0] = numVertStart + 8;
+			_triangles[numTrianStart + 12 + 1] = numVertStart + 8 + 1;
+			_triangles[numTrianStart + 12 + 2] = numVertStart + 8 + 2;
+
+			_triangles[numTrianStart + 12 + 3] = numVertStart + 8 + 2;
+			_triangles[numTrianStart + 12 + 4] = numVertStart + 8 + 3;
+			_triangles[numTrianStart + 12 + 5] = numVertStart + 8;
+
+			for(int num = 0; num < 4; num++)
+				_normals[numVertStart + num + 8] = float3(0.0f, 0.0f, 1.0f);
+		}
+		//Neibour Back chank
+		else if(id.z == 0){
+		
+		}
+		else{
+			for(int num = 0; num < 6; num++)
+				_triangles[numTrianStart + num + 12] = 0;
+		}
+	}
+}
+

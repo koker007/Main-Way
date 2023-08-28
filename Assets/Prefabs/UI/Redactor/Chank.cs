@@ -63,6 +63,10 @@ public abstract class Chank
     abstract public Color GetColor(Vector3Int pos, Placement placement = Placement.Current);
     abstract public BlockData GetBlock(Vector3Int pos, Placement placement = Placement.Current);
 
+    virtual public Color[,,] GetColors() {
+        return Colors;
+    }
+
     //ѕотом, ниже, надо будет создать job system дл€ загрузки чанка
 
     /// <summary>

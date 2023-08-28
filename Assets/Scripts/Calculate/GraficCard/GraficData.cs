@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 //Хранит данные вычислений видео карты
-public class GraficData : MonoBehaviour
+public partial class GraficData : MonoBehaviour
 {
     static int LastPerlinID = 0;
     static int LastPerlin2DID = 0;
@@ -793,4 +793,6 @@ public class GraficData : MonoBehaviour
             
         }
     }
+
+
 }

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Unity.Jobs;
 using UnityEngine;
+using System.Diagnostics;
 
 namespace Game
 {
@@ -110,6 +111,9 @@ namespace Game
                 }
                 static public void CalcMeshColor2(Chank data, out Mesh mesh, out Texture2D texture2D)
                 {
+                    Stopwatch stopwatch = new Stopwatch();
+                    stopwatch.Start();
+
                     mesh = new Mesh();
 
                     List<Vector3> vert = new List<Vector3>();
@@ -216,6 +220,10 @@ namespace Game
                     texture2Dnew.filterMode = FilterMode.Point;
                     texture2D = texture2Dnew;
 
+                    stopwatch.Stop();
+                    UnityEngine.Debug.Log("GenChankGO: " + data.index +
+                        " stopwatch: " + stopwatch.ElapsedMilliseconds);
+
                     void AddPlane(int P1, int P2, int P3, int P4, Color color, bool inside, char colorPixX, char colorPisY)
                     {
                         int vertNum1 = vert.Count;
@@ -280,6 +288,29 @@ namespace Game
                         }
                     }
                 }
+
+                static public void CalcMeshColorShader(Chank data, out Mesh mesh, out Texture2D texture2D) {
+                    Stopwatch stopwatch = new Stopwatch();
+                    stopwatch.Start();
+
+                    mesh = new Mesh();
+
+                    Grafic.Data.MeshChankColor MeshData = new Grafic.Data.MeshChankColor();
+                    Grafic.Calc.MeshChankColor.calculate(MeshData, data);
+
+                    mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
+                    mesh.vertices = vertices32;
+                    mesh.triangles = MeshData.triangles;
+                    mesh.normals = MeshData.normals;
+                    mesh.uv = MeshData.uv;
+
+                    Texture2D texture2Dnew = new Texture2D(sizeXTextureColor, sizeYTextureColor);
+                    texture2D = texture2Dnew;
+
+                    stopwatch.Stop();
+                    UnityEngine.Debug.Log("GenChankGO: " + data.index +
+                        " stopwatch: " + stopwatch.ElapsedMilliseconds);
+                }
             }
 
             struct JobRedraw : IJob
@@ -303,7 +334,7 @@ namespace Game
                 Mesh mesh;
 
                 //Если размер биома больше 1 то рисуем по цвету
-                MeshData.CalcMeshColor2(data, out mesh, out texture2D);
+                MeshData.CalcMeshColorShader(data, out mesh, out texture2D);
 
                 meshRendererBasic.materials[0].mainTexture = texture2D;
                 meshFilterBasic.mesh = mesh;
