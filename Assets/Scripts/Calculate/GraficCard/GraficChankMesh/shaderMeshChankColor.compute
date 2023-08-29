@@ -26,6 +26,23 @@ void calcNormal(uint3 id, int index);
 
 float getlllumination(uint3 id);
 
+//Get light for point of side cube
+float getLightL_DB(uint3 id);
+float getLightL_UB(uint3 id);
+float getLightL_UF(uint3 id);
+float getLightL_DF(uint3 id);
+
+float getLightD_LB(uint3 id);
+float getLightD_LF(uint3 id);
+float getLightD_RF(uint3 id);
+float getLightD_RB(uint3 id);
+
+float getLightB_LD(uint3 id);
+float getLightB_LU(uint3 id);
+float getLightB_RU(uint3 id);
+float getLightB_RD(uint3 id);
+
+
 [numthreads(32,32,1)]
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
@@ -74,8 +91,8 @@ void calcBlock(uint3 id){
 	float uvXnow =  texturePos.x * uvXsize;
 	float uvYnow =  texturePos.y * uvYsize;
 
-	for(int num = 0; num < 12; num++)
-		_uv2[numVertStart + num] = float2(0.9f, 0);
+	//for(int num = 0; num < 12; num++)
+	//	_uv2[numVertStart + num] = float2(0.9f, 0);
 
 
 	//Left, Down, Back
@@ -122,6 +139,12 @@ void calcBlock(uint3 id){
 			_uv[numVertStart + 1 + 4] = float2(uvXnow, uvYnow + uvYsize);
 			_uv[numVertStart + 2 + 4] = float2(uvXnow + uvXsize, uvYnow + uvYsize);
 			_uv[numVertStart + 3 + 4] = float2(uvXnow + uvXsize, uvYnow);
+
+			float light = getlllumination(uint3(id.x, id.y - 1, id.z));
+			_uv2[numVertStart + 0 + 4] = float2(light, 0);
+			_uv2[numVertStart + 1 + 4] = float2(light, 1);
+			_uv2[numVertStart + 2 + 4] = float2(light, 1);
+			_uv2[numVertStart + 3 + 4] = float2(light, 0);
 		}
 		//Back
 		if(indexB >= 0 && colorB.w <= 0.9f || indexB < 0){
@@ -140,6 +163,12 @@ void calcBlock(uint3 id){
 			_uv[numVertStart + 1 + 8] = float2(uvXnow, uvYnow + uvYsize);
 			_uv[numVertStart + 2 + 8] = float2(uvXnow + uvXsize, uvYnow + uvYsize);
 			_uv[numVertStart + 3 + 8] = float2(uvXnow + uvXsize, uvYnow);
+
+			float light = getlllumination(uint3(id.x, id.y, id.z - 1));
+			_uv2[numVertStart + 0 + 8] = float2(light, 0);
+			_uv2[numVertStart + 1 + 8] = float2(light, 1);
+			_uv2[numVertStart + 2 + 8] = float2(light, 1);
+			_uv2[numVertStart + 3 + 8] = float2(light, 0);
 		}
 
 	}
@@ -166,6 +195,12 @@ void calcBlock(uint3 id){
 			_uv[numVertStart + 1] = float2(uvXL, uvYL + uvYsize);
 			_uv[numVertStart + 2] = float2(uvXL + uvXsize, uvYL + uvYsize);
 			_uv[numVertStart + 3] = float2(uvXL + uvXsize, uvYL);
+
+			float light = getlllumination(uint3(id.x, id.y, id.z));
+			_uv2[numVertStart + 0] = float2(light, 0);
+			_uv2[numVertStart + 1] = float2(light, 1);
+			_uv2[numVertStart + 2] = float2(light, 1);
+			_uv2[numVertStart + 3] = float2(light, 0);
 		}
 		//Neibour Left chank
 		else if(id.x == 0){
@@ -196,6 +231,12 @@ void calcBlock(uint3 id){
 			_uv[numVertStart + 1 + 4] = float2(uvXD, uvYD + uvYsize);
 			_uv[numVertStart + 2 + 4] = float2(uvXD + uvXsize, uvYD + uvYsize);
 			_uv[numVertStart + 3 + 4] = float2(uvXD + uvXsize, uvYD);
+
+			float light = getlllumination(uint3(id.x, id.y, id.z));
+			_uv2[numVertStart + 0 + 4] = float2(light, 0);
+			_uv2[numVertStart + 1 + 4] = float2(light, 1);
+			_uv2[numVertStart + 2 + 4] = float2(light, 1);
+			_uv2[numVertStart + 3 + 4] = float2(light, 0);
 		}
 		//Neibour Down chank
 		else if(id.y == 0){
@@ -227,6 +268,12 @@ void calcBlock(uint3 id){
 			_uv[numVertStart + 1 + 8] = float2(uvXB, uvYB + uvYsize);
 			_uv[numVertStart + 2 + 8] = float2(uvXB + uvXsize, uvYB + uvYsize);
 			_uv[numVertStart + 3 + 8] = float2(uvXB + uvXsize, uvYB);
+
+			float light = getlllumination(uint3(id.x, id.y, id.z));
+			_uv2[numVertStart + 0 + 8] = float2(light, 0);
+			_uv2[numVertStart + 1 + 8] = float2(light, 1);
+			_uv2[numVertStart + 2 + 8] = float2(light, 1);
+			_uv2[numVertStart + 3 + 8] = float2(light, 0);
 		}
 		//Neibour Back chank
 		else if(id.z == 0){
@@ -249,5 +296,5 @@ float getlllumination(uint3 id){
 	if(index >= 0)
 		return _lllumination[index];
 
-	return 1.0f;
+	return 0.99f;
 }

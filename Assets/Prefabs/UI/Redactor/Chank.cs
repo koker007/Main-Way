@@ -17,7 +17,7 @@ public abstract class Chank
             for (int x = 0; x < Illumination.GetLength(0); x++) {
                 for (int y = 0; y < Illumination.GetLength(1); y++) {
                     for (int z = 0; z < Illumination.GetLength(2); z++) {
-                        Illumination[x, y, z] = 1.0f;
+                        Illumination[x, y, z] = 0.99f;
                     }
                 }
             }
