@@ -44,65 +44,36 @@ namespace Grafic
                 if (dataMesh.calculated)
                     return;
 
-                /*
-                for (int x = 0; x < 32; x++)
-                {
-                    for (int y = 0; y < 32; y++)
-                    {
-                        for (int z = 0; z < 31; z++)
-                        {
-                            dataChank.Colors[x, y, z] = new Color(0, 0, 0, 0);
-                        }
-                    }
-                }
-                
-                for (int x = 0; x < 32; x++)
-                {
-                    for (int y = 31; y < 32; y++)
-                    {
-                        for (int z = 0; z < 32; z++)
-                        {
-                            dataChank.Colors[x, y, z] = new Color(0, 0, 0, 0);
-                        }
-                    }
-                }
-                */
-
-
-                for (int x = 0; x < 4; x++) {
-                    for (int y = 31; y < 32; y++) {
-                        for (int z = 0; z < 6; z++) {
-                            dataChank.Colors[x, y, z] = new Color(0, 0, 0, 1);
-                        }
-                    }
-                }
-
                 // Создание буферов для хранения данных
                 //ComputeBuffer verticesBuffer = new ComputeBuffer(dataMesh.vertices.Length, Grafic.Data.MeshChankColor.sizeOfVertices);
                 ComputeBuffer normalsBuffer = new ComputeBuffer(dataMesh.normals.Length, Grafic.Data.MeshChankColor.sizeOfNormals);
                 ComputeBuffer uvBuffer = new ComputeBuffer(dataMesh.uv.Length, Grafic.Data.MeshChankColor.sizeOfUV);
+                ComputeBuffer uv2Buffer = new ComputeBuffer(dataMesh.uv2.Length, Grafic.Data.MeshChankColor.sizeOfUV);
                 ComputeBuffer trianglesBuffer = new ComputeBuffer(dataMesh.triangles.Length, Grafic.Data.MeshChankColor.sizeOfTriangles);
 
                 Color[,,] colors = dataChank.GetColors();
                 ComputeBuffer colorsBuffer = new ComputeBuffer(colors.Length, sizeof(float) * 4);
 
-                // Заполнение буферов данными из меша
-                //verticesBuffer.SetData(dataMesh.vertices);
-                normalsBuffer.SetData(dataMesh.normals);
-                uvBuffer.SetData(dataMesh.uv);
-                trianglesBuffer.SetData(dataMesh.triangles);
+                ComputeBuffer llluminationBuffer = new ComputeBuffer(dataChank.Illumination.Length, sizeof(float));
 
+                // Заполнение буферов данными
                 colorsBuffer.SetData(colors);
+                llluminationBuffer.SetData(dataChank.Illumination);
 
                 // Установка данных буферов в вычислительный шейдер
                 //main.ShaderMeshChankColor.SetBuffer(main._kernelIndexMeshChankColor, "_vertices", verticesBuffer);
                 main.ShaderMeshChankColor.SetBuffer(main._kernelIndexMeshChankColor, "_normals", normalsBuffer);
                 main.ShaderMeshChankColor.SetBuffer(main._kernelIndexMeshChankColor, "_uv", uvBuffer);
+                main.ShaderMeshChankColor.SetBuffer(main._kernelIndexMeshChankColor, "_uv2", uv2Buffer);
                 main.ShaderMeshChankColor.SetBuffer(main._kernelIndexMeshChankColor, "_triangles", trianglesBuffer);
 
                 main.ShaderMeshChankColor.SetBuffer(main._kernelIndexMeshChankColor, "_colors", colorsBuffer);
+                main.ShaderMeshChankColor.SetBuffer(main._kernelIndexMeshChankColor, "_lllumination", llluminationBuffer);
 
-                //main.ShaderMeshChankColor.SetInt("_RulesMax", DataPerlin3DArray.genRules.Length);
+                main.ShaderMeshChankColor.SetTexture(main._kernelIndexMeshChankColor, "_mainTexture", dataMesh.mainTexture);
+
+                main.ShaderMeshChankColor.SetInt("_mainTextureWight", dataMesh.mainTexture.width);
+                main.ShaderMeshChankColor.SetInt("_mainTextureHeight", dataMesh.mainTexture.height);
 
                 //Начать вычисления шейдера
                 main.ShaderMeshChankColor.Dispatch(main._kernelIndexMeshChankColor, 1, 1, 1);
@@ -111,6 +82,7 @@ namespace Grafic
                 //verticesBuffer.GetData(dataMesh.vertices);
                 normalsBuffer.GetData(dataMesh.normals);
                 uvBuffer.GetData(dataMesh.uv);
+                uv2Buffer.GetData(dataMesh.uv2);
                 trianglesBuffer.GetData(dataMesh.triangles);
 
                 //Сказать что данные закончили вычисления и готовы к работе
@@ -120,6 +92,7 @@ namespace Grafic
                 //verticesBuffer.Dispose();
                 normalsBuffer.Dispose();
                 uvBuffer.Dispose();
+                uv2Buffer.Dispose();
                 trianglesBuffer.Dispose();
 
                 colorsBuffer.Dispose();

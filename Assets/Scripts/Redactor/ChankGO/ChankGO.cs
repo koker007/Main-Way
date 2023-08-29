@@ -26,7 +26,7 @@ namespace Game
                 static readonly Vector3[] normals32;
 
                 static readonly Vector2[] uvTexBlock;
-                static readonly Texture2D textureShadow;
+                static public readonly Texture2D textureShadow;
 
                 static MeshData()
                 {
@@ -104,12 +104,14 @@ namespace Game
                     //Создаем текструру тени
                     textureShadow = new Texture2D(255, 1);
                     for (int x = 0; x < textureShadow.width; x++) {
-                        Color color = new Color(0,0,0, (float)x / textureShadow.width);
+                        float coof = (float)x / textureShadow.width;
+                        Color color = new Color(coof, coof, coof);
                         textureShadow.SetPixel(x, 0, color);
                     }
+                    textureShadow.filterMode = FilterMode.Point;
                     textureShadow.Apply();
                 }
-                static public void CalcMeshColor2(Chank data, out Mesh mesh, out Texture2D texture2D)
+                static public void CalcMeshColor(Chank data, out Mesh mesh, out Texture2D texture2D)
                 {
                     Stopwatch stopwatch = new Stopwatch();
                     stopwatch.Start();
@@ -289,7 +291,7 @@ namespace Game
                     }
                 }
 
-                static public void CalcMeshColorShader(Chank data, out Mesh mesh, out Texture2D texture2D) {
+                static public void CalcMeshColorShader(Chank data, out Mesh mesh, out RenderTexture texture) {
                     Stopwatch stopwatch = new Stopwatch();
                     stopwatch.Start();
 
@@ -303,9 +305,9 @@ namespace Game
                     mesh.triangles = MeshData.triangles;
                     mesh.normals = MeshData.normals;
                     mesh.uv = MeshData.uv;
+                    mesh.uv2 = MeshData.uv2;
 
-                    Texture2D texture2Dnew = new Texture2D(sizeXTextureColor, sizeYTextureColor);
-                    texture2D = texture2Dnew;
+                    texture = MeshData.mainTexture;
 
                     stopwatch.Stop();
                     UnityEngine.Debug.Log("GenChankGO: " + data.index +
@@ -330,13 +332,15 @@ namespace Game
 
             void JobStartRedraw() {
 
-                Texture2D texture2D;
+                RenderTexture texture;
                 Mesh mesh;
 
                 //Если размер биома больше 1 то рисуем по цвету
-                MeshData.CalcMeshColorShader(data, out mesh, out texture2D);
+                MeshData.CalcMeshColorShader(data, out mesh, out texture);
 
-                meshRendererBasic.materials[0].mainTexture = texture2D;
+                //meshRendererBasic.materials[0].mainTexture = texture;
+                meshRendererBasic.materials[0].SetTexture("_MainTex", texture);
+                meshRendererBasic.materials[0].SetTexture("_llluminationTex", MeshData.textureShadow);
                 meshFilterBasic.mesh = mesh;
                 
 

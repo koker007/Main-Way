@@ -35,17 +35,21 @@ namespace Grafic
             public int[] triangles;
             public Vector3[] normals;
             public Vector2[] uv;
+            public Vector2[] uv2;
 
-            public Texture2D mainTexture2D;
+            public RenderTexture mainTexture;
 
             public MeshChankColor()
             {
                 vertices = new Vector3[verticesCount];
                 uv = new Vector2[verticesCount];
+                uv2 = new Vector2[verticesCount];
                 triangles = new int[trianglesCount];
                 normals = new Vector3[verticesCount];
-
-                mainTexture2D = new Texture2D(sizeXTextureColor, sizeYTextureColor);
+                mainTexture = new RenderTexture(sizeXTextureColor, sizeYTextureColor, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Linear);
+                mainTexture.filterMode = FilterMode.Point;
+                mainTexture.enableRandomWrite = true;
+                mainTexture.Create();
             }
         }
     }

@@ -8,6 +8,22 @@ using System;
 /// </summary>
 public abstract class Chank
 {
+    static class DefaultValue {
+        static public readonly float[,,] Illumination;
+
+        static DefaultValue(){
+            Illumination = new float[Size, Size, Size];
+
+            for (int x = 0; x < Illumination.GetLength(0); x++) {
+                for (int y = 0; y < Illumination.GetLength(1); y++) {
+                    for (int z = 0; z < Illumination.GetLength(2); z++) {
+                        Illumination[x, y, z] = 1.0f;
+                    }
+                }
+            }
+        }
+    }
+
     //Чанк всегда кубический и вмещает в себя 32 блока по высоте ширене и длине.
     public const int Size = 32;
 
@@ -17,7 +33,8 @@ public abstract class Chank
 
     public int[,,] BlocksID = new int[Size, Size, Size]; //ID Блоков
     public uint[,,] BlocksVariant = new uint[Size, Size, Size]; //Вариант блоков
-    public Color[,,] Colors; //Цвета блоков
+    public Color[,,] Colors = new Color[Size, Size, Size]; //Цвета блоков
+    public float[,,] Illumination = new float[Size, Size, Size]; //Количество света в блоке
 
     protected PlanetData planetData;
     public event Action isChange;
@@ -76,6 +93,8 @@ public abstract class Chank
     /// <param name="index"></param>
     /// <param name="planetData"></param>
     public Chank(Size sizeBlock, Vector3Int index, PlanetData planetData) {
+        this.Illumination = DefaultValue.Illumination;
+
         this.sizeBlock = sizeBlock;
         this.index = index;
         this.planetData = planetData;
