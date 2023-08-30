@@ -24,6 +24,7 @@ void calcBlock(uint3 id);
 void calcTriangles(uint3 id, int index);
 void calcNormal(uint3 id, int index);
 
+bool isBlockExist(uint3 id);
 float getlllumination(uint3 id);
 
 //Get light for point of side cube
@@ -116,11 +117,12 @@ void calcBlock(uint3 id){
 			_uv[numVertStart + 2] = float2(uvXnow + uvXsize, uvYnow + uvYsize);
 			_uv[numVertStart + 3] = float2(uvXnow + uvXsize, uvYnow);
 
-			float light = getlllumination(uint3(id.x - 1, id.y, id.z));
-			_uv2[numVertStart + 0] = float2(light, 0);
-			_uv2[numVertStart + 1] = float2(light, 1);
-			_uv2[numVertStart + 2] = float2(light, 1);
-			_uv2[numVertStart + 3] = float2(light, 0);
+			uint3 posLeft = uint3(id.x-1, id.y, id.z);
+			//float light = getlllumination(uint3(id.x - 1, id.y, id.z));
+			_uv2[numVertStart + 0] = float2(getLightL_DB(posLeft), 0);
+			_uv2[numVertStart + 1] = float2(getLightL_UB(posLeft), 1);
+			_uv2[numVertStart + 2] = float2(getLightL_UF(posLeft), 1);
+			_uv2[numVertStart + 3] = float2(getLightL_DF(posLeft), 0);
 		}
 		//Down
 		if(indexD >= 0 && colorD.w <= 0.9f || indexD < 0){
@@ -140,11 +142,12 @@ void calcBlock(uint3 id){
 			_uv[numVertStart + 2 + 4] = float2(uvXnow + uvXsize, uvYnow + uvYsize);
 			_uv[numVertStart + 3 + 4] = float2(uvXnow + uvXsize, uvYnow);
 
-			float light = getlllumination(uint3(id.x, id.y - 1, id.z));
-			_uv2[numVertStart + 0 + 4] = float2(light, 0);
-			_uv2[numVertStart + 1 + 4] = float2(light, 1);
-			_uv2[numVertStart + 2 + 4] = float2(light, 1);
-			_uv2[numVertStart + 3 + 4] = float2(light, 0);
+			uint3 posDown = uint3(id.x, id.y-1, id.z);
+			//float light = getlllumination(uint3(id.x, id.y - 1, id.z));
+			_uv2[numVertStart + 0 + 4] = float2(getLightD_LB(posDown), 0);
+			_uv2[numVertStart + 1 + 4] = float2(getLightD_LF(posDown), 1);
+			_uv2[numVertStart + 2 + 4] = float2(getLightD_RF(posDown), 1);
+			_uv2[numVertStart + 3 + 4] = float2(getLightD_RB(posDown), 0);
 		}
 		//Back
 		if(indexB >= 0 && colorB.w <= 0.9f || indexB < 0){
@@ -164,11 +167,12 @@ void calcBlock(uint3 id){
 			_uv[numVertStart + 2 + 8] = float2(uvXnow + uvXsize, uvYnow + uvYsize);
 			_uv[numVertStart + 3 + 8] = float2(uvXnow + uvXsize, uvYnow);
 
-			float light = getlllumination(uint3(id.x, id.y, id.z - 1));
-			_uv2[numVertStart + 0 + 8] = float2(light, 0);
-			_uv2[numVertStart + 1 + 8] = float2(light, 1);
-			_uv2[numVertStart + 2 + 8] = float2(light, 1);
-			_uv2[numVertStart + 3 + 8] = float2(light, 0);
+			uint3 posDown = uint3(id.x, id.y, id.z-1);
+			//float light = getlllumination(uint3(id.x, id.y, id.z - 1));
+			_uv2[numVertStart + 0 + 8] = float2(getLightB_RD(posDown), 0);
+			_uv2[numVertStart + 1 + 8] = float2(getLightB_RU(posDown), 1);
+			_uv2[numVertStart + 2 + 8] = float2(getLightB_LU(posDown), 1);
+			_uv2[numVertStart + 3 + 8] = float2(getLightB_LD(posDown), 0);
 		}
 
 	}
@@ -196,11 +200,10 @@ void calcBlock(uint3 id){
 			_uv[numVertStart + 2] = float2(uvXL + uvXsize, uvYL + uvYsize);
 			_uv[numVertStart + 3] = float2(uvXL + uvXsize, uvYL);
 
-			float light = getlllumination(uint3(id.x, id.y, id.z));
-			_uv2[numVertStart + 0] = float2(light, 0);
-			_uv2[numVertStart + 1] = float2(light, 1);
-			_uv2[numVertStart + 2] = float2(light, 1);
-			_uv2[numVertStart + 3] = float2(light, 0);
+			_uv2[numVertStart + 0] = float2(getLightL_DB(id), 0);
+			_uv2[numVertStart + 1] = float2(getLightL_UB(id), 1);
+			_uv2[numVertStart + 2] = float2(getLightL_UF(id), 1);
+			_uv2[numVertStart + 3] = float2(getLightL_DF(id), 0);
 		}
 		//Neibour Left chank
 		else if(id.x == 0){
@@ -232,11 +235,10 @@ void calcBlock(uint3 id){
 			_uv[numVertStart + 2 + 4] = float2(uvXD + uvXsize, uvYD + uvYsize);
 			_uv[numVertStart + 3 + 4] = float2(uvXD + uvXsize, uvYD);
 
-			float light = getlllumination(uint3(id.x, id.y, id.z));
-			_uv2[numVertStart + 0 + 4] = float2(light, 0);
-			_uv2[numVertStart + 1 + 4] = float2(light, 1);
-			_uv2[numVertStart + 2 + 4] = float2(light, 1);
-			_uv2[numVertStart + 3 + 4] = float2(light, 0);
+			_uv2[numVertStart + 0 + 4] = float2(getLightD_LB(id), 0);
+			_uv2[numVertStart + 1 + 4] = float2(getLightD_LF(id), 1);
+			_uv2[numVertStart + 2 + 4] = float2(getLightD_RF(id), 1);
+			_uv2[numVertStart + 3 + 4] = float2(getLightD_RB(id), 0);
 		}
 		//Neibour Down chank
 		else if(id.y == 0){
@@ -269,11 +271,10 @@ void calcBlock(uint3 id){
 			_uv[numVertStart + 2 + 8] = float2(uvXB + uvXsize, uvYB + uvYsize);
 			_uv[numVertStart + 3 + 8] = float2(uvXB + uvXsize, uvYB);
 
-			float light = getlllumination(uint3(id.x, id.y, id.z));
-			_uv2[numVertStart + 0 + 8] = float2(light, 0);
-			_uv2[numVertStart + 1 + 8] = float2(light, 1);
-			_uv2[numVertStart + 2 + 8] = float2(light, 1);
-			_uv2[numVertStart + 3 + 8] = float2(light, 0);
+			_uv2[numVertStart + 0 + 8] = float2(getLightB_RD(id), 0);
+			_uv2[numVertStart + 1 + 8] = float2(getLightB_RU(id), 1);
+			_uv2[numVertStart + 2 + 8] = float2(getLightB_LU(id), 1);
+			_uv2[numVertStart + 3 + 8] = float2(getLightB_LD(id), 0);
 		}
 		//Neibour Back chank
 		else if(id.z == 0){
@@ -289,12 +290,424 @@ void calcBlock(uint3 id){
 	_mainTexture[texturePos] = color;
 }
 
+bool isBlockExist(uint3 id){
+	int index = id.z + id.y * 32 + id.x * 32 * 32;
+
+	if(index >= 0 && _colors[index].w > 0.9f){
+		return true;
+	}
+
+	return false;
+}
+
 
 float getlllumination(uint3 id){
 	int index = id.z + id.y * 32 + id.x * 32 * 32;
+	int indexMax = 32 * 32 * 32;
 
-	if(index >= 0)
+
+	if(id.x >= 0 && id.x < indexMax && 
+		id.y >= 0 && id.y < indexMax &&
+		id.z >= 0 && id.z < indexMax)
 		return _lllumination[index];
 
 	return 0.99f;
+}
+
+float getLightL_DB(uint3 id){
+
+	uint3 posYmZ = uint3(id.x, id.y-1, id.z);
+	uint3 posYmZm = uint3(id.x, id.y-1, id.z-1);
+	uint3 posYZm = uint3(id.x, id.y, id.z - 1);
+
+	bool YZ = isBlockExist(id);
+	bool YmZ = isBlockExist(posYmZ);
+	bool YmZm = isBlockExist(posYmZm);
+	bool YZm = isBlockExist(posYZm);
+
+	int count = 0;
+	float lightSum = 0;
+
+	if(!YZ){
+		count = count + 1;
+		lightSum = lightSum + getlllumination(id);
+	}
+	if(!YmZ){
+		count = count + 1;
+		lightSum = lightSum + getlllumination(posYmZ);
+	}
+	if(!YmZm){
+		count = count + 1;
+		lightSum = lightSum + getlllumination(posYmZm);
+	}
+	if(!YZm){
+		count = count + 1;
+		lightSum = lightSum + getlllumination(posYZm);
+	}
+
+	return lightSum/count;
+}
+float getLightL_UB(uint3 id){
+
+	uint3 posYpZ = uint3(id.x, id.y+1, id.z);
+	uint3 posYpZm = uint3(id.x, id.y+1, id.z-1);
+	uint3 posYZm = uint3(id.x, id.y, id.z - 1);
+
+	bool YZ = isBlockExist(id);
+	bool YpZ = isBlockExist(posYpZ);
+	bool YpZm = isBlockExist(posYpZm);
+	bool YZm = isBlockExist(posYZm);
+
+	int count = 0;
+	float lightSum = 0;
+	if(!YZ){
+		count = count + 1;
+		lightSum = lightSum + getlllumination(id);
+	}
+	if(!YpZ){
+		count = count + 1;
+		lightSum = lightSum + getlllumination(posYpZ);
+	}
+	if(!YpZm){
+		count = count + 1;
+		lightSum = lightSum + getlllumination(posYpZm);
+	}
+	if(!YZm){
+		count = count + 1;
+		lightSum = lightSum + getlllumination(posYZm);
+	}
+
+	return lightSum/count;
+}
+float getLightL_UF(uint3 id){
+
+	uint3 posYpZ = uint3(id.x, id.y+1, id.z);
+	uint3 posYpZp = uint3(id.x, id.y+1, id.z+1);
+	uint3 posYZp = uint3(id.x, id.y, id.z + 1);
+
+	bool YZ = isBlockExist(id);
+	bool YpZ = isBlockExist(posYpZ);
+	bool YpZp = isBlockExist(posYpZp);
+	bool YZp = isBlockExist(posYZp);
+
+	int count = 0;
+	float lightSum = 0;
+	if(!YZ){
+		count = count + 1;
+		lightSum = lightSum + getlllumination(id);
+	}
+	if(!YpZ){
+		count = count + 1;
+		lightSum = lightSum + getlllumination(posYpZ);
+	}
+	if(!YpZp){
+		count = count + 1;
+		lightSum = lightSum + getlllumination(posYpZp);
+	}
+	if(!YZp){
+		count = count + 1;
+		lightSum = lightSum + getlllumination(posYZp);
+	}
+
+	return lightSum/count;
+}
+float getLightL_DF(uint3 id){
+
+	uint3 posYmZ = uint3(id.x, id.y-1, id.z);
+	uint3 posYmZp = uint3(id.x, id.y-1, id.z+1);
+	uint3 posYZp = uint3(id.x, id.y, id.z + 1);
+
+	bool YZ = isBlockExist(id);
+	bool YmZ = isBlockExist(posYmZ);
+	bool YmZp = isBlockExist(posYmZp);
+	bool YZp = isBlockExist(posYZp);
+
+	int count = 0;
+	float lightSum = 0;
+	if(!YZ){
+		count = count + 1;
+		lightSum = lightSum + getlllumination(id);
+	}
+	if(!YmZ){
+		count = count + 1;
+		lightSum = lightSum + getlllumination(posYmZ);
+	}
+	if(!YmZp){
+		count = count + 1;
+		lightSum = lightSum + getlllumination(posYmZp);
+	}
+	if(!YZp){
+		count = count + 1;
+		lightSum = lightSum + getlllumination(posYZp);
+	}
+	
+
+	return lightSum/count;
+}
+
+
+float getLightD_LB(uint3 id){
+
+	uint3 posXmZ = uint3(id.x-1, id.y, id.z);
+	uint3 posXmZm = uint3(id.x-1, id.y, id.z-1);
+	uint3 posXZm = uint3(id.x, id.y, id.z - 1);
+
+	bool XZ = isBlockExist(id);
+	bool XmZ = isBlockExist(posXmZ);
+	bool XmZm = isBlockExist(posXmZm);
+	bool XZm = isBlockExist(posXZm);
+
+	int count = 0;
+	float lightSum = 0;
+
+	if(!XZ){
+		count = count + 1;
+		lightSum = lightSum + getlllumination(id);
+	}
+	if(!XmZ){
+		count = count + 1;
+		lightSum = lightSum + getlllumination(posXmZ);
+	}
+	if(!XmZm){
+		count = count + 1;
+		lightSum = lightSum + getlllumination(posXmZm);
+	}
+	if(!XZm){
+		count = count + 1;
+		lightSum = lightSum + getlllumination(posXZm);
+	}
+
+	return lightSum/count;
+}
+float getLightD_LF(uint3 id){
+
+	uint3 posXmZ = uint3(id.x-1, id.y, id.z);
+	uint3 posXmZp = uint3(id.x-1, id.y, id.z+1);
+	uint3 posXZp = uint3(id.x, id.y, id.z + 1);
+
+	bool XZ = isBlockExist(id);
+	bool XmZ = isBlockExist(posXmZ);
+	bool XmZp = isBlockExist(posXmZp);
+	bool XZp = isBlockExist(posXZp);
+
+	int count = 0;
+	float lightSum = 0;
+
+	if(!XZ){
+		count = count + 1;
+		lightSum = lightSum + getlllumination(id);
+	}
+	if(!XmZ){
+		count = count + 1;
+		lightSum = lightSum + getlllumination(posXmZ);
+	}
+	if(!XmZp){
+		count = count + 1;
+		lightSum = lightSum + getlllumination(posXmZp);
+	}
+	if(!XZp){
+		count = count + 1;
+		lightSum = lightSum + getlllumination(posXZp);
+	}
+
+	return lightSum/count;
+}
+float getLightD_RF(uint3 id){
+
+	uint3 posXpZ = uint3(id.x+1, id.y, id.z);
+	uint3 posXpZp = uint3(id.x+1, id.y, id.z+1);
+	uint3 posXZp = uint3(id.x, id.y, id.z + 1);
+
+	bool XZ = isBlockExist(id);
+	bool XpZ = isBlockExist(posXpZ);
+	bool XpZp = isBlockExist(posXpZp);
+	bool XZp = isBlockExist(posXZp);
+
+	int count = 0;
+	float lightSum = 0;
+
+	if(!XZ){
+		count = count + 1;
+		lightSum = lightSum + getlllumination(id);
+	}
+	if(!XpZ){
+		count = count + 1;
+		lightSum = lightSum + getlllumination(posXpZ);
+	}
+	if(!XpZp){
+		count = count + 1;
+		lightSum = lightSum + getlllumination(posXpZp);
+	}
+	if(!XZp){
+		count = count + 1;
+		lightSum = lightSum + getlllumination(posXZp);
+	}
+
+	return lightSum/count;
+}
+float getLightD_RB(uint3 id){
+
+	uint3 posXpZ = uint3(id.x+1, id.y, id.z);
+	uint3 posXpZm = uint3(id.x+1, id.y, id.z-1);
+	uint3 posXZm = uint3(id.x, id.y, id.z - 1);
+
+	bool XZ = isBlockExist(id);
+	bool XpZ = isBlockExist(posXpZ);
+	bool XpZm = isBlockExist(posXpZm);
+	bool XZm = isBlockExist(posXZm);
+
+	int count = 0;
+	float lightSum = 0;
+
+	if(!XZ){
+		count = count + 1;
+		lightSum = lightSum + getlllumination(id);
+	}
+	if(!XpZ){
+		count = count + 1;
+		lightSum = lightSum + getlllumination(posXpZ);
+	}
+	if(!XpZm){
+		count = count + 1;
+		lightSum = lightSum + getlllumination(posXpZm);
+	}
+	if(!XZm){
+		count = count + 1;
+		lightSum = lightSum + getlllumination(posXZm);
+	}
+
+	return lightSum/count;
+}
+
+float getLightB_LD(uint3 id){
+
+	uint3 posXmY = uint3(id.x-1, id.y, id.z);
+	uint3 posXmYm = uint3(id.x-1, id.y-1, id.z);
+	uint3 posXYm = uint3(id.x, id.y-1, id.z);
+
+	bool XY = isBlockExist(id);
+	bool XmY = isBlockExist(posXmY);
+	bool XmYm = isBlockExist(posXmYm);
+	bool XYm = isBlockExist(posXYm);
+
+	int count = 0;
+	float lightSum = 0;
+
+	if(!XY){
+		count = count + 1;
+		lightSum = lightSum + getlllumination(id);
+	}
+	if(!XmY){
+		count = count + 1;
+		lightSum = lightSum + getlllumination(posXmY);
+	}
+	if(!XmYm){
+		count = count + 1;
+		lightSum = lightSum + getlllumination(posXmYm);
+	}
+	if(!XYm){
+		count = count + 1;
+		lightSum = lightSum + getlllumination(posXYm);
+	}
+
+	return lightSum/count;
+}
+float getLightB_LU(uint3 id){
+
+	uint3 posXmY = uint3(id.x-1, id.y, id.z);
+	uint3 posXmYp = uint3(id.x-1, id.y+1, id.z);
+	uint3 posXYp = uint3(id.x, id.y+1, id.z);
+
+	bool XY = isBlockExist(id);
+	bool XmY = isBlockExist(posXmY);
+	bool XmYp = isBlockExist(posXmYp);
+	bool XYp = isBlockExist(posXYp);
+
+	int count = 0;
+	float lightSum = 0;
+
+	if(!XY){
+		count = count + 1;
+		lightSum = lightSum + getlllumination(id);
+	}
+	if(!XmY){
+		count = count + 1;
+		lightSum = lightSum + getlllumination(posXmY);
+	}
+	if(!XmYp){
+		count = count + 1;
+		lightSum = lightSum + getlllumination(posXmYp);
+	}
+	if(!XYp){
+		count = count + 1;
+		lightSum = lightSum + getlllumination(posXYp);
+	}
+
+	return lightSum/count;
+}
+float getLightB_RU(uint3 id){
+
+	uint3 posXpY = uint3(id.x+1, id.y, id.z);
+	uint3 posXpYp = uint3(id.x+1, id.y+1, id.z);
+	uint3 posXYp = uint3(id.x, id.y+1, id.z);
+
+	bool XY = isBlockExist(id);
+	bool XpY = isBlockExist(posXpY);
+	bool XpYp = isBlockExist(posXpYp);
+	bool XYp = isBlockExist(posXYp);
+
+	int count = 0;
+	float lightSum = 0;
+
+	if(!XY){
+		count = count + 1;
+		lightSum = lightSum + getlllumination(id);
+	}
+	if(!XpY){
+		count = count + 1;
+		lightSum = lightSum + getlllumination(posXpY);
+	}
+	if(!XpYp){
+		count = count + 1;
+		lightSum = lightSum + getlllumination(posXpYp);
+	}
+	if(!XYp){
+		count = count + 1;
+		lightSum = lightSum + getlllumination(posXYp);
+	}
+
+	return lightSum/count;
+}
+float getLightB_RD(uint3 id){
+
+	uint3 posXpY = uint3(id.x+1, id.y, id.z);
+	uint3 posXpYm = uint3(id.x+1, id.y-1, id.z);
+	uint3 posXYm = uint3(id.x, id.y-1, id.z);
+
+	bool XY = isBlockExist(id);
+	bool XpY = isBlockExist(posXpY);
+	bool XpYm = isBlockExist(posXpYm);
+	bool XYm = isBlockExist(posXYm);
+
+	int count = 0;
+	float lightSum = 0;
+
+	if(!XY){
+		count = count + 1;
+		lightSum = lightSum + getlllumination(id);
+	}
+	if(!XpY){
+		count = count + 1;
+		lightSum = lightSum + getlllumination(posXpY);
+	}
+	if(!XpYm){
+		count = count + 1;
+		lightSum = lightSum + getlllumination(posXpYm);
+	}
+	if(!XYm){
+		count = count + 1;
+		lightSum = lightSum + getlllumination(posXYm);
+	}
+
+	return lightSum/count;
 }

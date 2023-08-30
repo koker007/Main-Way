@@ -44,6 +44,14 @@ namespace Grafic
                 if (dataMesh.calculated)
                     return;
 
+                for (int x = 1; x < 20; x++) {
+                    for (int y = 2; y < 20; y++) {
+                        for (int z = 3; z < 20; z++) {
+                            dataChank.Illumination[x, y, z] = 0.2f;
+                        }
+                    }
+                }
+
                 // Создание буферов для хранения данных
                 //ComputeBuffer verticesBuffer = new ComputeBuffer(dataMesh.vertices.Length, Grafic.Data.MeshChankColor.sizeOfVertices);
                 ComputeBuffer normalsBuffer = new ComputeBuffer(dataMesh.normals.Length, Grafic.Data.MeshChankColor.sizeOfNormals);
