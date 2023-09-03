@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Diagnostics;
 
 
 namespace Grafic
@@ -19,6 +20,8 @@ namespace Grafic
             uint lenghtZ = 0;
 
             int _kernelIndexMeshChankColor;
+
+            static bool isCalculateNow = false;
 
 
 
@@ -44,13 +47,22 @@ namespace Grafic
                 if (dataMesh.calculated)
                     return;
 
-                for (int x = 1; x < 20; x++) {
-                    for (int y = 2; y < 20; y++) {
-                        for (int z = 3; z < 20; z++) {
+                for (int x = 20; x < 32; x++) {
+                    for (int y = 20; y < 32; y++) {
+                        for (int z = 20; z < 32; z++) {
                             dataChank.Illumination[x, y, z] = 0.2f;
                         }
                     }
                 }
+
+                //Ожидаем завершения работы шейдера в другой job system задаче
+                Stopwatch stopwatch = new Stopwatch();
+                stopwatch.Start();
+                while (isCalculateNow && stopwatch.ElapsedMilliseconds < 1000)
+                {
+
+                }
+                isCalculateNow = true;
 
                 // Создание буферов для хранения данных
                 //ComputeBuffer verticesBuffer = new ComputeBuffer(dataMesh.vertices.Length, Grafic.Data.MeshChankColor.sizeOfVertices);
@@ -63,6 +75,11 @@ namespace Grafic
                 ComputeBuffer colorsBuffer = new ComputeBuffer(colors.Length, sizeof(float) * 4);
 
                 ComputeBuffer llluminationBuffer = new ComputeBuffer(dataChank.Illumination.Length, sizeof(float));
+
+                //Подготовка буфера основной текстуры
+                RenderTexture mainTexture = new RenderTexture(dataMesh.mainTexture.width, dataMesh.mainTexture.height, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Linear);
+                mainTexture.enableRandomWrite = true;
+                mainTexture.Create();
 
                 // Заполнение буферов данными
                 colorsBuffer.SetData(colors);
@@ -78,7 +95,7 @@ namespace Grafic
                 main.ShaderMeshChankColor.SetBuffer(main._kernelIndexMeshChankColor, "_colors", colorsBuffer);
                 main.ShaderMeshChankColor.SetBuffer(main._kernelIndexMeshChankColor, "_lllumination", llluminationBuffer);
 
-                main.ShaderMeshChankColor.SetTexture(main._kernelIndexMeshChankColor, "_mainTexture", dataMesh.mainTexture);
+                main.ShaderMeshChankColor.SetTexture(main._kernelIndexMeshChankColor, "_mainTexture", mainTexture);
 
                 main.ShaderMeshChankColor.SetInt("_mainTextureWight", dataMesh.mainTexture.width);
                 main.ShaderMeshChankColor.SetInt("_mainTextureHeight", dataMesh.mainTexture.height);
@@ -93,6 +110,11 @@ namespace Grafic
                 uv2Buffer.GetData(dataMesh.uv2);
                 trianglesBuffer.GetData(dataMesh.triangles);
 
+                //вытаскиваем текстуру из рендера в 2Д
+                RenderTexture.active = mainTexture;
+                dataMesh.mainTexture.ReadPixels(new Rect(0,0, dataMesh.mainTexture.width, dataMesh.mainTexture.height),0,0);
+                dataMesh.mainTexture.Apply();
+
                 //Сказать что данные закончили вычисления и готовы к работе
                 dataMesh.calculated = true;
 
@@ -104,6 +126,8 @@ namespace Grafic
                 trianglesBuffer.Dispose();
 
                 colorsBuffer.Dispose();
+
+                isCalculateNow = false;
             }
 
             // Update is called once per frame

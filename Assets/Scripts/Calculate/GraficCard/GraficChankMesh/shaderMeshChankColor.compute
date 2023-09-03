@@ -50,6 +50,7 @@ void CSMain (uint3 id : SV_DispatchThreadID)
 	//check all 32 z positions
 	for(uint z = 0; z < 32; z++){
 		uint3 index = uint3(id.x, id.y, z);
+		
 		calcBlock(index);
 	}
 }
@@ -57,28 +58,30 @@ void CSMain (uint3 id : SV_DispatchThreadID)
 void calcBlock(uint3 id){
 
 	//int indexMax = 32*32*32;
-
+	uint indexMax = 32u*32u*32u;
 	//get global index
-	int index = id.z + id.y * 32 + id.x * 32 * 32;
+	uint index = id.z + id.y * 32 + id.x * 32 * 32;
 
-	int indexB = (id.z - 1) + id.y * 32 + id.x * 32 * 32;
-	int indexD = id.z + (id.y - 1) * 32 + id.x * 32 * 32;
-	int indexL = id.z + id.y * 32 + (id.x - 1) * 32 * 32;
+	uint indexB = (id.z - 1) + id.y * 32 + id.x * 32 * 32;
+	uint indexD = id.z + (id.y - 1) * 32 + id.x * 32 * 32;
+	uint indexL = id.z + id.y * 32 + (id.x - 1) * 32 * 32;
 
-
-	float4 color = _colors[index];
+	float4 color = float4(0.0f, 0.0f, 0.0f, 0.0f);
+	if(index >= 0 && index < indexMax){
+		color = _colors[index];
+	}
 
 	//get color if Neibour exist
 	float4 colorL = float4(0.0f, 0.0f, 0.0f, 0.0f);
-	if(indexL >= 0){
+	if(indexL >= 0 && indexL < indexMax){
 		colorL = _colors[indexL];
 	}
 	float4 colorD = float4(0.0f, 0.0f, 0.0f, 0.0f);
-	if(indexD >= 0){
+	if(indexD >= 0 && indexD < indexMax){
 		colorD = _colors[indexD];
 	}
 	float4 colorB = float4(0.0f, 0.0f, 0.0f, 0.0f);
-	if(indexB >= 0){
+	if(indexB >= 0 && indexB < indexMax){
 		colorB = _colors[indexB];
 	}
 
@@ -92,15 +95,13 @@ void calcBlock(uint3 id){
 	float uvXnow =  texturePos.x * uvXsize;
 	float uvYnow =  texturePos.y * uvYsize;
 
-	//for(int num = 0; num < 12; num++)
-	//	_uv2[numVertStart + num] = float2(0.9f, 0);
-
 
 	//Left, Down, Back
 	if(color.w > 0.9f)
 	{
 		//Left
-		if(indexL >= 0 && colorL.w <= 0.9f || indexL < 0){
+		if(id.x > 0 && colorL.w <= 0.9f
+			){
 			_triangles[numTrianStart + 0] = numVertStart;
 			_triangles[numTrianStart + 1] = numVertStart + 3;
 			_triangles[numTrianStart + 2] = numVertStart + 2;
@@ -118,14 +119,20 @@ void calcBlock(uint3 id){
 			_uv[numVertStart + 3] = float2(uvXnow + uvXsize, uvYnow);
 
 			uint3 posLeft = uint3(id.x-1, id.y, id.z);
-			//float light = getlllumination(uint3(id.x - 1, id.y, id.z));
 			_uv2[numVertStart + 0] = float2(getLightL_DB(posLeft), 0);
 			_uv2[numVertStart + 1] = float2(getLightL_UB(posLeft), 1);
 			_uv2[numVertStart + 2] = float2(getLightL_UF(posLeft), 1);
 			_uv2[numVertStart + 3] = float2(getLightL_DF(posLeft), 0);
+
+			//float light = getlllumination(uint3(id.x - 1, id.y, id.z));
+			//_uv2[numVertStart + 0] = float2(light, 0);
+			//_uv2[numVertStart + 1] = float2(light, 1);
+			//_uv2[numVertStart + 2] = float2(light, 1);
+			//_uv2[numVertStart + 3] = float2(light, 0);
 		}
 		//Down
-		if(indexD >= 0 && colorD.w <= 0.9f || indexD < 0){
+		if(id.y > 0 && colorD.w <= 0.9f
+			){
 			_triangles[numTrianStart + 6 + 0] = numVertStart + 4;
 			_triangles[numTrianStart + 6 + 1] = numVertStart + 4 + 3;
 			_triangles[numTrianStart + 6 + 2] = numVertStart + 4 + 2;
@@ -150,7 +157,8 @@ void calcBlock(uint3 id){
 			_uv2[numVertStart + 3 + 4] = float2(getLightD_RB(posDown), 0);
 		}
 		//Back
-		if(indexB >= 0 && colorB.w <= 0.9f || indexB < 0){
+		if(id.z > 0 && colorB.w <= 0.9f
+			){
 			_triangles[numTrianStart + 12 + 0] = numVertStart + 8;
 			_triangles[numTrianStart + 12 + 1] = numVertStart + 8 + 3;
 			_triangles[numTrianStart + 12 + 2] = numVertStart + 8 + 2;
@@ -289,6 +297,7 @@ void calcBlock(uint3 id){
 	//Set Texture color
 	_mainTexture[texturePos] = color;
 }
+
 
 bool isBlockExist(uint3 id){
 	int index = id.z + id.y * 32 + id.x * 32 * 32;

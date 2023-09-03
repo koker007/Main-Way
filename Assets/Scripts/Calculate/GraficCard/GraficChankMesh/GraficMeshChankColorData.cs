@@ -23,7 +23,7 @@ namespace Grafic
             const int trianglesCount = 32 * 32 * 32 * 3 * 2 * 3;
 
             const int sizeXTextureColor = 180;
-            const int sizeYTextureColor = 183;
+            const int sizeYTextureColor = 200;//183;
 
             public const int sizeOfVertices = sizeof(float) * 3; //vector3
             public const int sizeOfTriangles = sizeof(int);
@@ -37,7 +37,7 @@ namespace Grafic
             public Vector2[] uv;
             public Vector2[] uv2;
 
-            public RenderTexture mainTexture;
+            public Texture2D mainTexture;
 
             public MeshChankColor()
             {
@@ -46,10 +46,10 @@ namespace Grafic
                 uv2 = new Vector2[verticesCount];
                 triangles = new int[trianglesCount];
                 normals = new Vector3[verticesCount];
-                mainTexture = new RenderTexture(sizeXTextureColor, sizeYTextureColor, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Linear);
+                //mainTexture = new RenderTexture(sizeXTextureColor, sizeYTextureColor, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Linear);
+                mainTexture = new Texture2D(sizeXTextureColor, sizeYTextureColor, TextureFormat.RGBA32, false);
                 mainTexture.filterMode = FilterMode.Point;
-                mainTexture.enableRandomWrite = true;
-                mainTexture.Create();
+                mainTexture.Apply();
             }
         }
     }

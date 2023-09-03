@@ -14,7 +14,7 @@ namespace Cosmos
         int[][,] biomeNum;
         Texture2D textureShadow;
 
-        ChankPlanet[][,,] chanks;
+        public ChankPlanet[][,,] chanks;
 
         public Texture2D TextureShadow { get { return textureShadow; } }
 

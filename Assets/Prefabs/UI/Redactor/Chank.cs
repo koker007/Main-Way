@@ -83,6 +83,43 @@ public abstract class Chank
     virtual public Color[,,] GetColors() {
         return Colors;
     }
+    virtual public Chank GetNeighbour(Side side) {
+        Chank result = null;
+
+        Vector3Int indexNeighbour = index;
+        switch (side) {
+            case Side.left:
+                indexNeighbour.x--;
+                break;
+            case Side.right:
+                indexNeighbour.x++;
+                break;
+            case Side.down:
+                indexNeighbour.y--;
+                break;
+            case Side.up:
+                indexNeighbour.y++;
+                break;
+            case Side.back:
+                indexNeighbour.z--;
+                break;
+            case Side.face:
+                indexNeighbour.z++;
+                break;
+        }
+
+        int indexSize = (int)sizeBlock - 1;
+
+        //≈сли вышли за пределы карты
+        if (indexNeighbour.x < 0 || indexNeighbour.y < 0 || indexNeighbour.z < 0 ||
+            indexNeighbour.x >= planetData.chanks[indexSize].GetLength(0) ||
+            indexNeighbour.y >= planetData.chanks[indexSize].GetLength(1) ||
+            indexNeighbour.z >= planetData.chanks[indexSize].GetLength(2))
+            return null;
+
+        result = planetData.chanks[indexSize][indexNeighbour.x, indexNeighbour.y, indexNeighbour.z];
+        return result;
+    }
 
     //ѕотом, ниже, надо будет создать job system дл€ загрузки чанка
 
