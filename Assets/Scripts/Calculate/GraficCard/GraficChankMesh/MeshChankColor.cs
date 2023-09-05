@@ -47,9 +47,9 @@ namespace Grafic
                 if (dataMesh.calculated)
                     return;
 
-                for (int x = 20; x < 32; x++) {
+                for (int x = 25; x < 32; x++) {
                     for (int y = 20; y < 32; y++) {
-                        for (int z = 20; z < 32; z++) {
+                        for (int z = 0; z < 32; z++) {
                             dataChank.Illumination[x, y, z] = 0.2f;
                         }
                     }
@@ -58,10 +58,10 @@ namespace Grafic
                 //Ожидаем завершения работы шейдера в другой job system задаче
                 Stopwatch stopwatch = new Stopwatch();
                 stopwatch.Start();
-                while (isCalculateNow && stopwatch.ElapsedMilliseconds < 1000)
-                {
+                //while (isCalculateNow && stopwatch.ElapsedMilliseconds < 1000)
+                //{
 
-                }
+                //}
                 isCalculateNow = true;
 
                 // Создание буферов для хранения данных

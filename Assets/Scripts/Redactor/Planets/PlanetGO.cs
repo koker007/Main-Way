@@ -127,6 +127,8 @@ namespace Game
                                     chanks[size][x, y, z].transform.SetParent(ParentChanks128.transform);
 
                                 chanks[size][x, y, z].Inicialize(planetData.GetChank(sizeChank, new Vector3Int(x,y,z)));
+
+                                AddReDraw(chanks[size][x, y, z]);
                             }
                         }
                     }

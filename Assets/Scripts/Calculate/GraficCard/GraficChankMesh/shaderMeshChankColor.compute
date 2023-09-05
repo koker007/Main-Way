@@ -345,7 +345,7 @@ float getLightL_DB(uint3 id){
 		count = count + 1;
 		lightSum = lightSum + getlllumination(posYmZ);
 	}
-	if(!YmZm){
+	if(!YmZm && (!YmZ && !YZm)){
 		count = count + 1;
 		lightSum = lightSum + getlllumination(posYmZm);
 	}
@@ -377,7 +377,7 @@ float getLightL_UB(uint3 id){
 		count = count + 1;
 		lightSum = lightSum + getlllumination(posYpZ);
 	}
-	if(!YpZm){
+	if(!YpZm && (!YpZ && !YZm)){
 		count = count + 1;
 		lightSum = lightSum + getlllumination(posYpZm);
 	}
@@ -409,7 +409,7 @@ float getLightL_UF(uint3 id){
 		count = count + 1;
 		lightSum = lightSum + getlllumination(posYpZ);
 	}
-	if(!YpZp){
+	if(!YpZp && (!YpZ && !YZp)){
 		count = count + 1;
 		lightSum = lightSum + getlllumination(posYpZp);
 	}
@@ -441,7 +441,7 @@ float getLightL_DF(uint3 id){
 		count = count + 1;
 		lightSum = lightSum + getlllumination(posYmZ);
 	}
-	if(!YmZp){
+	if(!YmZp && (!YmZ && !YZp)){
 		count = count + 1;
 		lightSum = lightSum + getlllumination(posYmZp);
 	}
@@ -477,7 +477,7 @@ float getLightD_LB(uint3 id){
 		count = count + 1;
 		lightSum = lightSum + getlllumination(posXmZ);
 	}
-	if(!XmZm){
+	if(!XmZm && (!XmZ && !XZm)){
 		count = count + 1;
 		lightSum = lightSum + getlllumination(posXmZm);
 	}
@@ -510,7 +510,7 @@ float getLightD_LF(uint3 id){
 		count = count + 1;
 		lightSum = lightSum + getlllumination(posXmZ);
 	}
-	if(!XmZp){
+	if(!XmZp && (!XmZ && !XZp)){
 		count = count + 1;
 		lightSum = lightSum + getlllumination(posXmZp);
 	}
@@ -543,7 +543,7 @@ float getLightD_RF(uint3 id){
 		count = count + 1;
 		lightSum = lightSum + getlllumination(posXpZ);
 	}
-	if(!XpZp){
+	if(!XpZp && (!XpZ && !XZp)){
 		count = count + 1;
 		lightSum = lightSum + getlllumination(posXpZp);
 	}
@@ -576,7 +576,7 @@ float getLightD_RB(uint3 id){
 		count = count + 1;
 		lightSum = lightSum + getlllumination(posXpZ);
 	}
-	if(!XpZm){
+	if(!XpZm && (!XpZ && !XZm)){
 		count = count + 1;
 		lightSum = lightSum + getlllumination(posXpZm);
 	}
@@ -610,7 +610,7 @@ float getLightB_LD(uint3 id){
 		count = count + 1;
 		lightSum = lightSum + getlllumination(posXmY);
 	}
-	if(!XmYm){
+	if(!XmYm && (!XmY && !XYm)){
 		count = count + 1;
 		lightSum = lightSum + getlllumination(posXmYm);
 	}
@@ -643,7 +643,7 @@ float getLightB_LU(uint3 id){
 		count = count + 1;
 		lightSum = lightSum + getlllumination(posXmY);
 	}
-	if(!XmYp){
+	if(!XmYp && (!XmY && !XYp)){
 		count = count + 1;
 		lightSum = lightSum + getlllumination(posXmYp);
 	}
@@ -676,7 +676,7 @@ float getLightB_RU(uint3 id){
 		count = count + 1;
 		lightSum = lightSum + getlllumination(posXpY);
 	}
-	if(!XpYp){
+	if(!XpYp && (!XpY && !XYp)){
 		count = count + 1;
 		lightSum = lightSum + getlllumination(posXpYp);
 	}
@@ -709,7 +709,7 @@ float getLightB_RD(uint3 id){
 		count = count + 1;
 		lightSum = lightSum + getlllumination(posXpY);
 	}
-	if(!XpYm){
+	if(!XpYm && (!XpY && !XYm)){
 		count = count + 1;
 		lightSum = lightSum + getlllumination(posXpYm);
 	}

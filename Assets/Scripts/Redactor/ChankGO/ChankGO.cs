@@ -18,7 +18,7 @@ namespace Game
             [SerializeField]
             MeshRenderer meshRendererBasic;
 
-            static class MeshData {
+           static class MeshData {
                 const byte sizeXTextureColor = 180;
                 const byte sizeYTextureColor = 200; //183 если без соседей
 
@@ -341,13 +341,14 @@ namespace Game
                     for (int x = 0; x < 32; x++) {
                         for (int y = 0; y < 32; y++) {
                             for (int z = 0; z < 32; z++) {
-                                if (x > 0 && x < 32 && y > 0 && y < 32 && z > 0 && z < 32)
+                                if (x > 0 && x < 31 && y > 0 && y < 31 && z > 0 && z < 31)
                                     break;
 
                                 DrawBlock(ref meshData, x,y,z);
                             }
                         }
                     }
+                    meshData.mainTexture.Apply();
 
                     void DrawBlock(ref Grafic.Data.MeshChankColor meshData, int x, int y, int z)
                     {
@@ -367,14 +368,14 @@ namespace Game
                         Vector3Int posD = new Vector3Int(pos.x, pos.y - 1, pos.z);
                         Vector3Int posB = new Vector3Int(pos.x, pos.y, pos.z - 1);
 
-                        if (color.a > 0.9f && x != 0 && y > 10 && z == 0)
-                        {
-                            bool test = false;
-                        }
-
                         getColorBlock(out colorL, posL);
                         getColorBlock(out colorD, posD);
                         getColorBlock(out colorB, posB);
+
+                        if (color.a > 0.9f && colorD.a > 0.9f && x >= 0 && y >= 0 && z == 31 && forward == null)
+                        {
+                            bool test = false;
+                        }
 
                         int num = x + y * 32 + z * 32 * 32;
                         int numVertStart = num * 4 * 3;
@@ -461,10 +462,10 @@ namespace Game
                                 meshData.uv[numVertStart + 2 + 8] = new Vector2(uvXnow + uvXsize, uvYnow + uvYsize);
                                 meshData.uv[numVertStart + 3 + 8] = new Vector2(uvXnow + uvXsize, uvYnow);
 
-                                meshData.uv2[numVertStart + 0 + 8] = new Vector2(getLightB_RD(posD), 0);
-                                meshData.uv2[numVertStart + 1 + 8] = new Vector2(getLightB_RU(posD), 1);
-                                meshData.uv2[numVertStart + 2 + 8] = new Vector2(getLightB_LU(posD), 1);
-                                meshData.uv2[numVertStart + 3 + 8] = new Vector2(getLightB_LD(posD), 0);
+                                meshData.uv2[numVertStart + 0 + 8] = new Vector2(getLightB_RD(posB), 0);
+                                meshData.uv2[numVertStart + 1 + 8] = new Vector2(getLightB_RU(posB), 1);
+                                meshData.uv2[numVertStart + 2 + 8] = new Vector2(getLightB_LU(posB), 1);
+                                meshData.uv2[numVertStart + 3 + 8] = new Vector2(getLightB_LD(posB), 0);
                             }
 
                         }
@@ -485,7 +486,12 @@ namespace Game
                                 for (int numNorm = 0; numNorm < 4; numNorm++)
                                     meshData.normals[numVertStart + numNorm] = new Vector3(1.0f, 0.0f, 0.0f);
 
-                                int numL = (x - 1) + y * 32 + z * 32 * 32;
+                                int numL = 0;
+                                if (x != 0) numL = (x - 1) + y * 32 + z * 32 * 32;
+                                else {
+                                    numL = indexMax + y + z * 32;
+                                }
+
                                 Vector2Int texturePosL = new Vector2Int(numL % sizeXTextureColor, numL / sizeXTextureColor);
                                 float uvXL = texturePosL.x * uvXsize;
                                 float uvYL = texturePosL.y * uvYsize;
@@ -493,6 +499,10 @@ namespace Game
                                 meshData.uv[numVertStart + 1] = new Vector2(uvXL, uvYL + uvYsize);
                                 meshData.uv[numVertStart + 2] = new Vector2(uvXL + uvXsize, uvYL + uvYsize);
                                 meshData.uv[numVertStart + 3] = new Vector2(uvXL + uvXsize, uvYL);
+
+                                if (x == 0) {
+                                    meshData.mainTexture.SetPixel(texturePosL.x, texturePosL.y, new Color(colorL.r, colorL.g, colorL.b, 1.0f));
+                                }
 
                                 meshData.uv2[numVertStart + 0] = new Vector2(getLightL_DB(pos), 0);
                                 meshData.uv2[numVertStart + 1] = new Vector2(getLightL_UB(pos), 1);
@@ -518,7 +528,13 @@ namespace Game
                                 for (int numNorm = 0; numNorm < 4; numNorm++)
                                     meshData.normals[numVertStart + numNorm + 4] = new Vector3(0.0f, 1.0f, 0.0f);
 
-                                int numD = x + (y - 1) * 32 + z * 32 * 32;
+                                int numD = 0;
+                                if (y != 0) numD = x + (y - 1) * 32 + z * 32 * 32;
+                                else
+                                {
+                                    numD = indexMax + 32 * 32 + x + z * 32;
+                                }
+
                                 Vector2Int texturePosL = new Vector2Int(numD % sizeXTextureColor, numD / sizeXTextureColor);
                                 float uvXD = texturePosL.x * uvXsize;
                                 float uvYD = texturePosL.y * uvYsize;
@@ -526,6 +542,9 @@ namespace Game
                                 meshData.uv[numVertStart + 1 + 4] = new Vector2(uvXD, uvYD + uvYsize);
                                 meshData.uv[numVertStart + 2 + 4] = new Vector2(uvXD + uvXsize, uvYD + uvYsize);
                                 meshData.uv[numVertStart + 3 + 4] = new Vector2(uvXD + uvXsize, uvYD);
+
+                                if (y == 0)
+                                    meshData.mainTexture.SetPixel(texturePosL.x, texturePosL.y, new Color(colorD.r, colorD.g, colorD.b, 1.0f));
 
                                 meshData.uv2[numVertStart + 0 + 4] = new Vector2(getLightD_LB(pos), 0);
                                 meshData.uv2[numVertStart + 1 + 4] = new Vector2(getLightD_LF(pos), 1);
@@ -552,7 +571,13 @@ namespace Game
                                 for (int numNorm = 0; numNorm < 4; numNorm++)
                                     meshData.normals[numVertStart + numNorm + 8] = new Vector3(0.0f, 0.0f, 1.0f);
 
-                                int numB = x + y * 32 + (z - 1) * 32 * 32;
+                                int numB = 0;
+                                if (z != 0) numB = x + y * 32 + (z - 1) * 32 * 32;
+                                else
+                                {
+                                    numB = indexMax + 32 * 32 * 2 + x + y * 32;
+                                }
+
                                 Vector2Int texturePosL = new Vector2Int(numB % sizeXTextureColor, numB / sizeXTextureColor);
                                 float uvXB = texturePosL.x * uvXsize;
                                 float uvYB = texturePosL.y * uvYsize;
@@ -560,6 +585,9 @@ namespace Game
                                 meshData.uv[numVertStart + 1 + 8] = new Vector2(uvXB, uvYB + uvYsize);
                                 meshData.uv[numVertStart + 2 + 8] = new Vector2(uvXB + uvXsize, uvYB + uvYsize);
                                 meshData.uv[numVertStart + 3 + 8] = new Vector2(uvXB + uvXsize, uvYB);
+
+                                if (z == 0)
+                                    meshData.mainTexture.SetPixel(texturePosL.x, texturePosL.y, new Color(colorB.r, colorB.g, colorB.b, 1.0f));
 
                                 meshData.uv2[numVertStart + 0 + 8] = new Vector2(getLightB_RD(pos), 0);
                                 meshData.uv2[numVertStart + 1 + 8] = new Vector2(getLightB_RU(pos), 1);
@@ -633,19 +661,19 @@ namespace Game
                         float result = 0.001f;
 
                         byte count = 0;
-                        if (c1.a > 0.9) {
+                        if (c1.a <= 0.9) {
                             count++;
                             result += s1;
                         }
-                        if (c2.a > 0.9) {
+                        if (c2.a <= 0.9) {
                             count++;
                             result += s2;
                         }
-                        if (c3.a > 0.9) {
+                        if (c3.a <= 0.9f && c2.a <= 0.9f && c4.a <= 0.9f) {
                             count++;
                             result += s3;
                         }
-                        if (c4.a > 0.9)
+                        if (c4.a <= 0.9)
                         {
                             count++;
                             result += s4;
@@ -659,7 +687,7 @@ namespace Game
                     }
                     void getColorAndLight(Vector3Int pos, out Color color, out float light) {
                         color = new Color(0, 0, 0, 0);
-                        light = 0;
+                        light = 0.99f;
 
                         byte countOutRange = 0;
                         if (pos.x < 0 || pos.x > 31)
@@ -733,7 +761,7 @@ namespace Game
                         getColorAndLight(new Vector3Int(pos.x, pos.y - 1, pos.z - 1), out c3, out s3);
                         getColorAndLight(new Vector3Int(pos.x, pos.y - 1, pos.z), out c4, out s4);
 
-                        result = calcShadow4(c1, s1, c2, s1, c3, s3, c4, s4);
+                        result = calcShadow4(c1, s1, c2, s2, c3, s3, c4, s4);
 
                         return result;
                     }
@@ -748,7 +776,7 @@ namespace Game
                         getColorAndLight(new Vector3Int(pos.x, pos.y+1, pos.z - 1), out c3, out s3);
                         getColorAndLight(new Vector3Int(pos.x, pos.y+1, pos.z), out c4, out s4);
 
-                        result = calcShadow4(c1,s1,c2,s1,c3,s3,c4,s4);
+                        result = calcShadow4(c1,s1,c2,s2,c3,s3,c4,s4);
 
                         return result;
                     }
@@ -763,7 +791,7 @@ namespace Game
                         getColorAndLight(new Vector3Int(pos.x, pos.y + 1, pos.z + 1), out c3, out s3);
                         getColorAndLight(new Vector3Int(pos.x, pos.y + 1, pos.z), out c4, out s4);
 
-                        result = calcShadow4(c1, s1, c2, s1, c3, s3, c4, s4);
+                        result = calcShadow4(c1, s1, c2, s2, c3, s3, c4, s4);
 
                         return result;
                     }
@@ -778,7 +806,7 @@ namespace Game
                         getColorAndLight(new Vector3Int(pos.x, pos.y - 1, pos.z + 1), out c3, out s3);
                         getColorAndLight(new Vector3Int(pos.x, pos.y - 1, pos.z), out c4, out s4);
 
-                        result = calcShadow4(c1, s1, c2, s1, c3, s3, c4, s4);
+                        result = calcShadow4(c1, s1, c2, s2, c3, s3, c4, s4);
 
                         return result;
                     }
@@ -794,7 +822,7 @@ namespace Game
                         getColorAndLight(new Vector3Int(pos.x - 1, pos.y, pos.z - 1), out c3, out s3);
                         getColorAndLight(new Vector3Int(pos.x - 1, pos.y, pos.z), out c4, out s4);
 
-                        result = calcShadow4(c1, s1, c2, s1, c3, s3, c4, s4);
+                        result = calcShadow4(c1, s1, c2, s2, c3, s3, c4, s4);
 
                         return result;
                     }
@@ -809,7 +837,7 @@ namespace Game
                         getColorAndLight(new Vector3Int(pos.x - 1, pos.y, pos.z + 1), out c3, out s3);
                         getColorAndLight(new Vector3Int(pos.x - 1, pos.y, pos.z), out c4, out s4);
 
-                        result = calcShadow4(c1, s1, c2, s1, c3, s3, c4, s4);
+                        result = calcShadow4(c1, s1, c2, s2, c3, s3, c4, s4);
 
                         return result;
                     }
@@ -824,7 +852,7 @@ namespace Game
                         getColorAndLight(new Vector3Int(pos.x + 1, pos.y, pos.z + 1), out c3, out s3);
                         getColorAndLight(new Vector3Int(pos.x + 1, pos.y, pos.z), out c4, out s4);
 
-                        result = calcShadow4(c1, s1, c2, s1, c3, s3, c4, s4);
+                        result = calcShadow4(c1, s1, c2, s2, c3, s3, c4, s4);
 
                         return result;
                     }
@@ -839,6 +867,8 @@ namespace Game
                         getColorAndLight(new Vector3Int(pos.x + 1, pos.y, pos.z - 1), out c3, out s3);
                         getColorAndLight(new Vector3Int(pos.x + 1, pos.y, pos.z), out c4, out s4);
 
+                        result = calcShadow4(c1, s1, c2, s2, c3, s3, c4, s4);
+
                         return result;
                     }
 
@@ -850,9 +880,9 @@ namespace Game
 
                         getColorAndLight(new Vector3Int(pos.x, pos.y, pos.z), out c1, out s1);
                         getColorAndLight(new Vector3Int(pos.x, pos.y - 1, pos.z), out c2, out s2);
-                        getColorAndLight(new Vector3Int(pos.x + 1, pos.y - 1, pos.z), out c3, out s3);
-                        getColorAndLight(new Vector3Int(pos.x + 1, pos.y, pos.z), out c4, out s4);
-
+                        getColorAndLight(new Vector3Int(pos.x - 1, pos.y - 1, pos.z), out c3, out s3);
+                        getColorAndLight(new Vector3Int(pos.x - 1, pos.y, pos.z), out c4, out s4);
+                        result = calcShadow4(c1, s1, c2, s2, c3, s3, c4, s4);
                         return result;
                     }
                     float getLightB_LU(Vector3Int pos) {
@@ -863,9 +893,9 @@ namespace Game
 
                         getColorAndLight(new Vector3Int(pos.x, pos.y, pos.z), out c1, out s1);
                         getColorAndLight(new Vector3Int(pos.x, pos.y + 1, pos.z), out c2, out s2);
-                        getColorAndLight(new Vector3Int(pos.x + 1, pos.y + 1, pos.z), out c3, out s3);
-                        getColorAndLight(new Vector3Int(pos.x + 1, pos.y, pos.z), out c4, out s4);
-
+                        getColorAndLight(new Vector3Int(pos.x - 1, pos.y + 1, pos.z), out c3, out s3);
+                        getColorAndLight(new Vector3Int(pos.x - 1, pos.y, pos.z), out c4, out s4);
+                        result = calcShadow4(c1, s1, c2, s2, c3, s3, c4, s4);
                         return result;
                     }
                     float getLightB_RU(Vector3Int pos) {
@@ -878,7 +908,7 @@ namespace Game
                         getColorAndLight(new Vector3Int(pos.x, pos.y + 1, pos.z), out c2, out s2);
                         getColorAndLight(new Vector3Int(pos.x + 1, pos.y + 1, pos.z), out c3, out s3);
                         getColorAndLight(new Vector3Int(pos.x + 1, pos.y, pos.z), out c4, out s4);
-
+                        result = calcShadow4(c1, s1, c2, s2, c3, s3, c4, s4);
                         return result;
                     }
                     float getLightB_RD(Vector3Int pos) {
@@ -891,7 +921,7 @@ namespace Game
                         getColorAndLight(new Vector3Int(pos.x, pos.y - 1, pos.z), out c2, out s2);
                         getColorAndLight(new Vector3Int(pos.x + 1, pos.y - 1, pos.z), out c3, out s3);
                         getColorAndLight(new Vector3Int(pos.x + 1, pos.y, pos.z), out c4, out s4);
-
+                        result = calcShadow4(c1, s1, c2, s2, c3, s3, c4, s4);
                         return result;
                     }
                 }
@@ -929,6 +959,12 @@ namespace Game
                 //≈сли размер биома 1 то рисуем по блокам
             }
 
+            public void ReDraw()
+            {
+                //перерисовать чанк
+                JobRedraw jobRedraw = new JobRedraw(this);
+                jobRedraw.Execute();
+            }
 
             public void Awake()
             {
@@ -964,13 +1000,9 @@ namespace Game
 
                 Vector3 position = chank.index * sizeChank;
                 transform.localPosition = position;
-
-
-                //перерисовать чанк
-                JobStartRedraw();
-                //JobRedraw jobRedraw = new JobRedraw(this);
-                //jobRedraw.Execute();
             }
+
+
             /// <summary>
             /// ќчистить чанк дл€ дальнейшего использовани€
             /// </summary>
