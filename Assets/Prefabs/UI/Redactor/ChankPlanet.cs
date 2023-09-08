@@ -149,7 +149,7 @@ public class ChankPlanet : Chank
             blockWinerID = planetData.pattern.biomesSurface[biomeNum].genRules[num].blockID;
         }
 
-        //Если блок ниже поверхности то проверяем еще срети подземных биомов
+        //Если блок ниже поверхности то проверяем еще среди подземных биомов
         if (heightNow < heightSurface)
         {
 
@@ -253,7 +253,7 @@ public class ChankPlanet : Chank
             }
         }
     }
-    protected override void UpdateNeighbour(Side side)
+    public override void UpdateNeighbour(Side side)
     {
         base.UpdateNeighbour(side);
     }

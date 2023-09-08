@@ -950,8 +950,8 @@ namespace Game
             struct JobRedraw : IJob
             {
                 //ChankGO chankGO;
-                const byte sizeXTextureColor = 180;
-                const byte sizeYTextureColor = 200; //183 если без соседей
+                public const byte sizeXTextureColor = 180;
+                public const byte sizeYTextureColor = 200; //183 если без соседей
 
                 const int indexMax = 32 * 32 * 32;
                 const int countSide = 32 * 32;
@@ -1393,17 +1393,17 @@ namespace Game
                         count++;
                         result += s1;
                     }
-                    if (c2.a <= 0.9)
+                    if (c2.a <= 0.9 && s2 > 0)
                     {
                         count++;
                         result += s2;
                     }
-                    if (c3.a <= 0.9f && c2.a <= 0.9f && c4.a <= 0.9f)
+                    if (c3.a <= 0.9f && s3 > 0 && c2.a <= 0.9f && c4.a <= 0.9f)
                     {
                         count++;
                         result += s3;
                     }
-                    if (c4.a <= 0.9)
+                    if (c4.a <= 0.9 && s4 > 0)
                     {
                         count++;
                         result += s4;
@@ -1635,10 +1635,17 @@ namespace Game
                             lightList[index] = data.Light[x, y, z];
                         }
 
-
-
                 colors = new NativeArray<Color>(colorList, Allocator.TempJob);
                 light = new NativeArray<float>(lightList, Allocator.TempJob);
+
+                //Проверяем соседей у чанка
+                data.UpdateNeighbour(Side.left);
+                data.UpdateNeighbour(Side.right);
+                data.UpdateNeighbour(Side.down);
+                data.UpdateNeighbour(Side.up);
+                data.UpdateNeighbour(Side.back);
+                data.UpdateNeighbour(Side.face);
+
                 neighbourColors = new NativeArray<Color>(data.neighbourColors, Allocator.TempJob);
                 neighbourLight = new NativeArray<float>(data.neighbourLights, Allocator.TempJob);
 
@@ -1667,6 +1674,16 @@ namespace Game
                 uvLight.AddRange(jobRedraw.uvLight.ToArray());
                 normals.AddRange(jobRedraw.normals.ToArray());
 
+                //Создаем текстуру
+                Texture2D texture = new Texture2D(JobRedraw.sizeXTextureColor, JobRedraw.sizeYTextureColor);
+                texture.filterMode = FilterMode.Point;
+                for (int num = 0; num < jobRedraw.colors.Length; num++) {
+                    Vector2Int texturePos = new Vector2Int(num % JobRedraw.sizeXTextureColor, num / JobRedraw.sizeXTextureColor);
+                    Color color = jobRedraw.colors[num];
+                    texture.SetPixel(texturePos.x, texturePos.y, new Color(color.r, color.g, color.b));
+                }
+                texture.Apply();
+
                 jobRedraw.triangles.Dispose();
                 jobRedraw.normals.Dispose();
                 jobRedraw.uvMain.Dispose();
@@ -1688,7 +1705,7 @@ namespace Game
 
                 //texture = graficMesh.dataMesh.mainTexture;
 
-                //meshRendererBasic.materials[0].SetTexture("_MainTex", texture);
+                meshRendererBasic.materials[0].SetTexture("_MainTex", texture);
                 meshRendererBasic.materials[0].SetTexture("_llluminationTex", MeshData.textureShadow);
                 meshFilterBasic.mesh = meshColor;
 

@@ -11,7 +11,7 @@ public abstract class Chank
     static class DefaultValue {
         static public readonly float[,,] Illumination;
 
-        static DefaultValue(){
+        static DefaultValue() {
             Illumination = new float[Size, Size, Size];
 
             for (int x = 0; x < Illumination.GetLength(0); x++) {
@@ -40,6 +40,7 @@ public abstract class Chank
 
     protected PlanetData planetData;
     public event Action isChange;
+    public Times times;
 
     /// <summary>
     /// генерация чанка
@@ -47,6 +48,13 @@ public abstract class Chank
     protected bool isStartGenerate = false;
     protected bool isLocalGenerateDone = false; //Когда генерация в этом чанке завершена и данными могут пользоваться другие чанки, но сам чанк еще должен проверить соседей
     protected bool isDoneGenerate = false;
+
+
+    public struct Times {
+        public double lastChange;
+
+    }
+
     protected struct JobGenerate : IJob
     {
         Chank chank;
@@ -129,7 +137,7 @@ public abstract class Chank
     /// </summary>
     /// <param name="chank"></param>
     /// <param name="side"></param>
-    virtual protected void UpdateNeighbour(Side side) {
+    virtual public void UpdateNeighbour(Side side) {
         int blockSide = Size * Size;
 
         switch (side) {
@@ -145,7 +153,7 @@ public abstract class Chank
         void CalcLeft()
         {
             Chank neigbour = GetNeighbour(Side.left);
-            if (neigbour == null)
+            if (neigbour == null || neigbour.times.lastChange < times.lastChange)
                 return;
 
 
@@ -164,7 +172,7 @@ public abstract class Chank
         void CalcRight()
         {
             Chank neigbour = GetNeighbour(Side.right);
-            if (neigbour == null)
+            if (neigbour == null || neigbour.times.lastChange < times.lastChange)
                 return;
 
 
@@ -183,7 +191,7 @@ public abstract class Chank
         void CalcDown()
         {
             Chank neigbour = GetNeighbour(Side.down);
-            if (neigbour == null)
+            if (neigbour == null || neigbour.times.lastChange < times.lastChange)
                 return;
 
 
@@ -202,7 +210,7 @@ public abstract class Chank
         void CalcUp()
         {
             Chank neigbour = GetNeighbour(Side.up);
-            if (neigbour == null)
+            if (neigbour == null || neigbour.times.lastChange < times.lastChange)
                 return;
 
 
@@ -220,7 +228,7 @@ public abstract class Chank
         void CalcBack()
         {
             Chank neigbour = GetNeighbour(Side.back);
-            if (neigbour == null)
+            if (neigbour == null || neigbour.times.lastChange < times.lastChange)
                 return;
 
 
@@ -238,7 +246,7 @@ public abstract class Chank
         void CalcForward()
         {
             Chank neigbour = GetNeighbour(Side.back);
-            if (neigbour == null)
+            if (neigbour == null || neigbour.times.lastChange < times.lastChange)
                 return;
 
 
@@ -248,8 +256,8 @@ public abstract class Chank
                 for (int y = 0; y < Size; y++)
                 {
                     int index = indexStart + x + y * 32;
-                    neighbourColors[index] = neigbour.Colors[x, y, 31];
-                    neighbourLights[index] = neigbour.Light[x, y, 31];
+                    neighbourColors[index] = neigbour.Colors[x, y, 0];
+                    neighbourLights[index] = neigbour.Light[x, y, 0];
                 }
 
         }
@@ -269,6 +277,13 @@ public abstract class Chank
         this.sizeBlock = sizeBlock;
         this.index = index;
         this.planetData = planetData;
+
+        iniActIsChange();
+
+        void iniActIsChange()
+        {
+            isChange += fixChangeTime;
+        }
     }
 
     abstract protected void JobStartGenerate();
@@ -276,5 +291,9 @@ public abstract class Chank
     /// Вычислить финальный цвет для блоков
     /// </summary>
     abstract protected void CalcColor();
+
+    void fixChangeTime() {
+        times.lastChange = Time.unscaledTimeAsDouble;
+    }
 
 }
