@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Unity.Jobs;
 using UnityEngine;
+using Unity.Collections;
 using System.Diagnostics;
 
 namespace Game
@@ -10,6 +11,8 @@ namespace Game
         public class ChankGO : MonoBehaviour
         {
             static List<ChankGO> buffer = new List<ChankGO>();
+            //РћС‡РµСЂРµСЃСЊ С‡Р°РЅРєРѕРІ С‚СЂРµР±СѓСЋС‰РёС… РёРЅРёС†РёР°Р»РёР·Р°С†РёРё
+            static Queue<ChankGO> inicializeQueue = new Queue<ChankGO>();
 
             Chank data;
 
@@ -17,12 +20,26 @@ namespace Game
             MeshFilter meshFilterBasic;
             [SerializeField]
             MeshRenderer meshRendererBasic;
+            Mesh meshColor;
 
-           static class MeshData {
+            bool JobRedrawExist = false;
+            JobRedraw jobRedraw;
+            JobHandle jobRedrawHandle;
+
+            static public void tryInicialize() {
+                if (inicializeQueue.Count == 0)
+                    return;
+
+                ChankGO chankGO = inicializeQueue.Peek();
+
+                    inicializeQueue.Dequeue();
+            }
+
+            static class MeshData {
                 const byte sizeXTextureColor = 180;
-                const byte sizeYTextureColor = 200; //183 если без соседей
+                const byte sizeYTextureColor = 200; //183 РµСЃР»Рё Р±РµР· СЃРѕСЃРµРґРµР№
 
-                static readonly Vector3[] vertices32;
+                static public readonly Vector3[] vertices32;
                 static readonly Vector3[] normals32;
 
                 static readonly Vector2[] uvTexBlock;
@@ -34,14 +51,14 @@ namespace Game
                     List<Vector3> vertices32List = new List<Vector3>();
                     List<Vector3> normals32List = new List<Vector3>();
 
-                    //Перебираем все позиции блоков
+                    //РџРµСЂРµР±РёСЂР°РµРј РІСЃРµ РїРѕР·РёС†РёРё Р±Р»РѕРєРѕРІ
                     for (int z = 0; z < Chank.Size; z++)
                     {
                         for (int y = 0; y < Chank.Size; y++)
                         {
                             for (int x = 0; x < Chank.Size; x++)
                             {
-                                //1 блок 8 вершин
+                                //1 Р±Р»РѕРє 8 РІРµСЂС€РёРЅ
                                 Vector3 LDB = new Vector3(x + 0, y + 0, z + 0);
                                 Vector3 RDB = new Vector3(x + 1, y + 0, z + 0);
 
@@ -54,10 +71,10 @@ namespace Game
                                 Vector3 LUF = new Vector3(x + 0, y + 1, z + 1);
                                 Vector3 RUF = new Vector3(x + 1, y + 1, z + 1);
 
-                                //1 блок 3 сторон и 4 вершины на каждую 
-                                //Лицевая сторона внутри
+                                //1 Р±Р»РѕРє 3 СЃС‚РѕСЂРѕРЅ Рё 4 РІРµСЂС€РёРЅС‹ РЅР° РєР°Р¶РґСѓСЋ 
+                                //Р›РёС†РµРІР°СЏ СЃС‚РѕСЂРѕРЅР° РІРЅСѓС‚СЂРё
 
-                                //лево или право
+                                //Р»РµРІРѕ РёР»Рё РїСЂР°РІРѕ
                                 vertices32List.Add(LDB);
                                 vertices32List.Add(LUB);
                                 vertices32List.Add(LUF);
@@ -66,7 +83,7 @@ namespace Game
                                 for(int num = 0; num < 4; num++)
                                     normals32List.Add(Vector3.right);
 
-                                //низ или верх
+                                //РЅРёР· РёР»Рё РІРµСЂС…
                                 vertices32List.Add(LDB);
                                 vertices32List.Add(LDF);
                                 vertices32List.Add(RDF);
@@ -75,7 +92,7 @@ namespace Game
                                 for (int num = 0; num < 4; num++)
                                     normals32List.Add(Vector3.up);
 
-                                //зад и перед
+                                //Р·Р°Рґ Рё РїРµСЂРµРґ
                                 vertices32List.Add(RDB);
                                 vertices32List.Add(RUB);
                                 vertices32List.Add(LUB);
@@ -90,7 +107,7 @@ namespace Game
                     vertices32 = vertices32List.ToArray();
                     normals32 = vertices32List.ToArray();
 
-                    //Создаем базовые позиции основной текстуры
+                    //РЎРѕР·РґР°РµРј Р±Р°Р·РѕРІС‹Рµ РїРѕР·РёС†РёРё РѕСЃРЅРѕРІРЅРѕР№ С‚РµРєСЃС‚СѓСЂС‹
                     List<Vector2> uvTextureList = new List<Vector2>();
                     uvTextureList.Add(new Vector2(0, 0));
                     uvTextureList.Add(new Vector2(0, 1));
@@ -102,7 +119,7 @@ namespace Game
 
                     uvTexBlock = uvTextureList.ToArray();
 
-                    //Создаем текструру тени
+                    //РЎРѕР·РґР°РµРј С‚РµРєСЃС‚СЂСѓСЂСѓ С‚РµРЅРё
                     textureShadow = new Texture2D(255, 1);
                     for (int x = 0; x < textureShadow.width; x++) {
                         float coof = (float)x / textureShadow.width;
@@ -130,7 +147,7 @@ namespace Game
 
                     int vertSize = 4 * 3;
 
-                    //Перебираем все блоки
+                    //РџРµСЂРµР±РёСЂР°РµРј РІСЃРµ Р±Р»РѕРєРё
                     int blockNum = 0;
                     for (int z = 0; z < data.BlocksID.GetLength(1); z++)
                     {
@@ -144,7 +161,7 @@ namespace Game
                                 Color colorDown = data.GetColor(pos, Chank.Placement.Downer);
                                 Color colorBack = data.GetColor(pos, Chank.Placement.Back);
 
-                                //получаем индекс для всех 12 вершин
+                                //РїРѕР»СѓС‡Р°РµРј РёРЅРґРµРєСЃ РґР»СЏ РІСЃРµС… 12 РІРµСЂС€РёРЅ
 
                                 int X1 = blockNum * vertSize;
                                 int X2 = X1 + 1;
@@ -161,19 +178,19 @@ namespace Game
                                 int Z3 = X1 + 10;
                                 int Z4 = X1 + 11;
 
-                                //Находим пиксель этого блока на текстуре
+                                //РќР°С…РѕРґРёРј РїРёРєСЃРµР»СЊ СЌС‚РѕРіРѕ Р±Р»РѕРєР° РЅР° С‚РµРєСЃС‚СѓСЂРµ
                                 char pixX = (char)(blockNum % texture2Dnew.width);
                                 char pixY = (char)(blockNum / texture2Dnew.width);
 
-                                //Проверяем стороны
-                                //делаем стенки этого блока
+                                //РџСЂРѕРІРµСЂСЏРµРј СЃС‚РѕСЂРѕРЅС‹
+                                //РґРµР»Р°РµРј СЃС‚РµРЅРєРё СЌС‚РѕРіРѕ Р±Р»РѕРєР°
 
-                                //Если слева ничего и текущий цветоблок есть (достаточно не прозрачный)
+                                //Р•СЃР»Рё СЃР»РµРІР° РЅРёС‡РµРіРѕ Рё С‚РµРєСѓС‰РёР№ С†РІРµС‚РѕР±Р»РѕРє РµСЃС‚СЊ (РґРѕСЃС‚Р°С‚РѕС‡РЅРѕ РЅРµ РїСЂРѕР·СЂР°С‡РЅС‹Р№)
                                 if (colorLeft.a <= 0.9f && colorThis.a > 0.9f)
                                 {
                                     AddPlane(X1, X2, X3, X4, colorThis, false, pixX, pixY);
                                 }
-                                //Правая сторона левого куба
+                                //РџСЂР°РІР°СЏ СЃС‚РѕСЂРѕРЅР° Р»РµРІРѕРіРѕ РєСѓР±Р°
                                 else if (colorLeft.a > 0.9f && colorThis.a <= 0.9f)
                                 {
                                     int blockNumLeft = (x + y * Chank.Size + z * Chank.Size * Chank.Size);
@@ -182,12 +199,12 @@ namespace Game
                                     AddPlane(X1, X2, X3, X4, colorLeft, true, pixXL, pixYL);
                                 }
 
-                                //Если снизу ничего и текущий цветоблок есть (достаточно не прозрачный)
+                                //Р•СЃР»Рё СЃРЅРёР·Сѓ РЅРёС‡РµРіРѕ Рё С‚РµРєСѓС‰РёР№ С†РІРµС‚РѕР±Р»РѕРє РµСЃС‚СЊ (РґРѕСЃС‚Р°С‚РѕС‡РЅРѕ РЅРµ РїСЂРѕР·СЂР°С‡РЅС‹Р№)
                                 if (colorDown.a <= 0.9f && colorThis.a > 0.9f)
                                 {
                                     AddPlane(Y1, Y2, Y3, Y4, colorThis, false, pixX, pixY);
                                 }
-                                //Верхняя сторона нижнего куба
+                                //Р’РµСЂС…РЅСЏСЏ СЃС‚РѕСЂРѕРЅР° РЅРёР¶РЅРµРіРѕ РєСѓР±Р°
                                 else if (colorDown.a > 0.9f && colorThis.a <= 0.9f)
                                 {
                                     int blockNumDown = (x + y * Chank.Size + z * Chank.Size * Chank.Size);
@@ -196,12 +213,12 @@ namespace Game
                                     AddPlane(Y1, Y2, Y3, Y4, colorDown, true, pixXD, pixYD);
                                 }
 
-                                //Если сзади ничего и текущий цветоблок есть (достаточно не прозрачный)
+                                //Р•СЃР»Рё СЃР·Р°РґРё РЅРёС‡РµРіРѕ Рё С‚РµРєСѓС‰РёР№ С†РІРµС‚РѕР±Р»РѕРє РµСЃС‚СЊ (РґРѕСЃС‚Р°С‚РѕС‡РЅРѕ РЅРµ РїСЂРѕР·СЂР°С‡РЅС‹Р№)
                                 if (colorBack.a <= 0.9f && colorThis.a > 0.9f)
                                 {
                                     AddPlane(Z1, Z2, Z3, Z4, colorThis, false, pixX, pixY);
                                 }
-                                //Передняя сторона заднего куба
+                                //РџРµСЂРµРґРЅСЏСЏ СЃС‚РѕСЂРѕРЅР° Р·Р°РґРЅРµРіРѕ РєСѓР±Р°
                                 else if (colorBack.a > 0.9f && colorThis.a <= 0.9f)
                                 {
                                     int blockNumBack = (x + y * Chank.Size + z * Chank.Size * Chank.Size);
@@ -245,10 +262,10 @@ namespace Game
                         vert.Add(vertices32[P3]);
                         vert.Add(vertices32[P4]);
 
-                        //Вставляем цвет
+                        //Р’СЃС‚Р°РІР»СЏРµРј С†РІРµС‚
                         texture2Dnew.SetPixel(colorPixX, colorPisY, new Color(color.a, color.g, color.b));
 
-                        //Вычисляем текстурные координаты
+                        //Р’С‹С‡РёСЃР»СЏРµРј С‚РµРєСЃС‚СѓСЂРЅС‹Рµ РєРѕРѕСЂРґРёРЅР°С‚С‹
                         float posUVX = colorPixX / (float)texture2Dnew.width;
                         float posUVY = colorPisY / (float)texture2Dnew.width;
                         float posUVXP = posUVX + (1 / (float)texture2Dnew.width);
@@ -293,40 +310,40 @@ namespace Game
                     }
                 }
 
-                static public void CalcMeshColorShader(Chank data, out Mesh mesh, out Texture2D texture) {
+                /*
+                public static void CalcMeshColorShader(Chank data, out Mesh mesh, out Texture2D texture, in Grafic.Calc.MeshChankColor2 graficMesh) {
                     Stopwatch stopwatch = new Stopwatch();
                     stopwatch.Start();
 
-                    mesh = new Mesh();
+                    mesh = graficMesh.dataMesh.mesh;
 
-                    Grafic.Data.MeshChankColor MeshData = new Grafic.Data.MeshChankColor();
-                    Grafic.Calc.MeshChankColor.calculate(MeshData, data);
+                    graficMesh.calculate(data);
 
-                    PlusNeibourChanksData(ref MeshData, data);
+                    //PlusNeibourChanksData(ref graficMesh.dataMesh, data);
 
                     mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
                     mesh.vertices = vertices32;
-                    mesh.triangles = MeshData.triangles;
-                    mesh.normals = MeshData.normals;
-                    mesh.uv = MeshData.uv;
-                    mesh.uv2 = MeshData.uv2;
+                    mesh.triangles = graficMesh.dataMesh.triangles;
+                    mesh.normals = graficMesh.dataMesh.normals;
+                    mesh.uv = graficMesh.dataMesh.uv;
+                    mesh.uv2 = graficMesh.dataMesh.uv2;
 
-
-                    texture = MeshData.mainTexture;
+                    texture = graficMesh.dataMesh.mainTexture;
 
                     stopwatch.Stop();
                     UnityEngine.Debug.Log("GenChankGO: " + data.index +
                         " stopwatch: " + stopwatch.ElapsedMilliseconds);
                 }
-
-                //Применить изменения с учетом данных о соседних чанках
+                */
+                //РџСЂРёРјРµРЅРёС‚СЊ РёР·РјРµРЅРµРЅРёСЏ СЃ СѓС‡РµС‚РѕРј РґР°РЅРЅС‹С… Рѕ СЃРѕСЃРµРґРЅРёС… С‡Р°РЅРєР°С…
+                /*
                 static public void PlusNeibourChanksData(ref Grafic.Data.MeshChankColor meshData,in Chank data) {
 
                     byte xEnd = (byte)(data.Colors.GetLength(0) - 1);
                     byte yEnd = (byte)(data.Colors.GetLength(0) - 1);
                     byte zEnd = (byte)(data.Colors.GetLength(0) - 1);
 
-                    //Получаем соседей
+                    //РџРѕР»СѓС‡Р°РµРј СЃРѕСЃРµРґРµР№
                     Chank chank = data;
                     Chank left = data.GetNeighbour(Side.left);
                     Chank right = data.GetNeighbour(Side.right);
@@ -337,12 +354,14 @@ namespace Game
 
                     int indexMax = 32 * 32 * 32;
 
-                    //изменяем текстуру и меш
+                    //РёР·РјРµРЅСЏРµРј С‚РµРєСЃС‚СѓСЂСѓ Рё РјРµС€
                     for (int x = 0; x < 32; x++) {
                         for (int y = 0; y < 32; y++) {
                             for (int z = 0; z < 32; z++) {
-                                if (x > 0 && x < 31 && y > 0 && y < 31 && z > 0 && z < 31)
+                                if (z < 31 && x > 0 && x < 31 && y > 0 && y < 31 && z > 0)
+                                {
                                     break;
+                                }
 
                                 DrawBlock(ref meshData, x,y,z);
                             }
@@ -393,7 +412,7 @@ namespace Game
                         {
 
                             //Left
-                            if (colorL.a <= 0.9f
+                            if (colorL.a <= 0.9f && pos.x == 0
                                 )
                             {
                                 meshData.triangles[numTrianStart + 0] = numVertStart;
@@ -418,7 +437,7 @@ namespace Game
                                 meshData.uv2[numVertStart + 3] = new Vector2(getLightL_DF(posL), 0);
                             }
                             //Down
-                            if (colorD.a <= 0.9f
+                            if (colorD.a <= 0.9f && pos.y == 0
                                 )
                             {
                                 meshData.triangles[numTrianStart + 6 + 0] = numVertStart + 4;
@@ -443,7 +462,7 @@ namespace Game
                                 meshData.uv2[numVertStart + 3 + 4] = new Vector2(getLightD_RB(posD), 0);
                             }
                             //Back
-                            if (colorB.a <= 0.9f
+                            if (colorB.a <= 0.9f && pos.z == 0
                                 )
                             {
                                 meshData.triangles[numTrianStart + 12 + 0] = numVertStart + 8;
@@ -706,46 +725,46 @@ namespace Game
                                 return;
 
                             color = left.Colors[31, pos.y, pos.z];
-                            light = left.Illumination[31, pos.y, pos.z];
+                            light = left.Light[31, pos.y, pos.z];
                         }
                         else if (pos.x > 31)
                         {
                             if (right == null)
                                 return;
                             color = right.Colors[0, pos.y, pos.z];
-                            light = right.Illumination[0, pos.y, pos.z];
+                            light = right.Light[0, pos.y, pos.z];
                         }
                         else if (pos.y < 0)
                         {
                             if (down == null)
                                 return;
                             color = down.Colors[pos.x, 31, pos.z];
-                            light = down.Illumination[pos.x, 31, pos.z];
+                            light = down.Light[pos.x, 31, pos.z];
                         }
                         else if (pos.y > 31)
                         {
                             if (up == null)
                                 return;
                             color = up.Colors[pos.x, 0, pos.z];
-                            light = up.Illumination[pos.x, 0, pos.z];
+                            light = up.Light[pos.x, 0, pos.z];
                         }
                         else if (pos.z < 0)
                         {
                             if (back == null)
                                 return;
                             color = back.Colors[pos.x, pos.y, 31];
-                            light = back.Illumination[pos.x, pos.y, 31];
+                            light = back.Light[pos.x, pos.y, 31];
                         }
                         else if (pos.z > 31)
                         {
                             if (forward == null)
                                 return;
                             color = forward.Colors[pos.x, pos.y, 0];
-                            light = forward.Illumination[pos.x, pos.y, 0];
+                            light = forward.Light[pos.x, pos.y, 0];
                         }
                         else  {
                             color = chank.Colors[pos.x, pos.y, pos.z];
-                            light = chank.Illumination[pos.x, pos.y, pos.z];
+                            light = chank.Light[pos.x, pos.y, pos.z];
                         }
 
 
@@ -925,74 +944,791 @@ namespace Game
                         return result;
                     }
                 }
+                */
             }
 
             struct JobRedraw : IJob
             {
-                ChankGO chankGO;
+                //ChankGO chankGO;
+                const byte sizeXTextureColor = 180;
+                const byte sizeYTextureColor = 200; //183 РµСЃР»Рё Р±РµР· СЃРѕСЃРµРґРµР№
 
-                public JobRedraw(ChankGO chankGO)
+                const int indexMax = 32 * 32 * 32;
+                const int countSide = 32 * 32;
+                const int countTriangles = indexMax * 3 * 2 * 3;
+                const int countVert = indexMax * 3 * 4;
+
+                public NativeArray<int> triangles;
+                public NativeArray<Vector2> uvMain;
+                public NativeArray<Vector2> uvLight;
+                public NativeArray<Vector3> normals;
+
+                public NativeArray<Color> colors;
+                public NativeArray<float> lights;
+                public NativeArray<Color> neighbourColors;
+                public NativeArray<float> neighbourLight;
+
+                public JobRedraw(NativeArray<Color> colors, NativeArray<float> lights, NativeArray<Color> neighbourColors, NativeArray<float> neighbourLight)
                 {
-                    this.chankGO = chankGO;
+                    triangles = new NativeArray<int>(countTriangles, Allocator.TempJob);
+                    uvMain = new NativeArray<Vector2>(countVert, Allocator.TempJob);
+                    uvLight = new NativeArray<Vector2>(countVert, Allocator.TempJob);
+                    normals = new NativeArray<Vector3>(countVert, Allocator.TempJob);
+
+                    this.colors = colors;
+                    this.lights = lights;
+                    this.neighbourColors = neighbourColors;
+                    this.neighbourLight = neighbourLight;
+
+                }
+
+                void calcMesh() {
+                    for (byte x = 0; x < 32; x++) {
+                        for (byte y = 0; y < 32; y++) {
+                            for(byte z = 0; z < 32; z++)
+                                calcBlock(x,y,z);
+                        }
+                    }
+                }
+
+                void calcBlock(byte x, byte y, byte z) {
+                    //get global index
+                    int index = x + y * 32 + z * 32 * 32;
+
+                    Color color = new Color(0.0f, 0.0f, 0.0f, 0.0f);
+                    if (index >= 0 && index < indexMax)
+                    {
+                        color = colors[index];
+                    }
+
+                    if (color.a > 0.9 && x >= 31) {
+                        bool test = true;
+                    }
+
+                    //get color if Neibour exist
+                    Color colorL, colorD, colorB;
+
+                    Vector3Int pos = new Vector3Int(x, y, z);
+                    Vector3Int posL = new Vector3Int(pos.x - 1, pos.y, pos.z);
+                    Vector3Int posD = new Vector3Int(pos.x, pos.y - 1, pos.z);
+                    Vector3Int posB = new Vector3Int(pos.x, pos.y, pos.z - 1);
+
+                    getDataColor(posL, out colorL);
+                    getDataColor(posD, out colorD);
+                    getDataColor(posB, out colorB);
+
+                    int num = x + y * 32 + z * 32 * 32;
+                    int numVertStart = num * 4 * 3;
+                    int numTrianStart = num * 3 * 2 * 3;
+
+                    Vector2 texturePos = new Vector2(num % sizeXTextureColor, num / sizeXTextureColor);
+                    float uvXsize = 1.0f / sizeXTextureColor;
+                    float uvYsize = 1.0f / sizeYTextureColor;
+                    float uvXnow = texturePos.x * uvXsize;
+                    float uvYnow = texturePos.y * uvYsize;
+
+
+                    //Left, Down, Back
+                    if (color.a > 0.9f)
+                    {
+
+                        //Left
+                        if (colorL.a <= 0.9f
+                            )
+                        {
+                            triangles[numTrianStart + 0] = numVertStart;
+                            triangles[numTrianStart + 1] = numVertStart + 3;
+                            triangles[numTrianStart + 2] = numVertStart + 2;
+
+                            triangles[numTrianStart + 3] = numVertStart + 2;
+                            triangles[numTrianStart + 4] = numVertStart + 1;
+                            triangles[numTrianStart + 5] = numVertStart;
+
+                            for (byte numNorm = 0; numNorm < 4; numNorm++)
+                                normals[numVertStart + numNorm] = new Vector3(-1.0f, 0.0f, 0.0f);
+
+                            uvMain[numVertStart + 0] = new Vector2(uvXnow, uvYnow);
+                            uvMain[numVertStart + 1] = new Vector2(uvXnow, uvYnow + uvYsize);
+                            uvMain[numVertStart + 2] = new Vector2(uvXnow + uvXsize, uvYnow + uvYsize);
+                            uvMain[numVertStart + 3] = new Vector2(uvXnow + uvXsize, uvYnow);
+
+                            uvLight[numVertStart + 0] = new Vector2(getLightL_DB(posL), 0);
+                            uvLight[numVertStart + 1] = new Vector2(getLightL_UB(posL), 1);
+                            uvLight[numVertStart + 2] = new Vector2(getLightL_UF(posL), 1);
+                            uvLight[numVertStart + 3] = new Vector2(getLightL_DF(posL), 0);
+                        }
+                        //Down
+                        if (colorD.a <= 0.9f
+                            )
+                        {
+                            triangles[numTrianStart + 6 + 0] = numVertStart + 4;
+                            triangles[numTrianStart + 6 + 1] = numVertStart + 4 + 3;
+                            triangles[numTrianStart + 6 + 2] = numVertStart + 4 + 2;
+
+                            triangles[numTrianStart + 6 + 3] = numVertStart + 4 + 2;
+                            triangles[numTrianStart + 6 + 4] = numVertStart + 4 + 1;
+                            triangles[numTrianStart + 6 + 5] = numVertStart + 4;
+
+                            for (int numNorm = 0; numNorm < 4; numNorm++)
+                                normals[numVertStart + numNorm + 4] = new Vector3(0.0f, -1.0f, 0.0f);
+
+                            uvMain[numVertStart + 0 + 4] = new Vector2(uvXnow, uvYnow);
+                            uvMain[numVertStart + 1 + 4] = new Vector2(uvXnow, uvYnow + uvYsize);
+                            uvMain[numVertStart + 2 + 4] = new Vector2(uvXnow + uvXsize, uvYnow + uvYsize);
+                            uvMain[numVertStart + 3 + 4] = new Vector2(uvXnow + uvXsize, uvYnow);
+
+                            uvLight[numVertStart + 0 + 4] = new Vector2(getLightD_LB(posD), 0);
+                            uvLight[numVertStart + 1 + 4] = new Vector2(getLightD_LF(posD), 1);
+                            uvLight[numVertStart + 2 + 4] = new Vector2(getLightD_RF(posD), 1);
+                            uvLight[numVertStart + 3 + 4] = new Vector2(getLightD_RB(posD), 0);
+                        }
+                        //Back
+                        if (colorB.a <= 0.9f
+                            )
+                        {
+                            triangles[numTrianStart + 12 + 0] = numVertStart + 8;
+                            triangles[numTrianStart + 12 + 1] = numVertStart + 8 + 3;
+                            triangles[numTrianStart + 12 + 2] = numVertStart + 8 + 2;
+
+                            triangles[numTrianStart + 12 + 3] = numVertStart + 8 + 2;
+                            triangles[numTrianStart + 12 + 4] = numVertStart + 8 + 1;
+                            triangles[numTrianStart + 12 + 5] = numVertStart + 8;
+
+                            for (int numNorm = 0; numNorm < 4; numNorm++)
+                                normals[numVertStart + numNorm + 8] = new Vector3(0.0f, 0.0f, -1.0f);
+
+                            uvMain[numVertStart + 0 + 8] = new Vector2(uvXnow, uvYnow);
+                            uvMain[numVertStart + 1 + 8] = new Vector2(uvXnow, uvYnow + uvYsize);
+                            uvMain[numVertStart + 2 + 8] = new Vector2(uvXnow + uvXsize, uvYnow + uvYsize);
+                            uvMain[numVertStart + 3 + 8] = new Vector2(uvXnow + uvXsize, uvYnow);
+
+                            uvLight[numVertStart + 0 + 8] = new Vector2(getLightB_RD(posB), 0);
+                            uvLight[numVertStart + 1 + 8] = new Vector2(getLightB_RU(posB), 1);
+                            uvLight[numVertStart + 2 + 8] = new Vector2(getLightB_LU(posB), 1);
+                            uvLight[numVertStart + 3 + 8] = new Vector2(getLightB_LD(posB), 0);
+                        }
+
+                    }
+                    //Neibour
+                    else
+                    {
+                        //Left
+                        if (colorL.a > 0.9f)
+                        {
+                            triangles[numTrianStart + 0] = numVertStart;
+                            triangles[numTrianStart + 1] = numVertStart + 1;
+                            triangles[numTrianStart + 2] = numVertStart + 2;
+
+                            triangles[numTrianStart + 3] = numVertStart + 2;
+                            triangles[numTrianStart + 4] = numVertStart + 3;
+                            triangles[numTrianStart + 5] = numVertStart;
+
+                            for (int numNorm = 0; numNorm < 4; numNorm++)
+                                normals[numVertStart + numNorm] = new Vector3(1.0f, 0.0f, 0.0f);
+
+                            int numL = 0;
+                            if (x != 0) numL = (x - 1) + y * 32 + z * 32 * 32;
+                            else
+                            {
+                                numL = indexMax + y + z * 32;
+                            }
+
+                            Vector2Int texturePosL = new Vector2Int(numL % sizeXTextureColor, numL / sizeXTextureColor);
+                            float uvXL = texturePosL.x * uvXsize;
+                            float uvYL = texturePosL.y * uvYsize;
+                            uvMain[numVertStart + 0] = new Vector2(uvXL, uvYL);
+                            uvMain[numVertStart + 1] = new Vector2(uvXL, uvYL + uvYsize);
+                            uvMain[numVertStart + 2] = new Vector2(uvXL + uvXsize, uvYL + uvYsize);
+                            uvMain[numVertStart + 3] = new Vector2(uvXL + uvXsize, uvYL);
+
+                            if (x == 0)
+                            {
+                                //mainTexture.SetPixel(texturePosL.x, texturePosL.y, new Color(colorL.r, colorL.g, colorL.b, 1.0f));
+                            }
+
+                            uvLight[numVertStart + 0] = new Vector2(getLightL_DB(pos), 0);
+                            uvLight[numVertStart + 1] = new Vector2(getLightL_UB(pos), 1);
+                            uvLight[numVertStart + 2] = new Vector2(getLightL_UF(pos), 1);
+                            uvLight[numVertStart + 3] = new Vector2(getLightL_DF(pos), 0);
+                        }
+                        else
+                        {
+                            for (int numNorm = 0; numNorm < 6; numNorm++)
+                                triangles[numTrianStart + numNorm] = 0;
+                        }
+                        //Down
+                        if (colorD.a > 0.9f)
+                        {
+                            triangles[numTrianStart + 6 + 0] = numVertStart + 4;
+                            triangles[numTrianStart + 6 + 1] = numVertStart + 4 + 1;
+                            triangles[numTrianStart + 6 + 2] = numVertStart + 4 + 2;
+
+                            triangles[numTrianStart + 6 + 3] = numVertStart + 4 + 2;
+                            triangles[numTrianStart + 6 + 4] = numVertStart + 4 + 3;
+                            triangles[numTrianStart + 6 + 5] = numVertStart + 4;
+
+                            for (int numNorm = 0; numNorm < 4; numNorm++)
+                                normals[numVertStart + numNorm + 4] = new Vector3(0.0f, 1.0f, 0.0f);
+
+                            int numD = 0;
+                            if (y != 0) numD = x + (y - 1) * 32 + z * 32 * 32;
+                            else
+                            {
+                                numD = indexMax + 32 * 32 + x + z * 32;
+                            }
+
+                            Vector2Int texturePosL = new Vector2Int(numD % sizeXTextureColor, numD / sizeXTextureColor);
+                            float uvXD = texturePosL.x * uvXsize;
+                            float uvYD = texturePosL.y * uvYsize;
+                            uvMain[numVertStart + 0 + 4] = new Vector2(uvXD, uvYD);
+                            uvMain[numVertStart + 1 + 4] = new Vector2(uvXD, uvYD + uvYsize);
+                            uvMain[numVertStart + 2 + 4] = new Vector2(uvXD + uvXsize, uvYD + uvYsize);
+                            uvMain[numVertStart + 3 + 4] = new Vector2(uvXD + uvXsize, uvYD);
+
+                            if (y == 0)
+                            {
+                                //mainTexture.SetPixel(texturePosL.x, texturePosL.y, new Color(colorD.r, colorD.g, colorD.b, 1.0f));
+                            }
+                            uvLight[numVertStart + 0 + 4] = new Vector2(getLightD_LB(pos), 0);
+                            uvLight[numVertStart + 1 + 4] = new Vector2(getLightD_LF(pos), 1);
+                            uvLight[numVertStart + 2 + 4] = new Vector2(getLightD_RF(pos), 1);
+                            uvLight[numVertStart + 3 + 4] = new Vector2(getLightD_RB(pos), 0);
+                        }
+                        else
+                        {
+                            for (int numNorm = 0; numNorm < 6; numNorm++)
+                                triangles[numTrianStart + numNorm + 6] = 0;
+                        }
+
+                        //Back
+                        if (colorB.a > 0.9f)
+                        {
+                            triangles[numTrianStart + 12 + 0] = numVertStart + 8;
+                            triangles[numTrianStart + 12 + 1] = numVertStart + 8 + 1;
+                            triangles[numTrianStart + 12 + 2] = numVertStart + 8 + 2;
+
+                            triangles[numTrianStart + 12 + 3] = numVertStart + 8 + 2;
+                            triangles[numTrianStart + 12 + 4] = numVertStart + 8 + 3;
+                            triangles[numTrianStart + 12 + 5] = numVertStart + 8;
+
+                            for (int numNorm = 0; numNorm < 4; numNorm++)
+                                normals[numVertStart + numNorm + 8] = new Vector3(0.0f, 0.0f, 1.0f);
+
+                            int numB = 0;
+                            if (z != 0) numB = x + y * 32 + (z - 1) * 32 * 32;
+                            else
+                            {
+                                numB = indexMax + 32 * 32 * 2 + x + y * 32;
+                            }
+
+                            Vector2Int texturePosL = new Vector2Int(numB % sizeXTextureColor, numB / sizeXTextureColor);
+                            float uvXB = texturePosL.x * uvXsize;
+                            float uvYB = texturePosL.y * uvYsize;
+                            uvMain[numVertStart + 0 + 8] = new Vector2(uvXB, uvYB);
+                            uvMain[numVertStart + 1 + 8] = new Vector2(uvXB, uvYB + uvYsize);
+                            uvMain[numVertStart + 2 + 8] = new Vector2(uvXB + uvXsize, uvYB + uvYsize);
+                            uvMain[numVertStart + 3 + 8] = new Vector2(uvXB + uvXsize, uvYB);
+
+                            if (z == 0)
+                            {
+                                //mainTexture.SetPixel(texturePosL.x, texturePosL.y, new Color(colorB.r, colorB.g, colorB.b, 1.0f));
+                            }
+
+                            uvLight[numVertStart + 0 + 8] = new Vector2(getLightB_RD(pos), 0);
+                            uvLight[numVertStart + 1 + 8] = new Vector2(getLightB_RU(pos), 1);
+                            uvLight[numVertStart + 2 + 8] = new Vector2(getLightB_LU(pos), 1);
+                            uvLight[numVertStart + 3 + 8] = new Vector2(getLightB_LD(pos), 0);
+                        }
+                        else
+                        {
+                            for (int numNorm = 0; numNorm < 6; numNorm++)
+                                triangles[numTrianStart + numNorm + 12] = 0;
+                        }
+                    }
+                }
+
+                void getDataColor(Vector3Int pos, out Color color) {
+
+                    byte neightbours = 0;
+                    Side side = Side.left;
+
+                    if (pos.x < 0) {
+                        neightbours++;
+                        side = Side.left;
+                    }
+                    else if (pos.x > 31)
+                    {
+                        neightbours++;
+                        side = Side.right;
+                    }
+
+                    if (pos.y < 0)
+                    {
+                        neightbours++;
+                        side = Side.down;
+                    }
+                    else if (pos.y > 31)
+                    {
+                        neightbours++;
+                        side = Side.up;
+                    }
+
+                    if (pos.z < 0)
+                    {
+                        neightbours++;
+                        side = Side.back;
+                    }
+                    else if (pos.z > 31)
+                    {
+                        neightbours++;
+                        side = Side.face;
+                    }
+
+                    //Р”Р°РЅРЅС‹Рµ РёР· СЌС‚РѕРіРѕ С‡Р°РЅРєР°
+                    if (neightbours == 0)
+                    {
+                        int index = pos.x + pos.y * 32 + pos.z * 32 * 32;
+                        color = colors[index];
+                    }
+                    //Р”Р°РЅРЅС‹Рµ РєР°РєРѕРіРѕ-С‚Рѕ СЃРѕСЃРµРґР°
+                    else if (neightbours == 1)
+                    {
+                        int index = 0;
+
+                        switch (side) {
+                            case Side.left: index = pos.z + pos.y * 32 + countSide * 0; break;
+                            case Side.right: index = pos.z + pos.y * 32 + countSide * 1; break;
+                            case Side.down: index = pos.x + pos.z * 32 + countSide * 2; break;
+                            case Side.up: index = pos.x + pos.z * 32 + countSide * 3; break;
+                            case Side.back: index = pos.x + pos.y * 32 + countSide * 4; break;
+                            case Side.face: index = pos.x + pos.y * 32 + countSide * 5; break;
+                        }
+
+                        color = neighbourColors[index];
+                    }
+                    //РЎР»РёС€РєРѕРј СЃР±РѕРєСѓ
+                    else {
+                        color = new Color();
+                    }
+                }
+                void getColorAndLight(Vector3Int pos, out Color color, out float light)
+                {
+
+                    byte neightbours = 0;
+                    Side side = Side.left;
+
+                    if (pos.x < 0)
+                    {
+                        neightbours++;
+                        side = Side.left;
+                    }
+                    else if (pos.x > 31)
+                    {
+                        neightbours++;
+                        side = Side.right;
+                    }
+
+                    if (pos.y < 0)
+                    {
+                        neightbours++;
+                        side = Side.down;
+                    }
+                    else if (pos.y > 31)
+                    {
+                        neightbours++;
+                        side = Side.up;
+                    }
+
+                    if (pos.z < 0)
+                    {
+                        neightbours++;
+                        side = Side.back;
+                    }
+                    else if (pos.z > 31)
+                    {
+                        neightbours++;
+                        side = Side.face;
+                    }
+
+                    //Р”Р°РЅРЅС‹Рµ РёР· СЌС‚РѕРіРѕ С‡Р°РЅРєР°
+                    if (neightbours == 0)
+                    {
+                        int index = pos.x + pos.y * 32 + pos.z * 32 * 32;
+                        color = colors[index];
+                        light = lights[index];
+                    }
+                    //Р”Р°РЅРЅС‹Рµ РєР°РєРѕРіРѕ-С‚Рѕ СЃРѕСЃРµРґР°
+                    else if (neightbours == 1)
+                    {
+                        int index = 0;
+
+                        switch (side)
+                        {
+                            case Side.left: index = pos.z + pos.y * 32 + countSide * 0; break;
+                            case Side.right: index = pos.z + pos.y * 32 + countSide * 1; break;
+                            case Side.down: index = pos.x + pos.z * 32 + countSide * 2; break;
+                            case Side.up: index = pos.x + pos.z * 32 + countSide * 3; break;
+                            case Side.back: index = pos.x + pos.y * 32 + countSide * 4; break;
+                            case Side.face: index = pos.x + pos.y * 32 + countSide * 5; break;
+                        }
+
+                        color = neighbourColors[index];
+                        light = neighbourLight[index];
+                    }
+                    //РЎР»РёС€РєРѕРј СЃР±РѕРєСѓ
+                    else
+                    {
+                        color = new Color(0,0,0,1.0f);
+                        light = 0;
+                    }
+                }
+
+                float calcShadow4(in Color c1, in float s1, in Color c2, in float s2, in Color c3, in float s3, in Color c4, in float s4)
+                {
+                    float result = 0.001f;
+
+                    byte count = 0;
+                    if (c1.a <= 0.9)
+                    {
+                        count++;
+                        result += s1;
+                    }
+                    if (c2.a <= 0.9)
+                    {
+                        count++;
+                        result += s2;
+                    }
+                    if (c3.a <= 0.9f && c2.a <= 0.9f && c4.a <= 0.9f)
+                    {
+                        count++;
+                        result += s3;
+                    }
+                    if (c4.a <= 0.9)
+                    {
+                        count++;
+                        result += s4;
+                    }
+
+                    if (count > 0)
+                        result /= count;
+                    else result = 0.99f;
+
+                    return result;
+                }
+
+                float getLightL_DB(Vector3Int pos)
+                {
+                    float result = 0;
+
+                    Color c1, c2, c3, c4;
+                    float s1, s2, s3, s4;
+
+                    getColorAndLight(new Vector3Int(pos.x, pos.y, pos.z), out c1, out s1);
+                    getColorAndLight(new Vector3Int(pos.x, pos.y, pos.z - 1), out c2, out s2);
+                    getColorAndLight(new Vector3Int(pos.x, pos.y - 1, pos.z - 1), out c3, out s3);
+                    getColorAndLight(new Vector3Int(pos.x, pos.y - 1, pos.z), out c4, out s4);
+
+                    result = calcShadow4(c1, s1, c2, s2, c3, s3, c4, s4);
+
+                    return result;
+                }
+                float getLightL_UB(Vector3Int pos)
+                {
+                    float result = 0;
+
+                    Color c1, c2, c3, c4;
+                    float s1, s2, s3, s4;
+
+                    getColorAndLight(new Vector3Int(pos.x, pos.y, pos.z), out c1, out s1);
+                    getColorAndLight(new Vector3Int(pos.x, pos.y, pos.z - 1), out c2, out s2);
+                    getColorAndLight(new Vector3Int(pos.x, pos.y + 1, pos.z - 1), out c3, out s3);
+                    getColorAndLight(new Vector3Int(pos.x, pos.y + 1, pos.z), out c4, out s4);
+
+                    result = calcShadow4(c1, s1, c2, s2, c3, s3, c4, s4);
+
+                    return result;
+                }
+                float getLightL_UF(Vector3Int pos)
+                {
+                    float result = 0;
+
+                    Color c1, c2, c3, c4;
+                    float s1, s2, s3, s4;
+
+                    getColorAndLight(new Vector3Int(pos.x, pos.y, pos.z), out c1, out s1);
+                    getColorAndLight(new Vector3Int(pos.x, pos.y, pos.z + 1), out c2, out s2);
+                    getColorAndLight(new Vector3Int(pos.x, pos.y + 1, pos.z + 1), out c3, out s3);
+                    getColorAndLight(new Vector3Int(pos.x, pos.y + 1, pos.z), out c4, out s4);
+
+                    result = calcShadow4(c1, s1, c2, s2, c3, s3, c4, s4);
+
+                    return result;
+                }
+                float getLightL_DF(Vector3Int pos)
+                {
+                    float result = 0;
+
+                    Color c1, c2, c3, c4;
+                    float s1, s2, s3, s4;
+
+                    getColorAndLight(new Vector3Int(pos.x, pos.y, pos.z), out c1, out s1);
+                    getColorAndLight(new Vector3Int(pos.x, pos.y, pos.z + 1), out c2, out s2);
+                    getColorAndLight(new Vector3Int(pos.x, pos.y - 1, pos.z + 1), out c3, out s3);
+                    getColorAndLight(new Vector3Int(pos.x, pos.y - 1, pos.z), out c4, out s4);
+
+                    result = calcShadow4(c1, s1, c2, s2, c3, s3, c4, s4);
+
+                    return result;
+                }
+
+                float getLightD_LB(Vector3Int pos)
+                {
+                    float result = 0;
+
+                    Color c1, c2, c3, c4;
+                    float s1, s2, s3, s4;
+
+                    getColorAndLight(new Vector3Int(pos.x, pos.y, pos.z), out c1, out s1);
+                    getColorAndLight(new Vector3Int(pos.x, pos.y, pos.z - 1), out c2, out s2);
+                    getColorAndLight(new Vector3Int(pos.x - 1, pos.y, pos.z - 1), out c3, out s3);
+                    getColorAndLight(new Vector3Int(pos.x - 1, pos.y, pos.z), out c4, out s4);
+
+                    result = calcShadow4(c1, s1, c2, s2, c3, s3, c4, s4);
+
+                    return result;
+                }
+                float getLightD_LF(Vector3Int pos)
+                {
+                    float result = 0;
+
+                    Color c1, c2, c3, c4;
+                    float s1, s2, s3, s4;
+
+                    getColorAndLight(new Vector3Int(pos.x, pos.y, pos.z), out c1, out s1);
+                    getColorAndLight(new Vector3Int(pos.x, pos.y, pos.z + 1), out c2, out s2);
+                    getColorAndLight(new Vector3Int(pos.x - 1, pos.y, pos.z + 1), out c3, out s3);
+                    getColorAndLight(new Vector3Int(pos.x - 1, pos.y, pos.z), out c4, out s4);
+
+                    result = calcShadow4(c1, s1, c2, s2, c3, s3, c4, s4);
+
+                    return result;
+                }
+                float getLightD_RF(Vector3Int pos)
+                {
+                    float result = 0;
+
+                    Color c1, c2, c3, c4;
+                    float s1, s2, s3, s4;
+
+                    getColorAndLight(new Vector3Int(pos.x, pos.y, pos.z), out c1, out s1);
+                    getColorAndLight(new Vector3Int(pos.x, pos.y, pos.z + 1), out c2, out s2);
+                    getColorAndLight(new Vector3Int(pos.x + 1, pos.y, pos.z + 1), out c3, out s3);
+                    getColorAndLight(new Vector3Int(pos.x + 1, pos.y, pos.z), out c4, out s4);
+
+                    result = calcShadow4(c1, s1, c2, s2, c3, s3, c4, s4);
+
+                    return result;
+                }
+                float getLightD_RB(Vector3Int pos)
+                {
+                    float result = 0;
+
+                    Color c1, c2, c3, c4;
+                    float s1, s2, s3, s4;
+
+                    getColorAndLight(new Vector3Int(pos.x, pos.y, pos.z), out c1, out s1);
+                    getColorAndLight(new Vector3Int(pos.x, pos.y, pos.z - 1), out c2, out s2);
+                    getColorAndLight(new Vector3Int(pos.x + 1, pos.y, pos.z - 1), out c3, out s3);
+                    getColorAndLight(new Vector3Int(pos.x + 1, pos.y, pos.z), out c4, out s4);
+
+                    result = calcShadow4(c1, s1, c2, s2, c3, s3, c4, s4);
+
+                    return result;
+                }
+
+                float getLightB_LD(Vector3Int pos)
+                {
+                    float result = 0;
+
+                    Color c1, c2, c3, c4;
+                    float s1, s2, s3, s4;
+
+                    getColorAndLight(new Vector3Int(pos.x, pos.y, pos.z), out c1, out s1);
+                    getColorAndLight(new Vector3Int(pos.x, pos.y - 1, pos.z), out c2, out s2);
+                    getColorAndLight(new Vector3Int(pos.x - 1, pos.y - 1, pos.z), out c3, out s3);
+                    getColorAndLight(new Vector3Int(pos.x - 1, pos.y, pos.z), out c4, out s4);
+                    result = calcShadow4(c1, s1, c2, s2, c3, s3, c4, s4);
+                    return result;
+                }
+                float getLightB_LU(Vector3Int pos)
+                {
+                    float result = 0;
+
+                    Color c1, c2, c3, c4;
+                    float s1, s2, s3, s4;
+
+                    getColorAndLight(new Vector3Int(pos.x, pos.y, pos.z), out c1, out s1);
+                    getColorAndLight(new Vector3Int(pos.x, pos.y + 1, pos.z), out c2, out s2);
+                    getColorAndLight(new Vector3Int(pos.x - 1, pos.y + 1, pos.z), out c3, out s3);
+                    getColorAndLight(new Vector3Int(pos.x - 1, pos.y, pos.z), out c4, out s4);
+                    result = calcShadow4(c1, s1, c2, s2, c3, s3, c4, s4);
+                    return result;
+                }
+                float getLightB_RU(Vector3Int pos)
+                {
+                    float result = 0;
+
+                    Color c1, c2, c3, c4;
+                    float s1, s2, s3, s4;
+
+                    getColorAndLight(new Vector3Int(pos.x, pos.y, pos.z), out c1, out s1);
+                    getColorAndLight(new Vector3Int(pos.x, pos.y + 1, pos.z), out c2, out s2);
+                    getColorAndLight(new Vector3Int(pos.x + 1, pos.y + 1, pos.z), out c3, out s3);
+                    getColorAndLight(new Vector3Int(pos.x + 1, pos.y, pos.z), out c4, out s4);
+                    result = calcShadow4(c1, s1, c2, s2, c3, s3, c4, s4);
+                    return result;
+                }
+                float getLightB_RD(Vector3Int pos)
+                {
+                    float result = 0;
+
+                    Color c1, c2, c3, c4;
+                    float s1, s2, s3, s4;
+
+                    getColorAndLight(new Vector3Int(pos.x, pos.y, pos.z), out c1, out s1);
+                    getColorAndLight(new Vector3Int(pos.x, pos.y - 1, pos.z), out c2, out s2);
+                    getColorAndLight(new Vector3Int(pos.x + 1, pos.y - 1, pos.z), out c3, out s3);
+                    getColorAndLight(new Vector3Int(pos.x + 1, pos.y, pos.z), out c4, out s4);
+                    result = calcShadow4(c1, s1, c2, s2, c3, s3, c4, s4);
+                    return result;
                 }
 
                 public void Execute()
                 {
-                    chankGO.JobStartRedraw();
+                    calcMesh();
                 }
-            }
 
-            void JobStartRedraw() {
-
-                Texture2D texture;
-                Mesh mesh;
-
-                //Если размер биома больше 1 то рисуем по цвету
-                MeshData.CalcMeshColorShader(data, out mesh, out texture);
-
-                //meshRendererBasic.materials[0].mainTexture = texture;
-                meshRendererBasic.materials[0].SetTexture("_MainTex", texture);
-                meshRendererBasic.materials[0].SetTexture("_llluminationTex", MeshData.textureShadow);
-                meshFilterBasic.mesh = mesh;
                 
-
-                //Если размер биома 1 то рисуем по блокам
             }
 
-            public void ReDraw()
+            public void FixedReDraw()
             {
-                //перерисовать чанк
-                JobRedraw jobRedraw = new JobRedraw(this);
-                jobRedraw.Execute();
+                int blocks = 32 * 32;
+
+                int blocksAll = 32 * 32 * 32;
+                int blocksNeighbour = blocks * 6;
+
+                NativeArray<Color> colors;
+                NativeArray<float> light;
+                NativeArray<Color> neighbourColors;
+                NativeArray<float> neighbourLight;
+
+                Color[] colorList = new Color[blocksAll];
+                float[] lightList = new float[blocksAll];
+
+                for (byte z = 0; z < 32; z++)
+                    for (byte x = 0; x < 32; x++)
+                        for (byte y = 0; y < 32; y++) {
+                            int index = x + y * 32 + z * 32 * 32;
+
+                            colorList[index] = data.Colors[x, y, z];
+                            lightList[index] = data.Light[x, y, z];
+                        }
+
+
+
+                colors = new NativeArray<Color>(colorList, Allocator.TempJob);
+                light = new NativeArray<float>(lightList, Allocator.TempJob);
+                neighbourColors = new NativeArray<Color>(data.neighbourColors, Allocator.TempJob);
+                neighbourLight = new NativeArray<float>(data.neighbourLights, Allocator.TempJob);
+
+                jobRedraw = new JobRedraw(colors, light, neighbourColors, neighbourLight);
+                jobRedrawHandle = jobRedraw.Schedule();
+
+                JobRedrawExist = true;
+            }
+            public bool LateReDraw() {
+                //Р•СЃР»Рё СЂР°Р±РѕС‚Р° РµСЃС‚СЊ Рё РѕРЅР° РµС‰Рµ РЅРµ Р·Р°РєРѕРЅС‡РµРЅРЅР°, СѓРґР°Р»СЏС‚СЊ РЅРµР»СЊР·СЏ
+                if (JobRedrawExist && !jobRedrawHandle.IsCompleted)
+                    return false;                    
+
+                // РћР¶РёРґР°РµРј Р·Р°РІРµСЂС€РµРЅРёСЏ РІСЃРµС… Р·Р°РґР°С‡ СЃ РїРѕРјРѕС‰СЊСЋ JobHandle
+                jobRedrawHandle.Complete();
+
+                List<int> triangles = new List<int>();
+                List<Vector2> uvMain = new List<Vector2>();
+                List<Vector2> uvLight = new List<Vector2>();
+                List<Vector3> normals = new List<Vector3>();
+
+                // РўРµРїРµСЂСЊ РјРѕР¶РЅРѕ РїРѕР»СѓС‡РёС‚СЊ РґР°РЅРЅС‹Рµ Рё РѕСЃРІРѕР±РѕРґРёС‚СЊ СЂРµСЃСѓСЂСЃС‹
+
+                triangles.AddRange(jobRedraw.triangles.ToArray());
+                uvMain.AddRange(jobRedraw.uvMain.ToArray());
+                uvLight.AddRange(jobRedraw.uvLight.ToArray());
+                normals.AddRange(jobRedraw.normals.ToArray());
+
+                jobRedraw.triangles.Dispose();
+                jobRedraw.normals.Dispose();
+                jobRedraw.uvMain.Dispose();
+                jobRedraw.uvLight.Dispose();
+
+                jobRedraw.colors.Dispose();
+                jobRedraw.lights.Dispose();
+                jobRedraw.neighbourColors.Dispose();
+                jobRedraw.neighbourLight.Dispose();
+
+                JobRedrawExist = false;
+
+                meshColor.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
+                meshColor.vertices = MeshData.vertices32;
+                meshColor.triangles = triangles.ToArray();
+                meshColor.normals = normals.ToArray();
+                meshColor.uv = uvMain.ToArray();
+                meshColor.uv2 = uvLight.ToArray();
+
+                //texture = graficMesh.dataMesh.mainTexture;
+
+                //meshRendererBasic.materials[0].SetTexture("_MainTex", texture);
+                meshRendererBasic.materials[0].SetTexture("_llluminationTex", MeshData.textureShadow);
+                meshFilterBasic.mesh = meshColor;
+
+                //Р Р°Р±РѕС‚Р° РІС‹РїРѕР»РЅРµРЅР°, СѓРґР°Р»СЏС‚СЊ РјРѕР¶РЅРѕ
+                return true;
+            }
+
+            public void StartInicialize()
+            {
+                inicializeQueue.Enqueue(this);
             }
 
             public void Awake()
             {
-                //Создался новый игровой объект чанка, запихиваем в буфер
+                meshColor = new Mesh();
+                //РЎРѕР·РґР°Р»СЃСЏ РЅРѕРІС‹Р№ РёРіСЂРѕРІРѕР№ РѕР±СЉРµРєС‚ С‡Р°РЅРєР°, Р·Р°РїРёС…РёРІР°РµРј РІ Р±СѓС„РµСЂ
                 buffer.Add(this);
             }
 
             /// <summary>
-            /// Получить свободный чанк
+            /// РџРѕР»СѓС‡РёС‚СЊ СЃРІРѕР±РѕРґРЅС‹Р№ С‡Р°РЅРє
             /// </summary>
             /// <returns></returns>
             static public ChankGO GetChankGO()
             {
-                //Перебираем все чанки, ищем свободный
+                //РџРµСЂРµР±РёСЂР°РµРј РІСЃРµ С‡Р°РЅРєРё, РёС‰РµРј СЃРІРѕР±РѕРґРЅС‹Р№
                 foreach (ChankGO chankGO in buffer)
                 {
                     if (chankGO.data == null)
                         return chankGO;
                 }
 
-                //Необходимо создать новый префаб чанка
+                //РќРµРѕР±С…РѕРґРёРјРѕ СЃРѕР·РґР°С‚СЊ РЅРѕРІС‹Р№ РїСЂРµС„Р°Р± С‡Р°РЅРєР°
                 ChankGO chankNew = Instantiate(GameData.main.prefabChankGO);
                 return chankNew;
             }
 
             public void Inicialize(Chank chank) {
                 data = chank;
-                //меняем размер на размер чанка
+                //РјРµРЅСЏРµРј СЂР°Р·РјРµСЂ РЅР° СЂР°Р·РјРµСЂ С‡Р°РЅРєР°
                 int sizeBlock = Calc.GetSizeInt(chank.sizeBlock);
                 int sizeChank = sizeBlock * Chank.Size;
 
@@ -1004,7 +1740,7 @@ namespace Game
 
 
             /// <summary>
-            /// Очистить чанк для дальнейшего использования
+            /// РћС‡РёСЃС‚РёС‚СЊ С‡Р°РЅРє РґР»СЏ РґР°Р»СЊРЅРµР№С€РµРіРѕ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ
             /// </summary>
             public void Clear() {
                 data = null;

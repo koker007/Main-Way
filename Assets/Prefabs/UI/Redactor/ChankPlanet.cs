@@ -38,7 +38,8 @@ public class ChankPlanet : Chank
     }
     protected override void JobStartGenerate()
     {
-
+        Stopwatch stopwatch = new Stopwatch();
+        stopwatch.Start();
         //нужно узнать по каждому из блоков к какому биому он принадлежит
 
         Vector2Int index2D = new Vector2Int(index.x, index.z);
@@ -77,10 +78,19 @@ public class ChankPlanet : Chank
             }
         }
 
+        isLocalGenerateDone = true;
+
         //ID блока уже найденно
 
         //Теперь если размер чанка больше 1, то нужно еще заполнить цвет
         CalcColor();
+
+        //нужно расчитать соседей чанка
+        CalcNeighbours();
+
+        stopwatch.Stop();
+        UnityEngine.Debug.Log("GenChankPlanet: " + index +
+            " stopwatch: " + stopwatch.ElapsedMilliseconds);
     }
 
     void CalcNoisesSurface(int biomeNum)
@@ -151,6 +161,61 @@ public class ChankPlanet : Chank
         else BlocksID[pos.x, pos.y, pos.z] = 0;
     }
 
+    /// <summary>
+    /// проверить и сообщить соседям о себе
+    /// </summary>
+    void CalcNeighbours() {
+        ChankPlanet left = GetNeighbour(Side.left) as ChankPlanet;
+        ChankPlanet right = GetNeighbour(Side.right) as ChankPlanet;
+        ChankPlanet down = GetNeighbour(Side.down) as ChankPlanet;
+        ChankPlanet up = GetNeighbour(Side.up) as ChankPlanet;
+        ChankPlanet back = GetNeighbour(Side.back) as ChankPlanet;
+        ChankPlanet forward = GetNeighbour(Side.face) as ChankPlanet;
+
+        if (left != null) {
+            waitingChank(left);
+            left.UpdateNeighbour(Side.right);
+            this.UpdateNeighbour(Side.left);
+        }
+        if (right != null)
+        {
+            waitingChank(right);
+            right.UpdateNeighbour(Side.left);
+            this.UpdateNeighbour(Side.right);
+        }
+        if (down != null)
+        {
+            waitingChank(down);
+            down.UpdateNeighbour(Side.up);
+            this.UpdateNeighbour(Side.down);
+        }
+        if (up != null)
+        {
+            waitingChank(up);
+            up.UpdateNeighbour(Side.down);
+            this.UpdateNeighbour(Side.up);
+        }
+        if (back != null)
+        {
+            waitingChank(back);
+            back.UpdateNeighbour(Side.face);
+            this.UpdateNeighbour(Side.back);
+        }
+        if (forward != null)
+        {
+            waitingChank(forward);
+            forward.UpdateNeighbour(Side.back);
+            this.UpdateNeighbour(Side.face);
+        }
+
+        void waitingChank(ChankPlanet chank) {
+            //Если чанк начал генерацию, ожидаем завершения генерации в этом чанке
+            while (chank.isStartGenerate && !chank.isLocalGenerateDone) {
+                UnityEngine.Debug.Log("Waiting " + chank.index);
+            }
+        }
+    }
+
     protected override void CalcColor()
     {
         if (Colors == null)
@@ -187,6 +252,10 @@ public class ChankPlanet : Chank
                 }
             }
         }
+    }
+    protected override void UpdateNeighbour(Side side)
+    {
+        base.UpdateNeighbour(side);
     }
 
     public override Color GetColor(Vector3Int pos, Placement placement = Placement.Current)

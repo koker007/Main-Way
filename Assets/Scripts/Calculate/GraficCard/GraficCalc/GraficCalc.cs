@@ -6,7 +6,12 @@ public class GraficCalc : MonoBehaviour
 {
     public static GraficCalc main;
 
+    [Header("Private Shaders")]
+    [SerializeField]
+    ComputeShader shaderMeshChankColor;
+    public ComputeShader ShaderMeshChankColor { get { return shaderMeshChankColor; } }
 
+    [Header("Static Shaders")]
     [SerializeField]
     ComputeShader shaderCalcMergeVector2;
 

@@ -3860,6 +3860,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e14dc1b4be3c21140bc9994c0d00171e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  shaderMeshChankColor: {fileID: 7200000, guid: 432dd277bed2f6e47b397c5f55e930a1, type: 3}
   shaderCalcMergeVector2: {fileID: 7200000, guid: 21e513b16ec68de41ad7a29189542cdc, type: 3}
   shaderCalcMergeVector2_2: {fileID: 7200000, guid: ae9e7ef6fa55d9e4a90594643958d79d, type: 3}
   shaderCalcMergeVector3: {fileID: 7200000, guid: eb10eb5a22c6bc144a66e6a4e27b3b2a, type: 3}
@@ -3946,6 +3947,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ShaderMeshChankColor: {fileID: 7200000, guid: 432dd277bed2f6e47b397c5f55e930a1, type: 3}
+  lenghtX: 0
+  lenghtY: 0
+  lenghtZ: 0
+  _kernelIndexMeshChankColor: 0
 --- !u!1 &262324757
 GameObject:
   m_ObjectHideFlags: 0
@@ -20245,7 +20250,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7176533566875976478, guid: d7b2deb1b6f117c4b92abfc7b1942566, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0.00000667572
+      value: 0.00004005432
       objectReference: {fileID: 0}
     - target: {fileID: 7417510024086745306, guid: d7b2deb1b6f117c4b92abfc7b1942566, type: 3}
       propertyPath: m_AnchorMax.x
@@ -31404,7 +31409,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7176533566875976478, guid: d7b2deb1b6f117c4b92abfc7b1942566, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0.0005493164
+      value: 0.0007324219
       objectReference: {fileID: 0}
     - target: {fileID: 7417510024086745306, guid: d7b2deb1b6f117c4b92abfc7b1942566, type: 3}
       propertyPath: m_AnchorMax.x
@@ -40859,7 +40864,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2108025039
 Transform:
   m_ObjectHideFlags: 0

@@ -34,7 +34,9 @@ public abstract class Chank
     public int[,,] BlocksID = new int[Size, Size, Size]; //ID Ѕлоков
     public uint[,,] BlocksVariant = new uint[Size, Size, Size]; //¬ариант блоков
     public Color[,,] Colors = new Color[Size, Size, Size]; //÷вета блоков
-    public float[,,] Illumination = new float[Size, Size, Size]; // оличество света в блоке
+    public float[,,] Light = new float[Size, Size, Size]; // оличество света в блоке
+    public Color[] neighbourColors = new Color[Size * Size * 6]; //÷вет соседей чанка
+    public float[] neighbourLights = new float[Size * Size * 6]; //ќсвещенность соседей чанка
 
     protected PlanetData planetData;
     public event Action isChange;
@@ -43,6 +45,7 @@ public abstract class Chank
     /// генераци€ чанка
     /// </summary>
     protected bool isStartGenerate = false;
+    protected bool isLocalGenerateDone = false; // огда генераци€ в этом чанке завершена и данными могут пользоватьс€ другие чанки, но сам чанк еще должен проверить соседей
     protected bool isDoneGenerate = false;
     protected struct JobGenerate : IJob
     {
@@ -121,6 +124,137 @@ public abstract class Chank
         return result;
     }
 
+    /// <summary>
+    /// ѕерерасчет данных крайних блоков с учетом данных соседского чанка
+    /// </summary>
+    /// <param name="chank"></param>
+    /// <param name="side"></param>
+    virtual protected void UpdateNeighbour(Side side) {
+        int blockSide = Size * Size;
+
+        switch (side) {
+            case Side.left: CalcLeft(); break;
+            case Side.right: CalcRight(); break;
+            case Side.down: CalcDown(); break;
+            case Side.up: CalcUp(); break;
+            case Side.back: CalcBack(); break;
+            case Side.face: CalcForward(); break;
+        }
+
+
+        void CalcLeft()
+        {
+            Chank neigbour = GetNeighbour(Side.left);
+            if (neigbour == null)
+                return;
+
+
+            int indexStart = blockSide * 0;
+
+            for (int z = 0; z < Size; z++)
+                for (int y = 0; y < Size; y++)
+                {
+                    int index = indexStart + z + y * 32;
+                    neighbourColors[index] = neigbour.Colors[31, y, z];
+                    neighbourLights[index] = neigbour.Light[31, y, z];
+                }
+
+
+        }
+        void CalcRight()
+        {
+            Chank neigbour = GetNeighbour(Side.right);
+            if (neigbour == null)
+                return;
+
+
+            int indexStart = blockSide * 1;
+
+            for (int z = 0; z < Size; z++)
+                for (int y = 0; y < Size; y++)
+                {
+                    int index = indexStart + z + y * 32;
+                    neighbourColors[index] = neigbour.Colors[0, y, z];
+                    neighbourLights[index] = neigbour.Light[0, y, z];
+                }
+
+
+        }
+        void CalcDown()
+        {
+            Chank neigbour = GetNeighbour(Side.down);
+            if (neigbour == null)
+                return;
+
+
+            int indexStart = blockSide * 2;
+
+            for (int z = 0; z < Size; z++)
+                for (int x = 0; x < Size; x++)
+                {
+                    int index = indexStart + x + z * 32;
+                    neighbourColors[index] = neigbour.Colors[x, 31, z];
+                    neighbourLights[index] = neigbour.Light[x, 31, z];
+                }
+
+
+        }
+        void CalcUp()
+        {
+            Chank neigbour = GetNeighbour(Side.up);
+            if (neigbour == null)
+                return;
+
+
+            int indexStart = blockSide * 3;
+
+            for (int z = 0; z < Size; z++)
+                for (int x = 0; x < Size; x++)
+                {
+                    int index = indexStart + x + z * 32;
+                    neighbourColors[index] = neigbour.Colors[x, 0, z];
+                    neighbourLights[index] = neigbour.Light[x, 0, z];
+                }
+
+        }
+        void CalcBack()
+        {
+            Chank neigbour = GetNeighbour(Side.back);
+            if (neigbour == null)
+                return;
+
+
+            int indexStart = blockSide * 4;
+
+            for (int x = 0; x < Size; x++)
+                for (int y = 0; y < Size; y++)
+                {
+                    int index = indexStart + x + y * 32;
+                    neighbourColors[index] = neigbour.Colors[x, y, 31];
+                    neighbourLights[index] = neigbour.Light[x, y, 31];
+                }
+
+        }
+        void CalcForward()
+        {
+            Chank neigbour = GetNeighbour(Side.back);
+            if (neigbour == null)
+                return;
+
+
+            int indexStart = blockSide * 5;
+
+            for (int x = 0; x < Size; x++)
+                for (int y = 0; y < Size; y++)
+                {
+                    int index = indexStart + x + y * 32;
+                    neighbourColors[index] = neigbour.Colors[x, y, 31];
+                    neighbourLights[index] = neigbour.Light[x, y, 31];
+                }
+
+        }
+    }
+
     //ѕотом, ниже, надо будет создать job system дл€ загрузки чанка
 
     /// <summary>
@@ -130,7 +264,7 @@ public abstract class Chank
     /// <param name="index"></param>
     /// <param name="planetData"></param>
     public Chank(Size sizeBlock, Vector3Int index, PlanetData planetData) {
-        this.Illumination = DefaultValue.Illumination;
+        this.Light = DefaultValue.Illumination;
 
         this.sizeBlock = sizeBlock;
         this.index = index;

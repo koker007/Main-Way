@@ -22,7 +22,8 @@ namespace Game
             protected ObjData data;
             protected ChankGO[][,,] chanks;
 
-            protected Queue<ChankGO> DrawQueue = new Queue<ChankGO>();
+            protected Queue<ChankGO> startDrawQueue = new Queue<ChankGO>();
+            protected Queue<ChankGO> endDrawQueue = new Queue<ChankGO>();
 
             //Пространство в котором сейчас находится игрок
             static protected VisualZoneGO now;
@@ -98,7 +99,7 @@ namespace Game
             abstract public void iniChanks();
 
             protected void AddReDraw(ChankGO chankGO) {
-                DrawQueue.Enqueue(chankGO);
+                startDrawQueue.Enqueue(chankGO);
             }
 
             void Awake()
@@ -155,18 +156,34 @@ namespace Game
                 return bufferNum;
             }
 
-            void lateReDraw() {
-                if (DrawQueue.Count == 0)
+            void FixedReDraw() {
+                //Запуск отрисовки чанков
+                if (startDrawQueue.Count == 0)
                     return;
 
-                ChankGO chankGO = DrawQueue.Dequeue();
-                chankGO.ReDraw();
+                ChankGO chankGO = startDrawQueue.Dequeue();
+                chankGO.FixedReDraw();
+                endDrawQueue.Enqueue(chankGO);
             }
 
+            //Завершение отрисовки чанков
+            void LateReDraw() {
+                if (endDrawQueue.Count == 0)
+                    return;
 
+                ChankGO chankGO = endDrawQueue.Peek();
+                if(chankGO.LateReDraw())
+                    endDrawQueue.Dequeue();
+            }
+
+            
+            private void FixedUpdate()
+            {
+                FixedReDraw();
+            }
             private void LateUpdate()
             {
-                lateReDraw();
+                LateReDraw();
             }
         }
     }
