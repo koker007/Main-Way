@@ -162,7 +162,7 @@ namespace Game
                     return;
 
                 ChankGO chankGO = startDrawQueue.Dequeue();
-                chankGO.FixedReDraw();
+                chankGO.StartReDrawAll();
                 endDrawQueue.Enqueue(chankGO);
             }
 
@@ -172,7 +172,7 @@ namespace Game
                     return;
 
                 ChankGO chankGO = endDrawQueue.Peek();
-                if(chankGO.LateReDraw())
+                if(chankGO.LateReDrawAwait())
                     endDrawQueue.Dequeue();
             }
 
