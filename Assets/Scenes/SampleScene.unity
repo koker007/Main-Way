@@ -3759,7 +3759,6 @@ GameObject:
   - component: {fileID: 259411733}
   - component: {fileID: 259411735}
   - component: {fileID: 259411736}
-  - component: {fileID: 259411740}
   - component: {fileID: 259411739}
   m_Layer: 0
   m_Name: GraficCalc
@@ -3934,23 +3933,6 @@ MonoBehaviour:
   offsetZ: 0
   intensive: 0
   NeedPerlin3dRules: 1
---- !u!114 &259411740
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 259411727}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ac1817450a9950b41b0a602498473e66, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ShaderMeshChankColor: {fileID: 7200000, guid: 432dd277bed2f6e47b397c5f55e930a1, type: 3}
-  lenghtX: 0
-  lenghtY: 0
-  lenghtZ: 0
-  _kernelIndexMeshChankColor: 0
 --- !u!1 &262324757
 GameObject:
   m_ObjectHideFlags: 0
@@ -20250,7 +20232,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7176533566875976478, guid: d7b2deb1b6f117c4b92abfc7b1942566, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0.00004005432
+      value: 0.000014305115
       objectReference: {fileID: 0}
     - target: {fileID: 7417510024086745306, guid: d7b2deb1b6f117c4b92abfc7b1942566, type: 3}
       propertyPath: m_AnchorMax.x
@@ -31409,7 +31391,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7176533566875976478, guid: d7b2deb1b6f117c4b92abfc7b1942566, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0.0007324219
+      value: 40.751465
       objectReference: {fileID: 0}
     - target: {fileID: 7417510024086745306, guid: d7b2deb1b6f117c4b92abfc7b1942566, type: 3}
       propertyPath: m_AnchorMax.x

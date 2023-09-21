@@ -85,9 +85,6 @@ public class ChankPlanet : Chank
         //“еперь если размер чанка больше 1, то нужно еще заполнить цвет
         CalcColor();
 
-        //нужно расчитать соседей чанка
-        CalcNeighbours();
-
         stopwatch.Stop();
         UnityEngine.Debug.Log("GenChankPlanet: " + index +
             " stopwatch: " + stopwatch.ElapsedMilliseconds);
@@ -161,61 +158,6 @@ public class ChankPlanet : Chank
         else BlocksID[pos.x, pos.y, pos.z] = 0;
     }
 
-    /// <summary>
-    /// проверить и сообщить сосед€м о себе
-    /// </summary>
-    void CalcNeighbours() {
-        ChankPlanet left = GetNeighbour(Side.left) as ChankPlanet;
-        ChankPlanet right = GetNeighbour(Side.right) as ChankPlanet;
-        ChankPlanet down = GetNeighbour(Side.down) as ChankPlanet;
-        ChankPlanet up = GetNeighbour(Side.up) as ChankPlanet;
-        ChankPlanet back = GetNeighbour(Side.back) as ChankPlanet;
-        ChankPlanet forward = GetNeighbour(Side.face) as ChankPlanet;
-
-        if (left != null) {
-            waitingChank(left);
-            left.UpdateNeighbour(Side.right);
-            this.UpdateNeighbour(Side.left);
-        }
-        if (right != null)
-        {
-            waitingChank(right);
-            right.UpdateNeighbour(Side.left);
-            this.UpdateNeighbour(Side.right);
-        }
-        if (down != null)
-        {
-            waitingChank(down);
-            down.UpdateNeighbour(Side.up);
-            this.UpdateNeighbour(Side.down);
-        }
-        if (up != null)
-        {
-            waitingChank(up);
-            up.UpdateNeighbour(Side.down);
-            this.UpdateNeighbour(Side.up);
-        }
-        if (back != null)
-        {
-            waitingChank(back);
-            back.UpdateNeighbour(Side.face);
-            this.UpdateNeighbour(Side.back);
-        }
-        if (forward != null)
-        {
-            waitingChank(forward);
-            forward.UpdateNeighbour(Side.back);
-            this.UpdateNeighbour(Side.face);
-        }
-
-        void waitingChank(ChankPlanet chank) {
-            //≈сли чанк начал генерацию, ожидаем завершени€ генерации в этом чанке
-            while (chank.isStartGenerate && !chank.isLocalGenerateDone) {
-                UnityEngine.Debug.Log("Waiting " + chank.index);
-            }
-        }
-    }
-
     protected override void CalcColor()
     {
         if (Colors == null)
@@ -239,23 +181,21 @@ public class ChankPlanet : Chank
 
                 for (int y = 0; y < Size; y++)
                 {
-
-                    //—мотрим по id блоку на его цвет
-                    int BID = BlocksID[x, z, y];
                     Color ColorBlock;// = Game.Blocks.GetColor(BID);
 
                     ColorBlock = new Color(Random.Range(0.5f, 1.0f), Random.Range(0.5f, 1.0f), Random.Range(0.5f, 1.0f), Random.Range(0.0f, 1.0f));
-                    if(x == 0 && y == 0 && z == 0)
-                        ColorBlock = new Color(1.0f, 0.0f, 0.0f, 1.0f);
+                    //if (z == 31 && x > 0 && 30 > Random.Range(0, 100))
+                    //   ColorBlock = new Color(1.0f, 0.0f, 0.0f, 1.0f);
+                    //else {
+                    //    ColorBlock = new Color(0.0f, 0.0f, 0.0f, 0.0f);
+                    //}
 
                     Colors[x, y, z] = Color.Lerp(ColorBlock, planetData.pattern.biomesSurface[biomeWinerSurface].color, interpolateCoof);
+
+                    Light[x, y, z] = Random.Range(0.0f, 1.0f);
                 }
             }
         }
-    }
-    public override void UpdateNeighbour(Side side)
-    {
-        base.UpdateNeighbour(side);
     }
 
     public override Color GetColor(Vector3Int pos, Placement placement = Placement.Current)

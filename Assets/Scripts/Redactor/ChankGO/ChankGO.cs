@@ -24,10 +24,6 @@ namespace Game
             Mesh meshColor;
             MeshData meshDataColor;
 
-            bool JobRedrawExist = false;
-            JobRedraw jobRedraw;
-            JobHandle jobRedrawHandle;
-
             static public void tryInicialize() {
                 if (inicializeQueue.Count == 0)
                     return;
@@ -977,27 +973,37 @@ namespace Game
                 private readonly object countCalcLock = new object();
                 public int countCalc = 0;
 
+                public Texture2D textureMain;
+
                 Chank data;
 
                 public MeshData(Chank data) {
                     this.data = data;
+
+                    textureMain = new Texture2D(sizeXTextureColor, sizeYTextureColor);
+                    textureMain.filterMode = FilterMode.Point;
                 }
 
-                public async Task ReDrawBlockIDAsync(int index, bool plusCount = true)
+                public async Task ReDrawLayersZ(int layerZ)
+                {
+                    for (int y = 0; y < Chank.Size; y++)
+                    {
+                        for (int x = 0; x < Chank.Size; x++)
+                        {
+                            ReDrawBlockID(x, y, layerZ);
+                        }
+                    }
+
+                    await Task.CompletedTask;
+                }
+
+                public void ReDrawBlockID(int x, int y, int z, bool plusCount = true)
                 {
 
                     //Начиначем расчет
-                    //Находим позицию по XYZ
-                    int x = index % 32;
-                    int y = (index / 32) % 32;
-                    int z = index / 1024;
-
 
                     Color color = new Color(0.0f, 0.0f, 0.0f, 0.0f);
-                    if (index >= 0 && index < indexMax)
-                    {
-                        color = data.Colors[x, y, z];
-                    }
+                    color = data.Colors[x, y, z];
 
                     if (color.a > 0.9 && x >= 31)
                     {
@@ -1012,20 +1018,19 @@ namespace Game
                     Vector3Int posD = new Vector3Int(pos.x, pos.y - 1, pos.z);
                     Vector3Int posB = new Vector3Int(pos.x, pos.y, pos.z - 1);
 
-                    getDataColor(posL, out colorL);
-                    getDataColor(posD, out colorD);
-                    getDataColor(posB, out colorB);
+                    getDataColor(in data, posL, out colorL);
+                    getDataColor(in data, posD, out colorD);
+                    getDataColor(in data, posB, out colorB);
 
-                    int num = x + y * 32 + z * 32 * 32;
+                    int num = x + y * Chank.Size + z * Chank.Size * Chank.Size;
                     int numVertStart = num * 4 * 3;
                     int numTrianStart = num * 3 * 2 * 3;
 
-                    Vector2 texturePos = new Vector2(num % sizeXTextureColor, num / sizeXTextureColor);
+                    Vector2Int texturePos = getTexPos(num);
                     float uvXsize = 1.0f / sizeXTextureColor;
                     float uvYsize = 1.0f / sizeYTextureColor;
                     float uvXnow = texturePos.x * uvXsize;
                     float uvYnow = texturePos.y * uvYsize;
-
 
                     //Left, Down, Back
                     if (color.a > 0.9f)
@@ -1108,6 +1113,7 @@ namespace Game
                         }
 
                     }
+
                     //Neibour
                     else
                     {
@@ -1132,18 +1138,13 @@ namespace Game
                                 numL = indexMax + y + z * 32;
                             }
 
-                            Vector2Int texturePosL = new Vector2Int(numL % sizeXTextureColor, numL / sizeXTextureColor);
+                            Vector2Int texturePosL = getTexPos(numL);
                             float uvXL = texturePosL.x * uvXsize;
                             float uvYL = texturePosL.y * uvYsize;
                             uvMain[numVertStart + 0] = new Vector2(uvXL, uvYL);
                             uvMain[numVertStart + 1] = new Vector2(uvXL, uvYL + uvYsize);
                             uvMain[numVertStart + 2] = new Vector2(uvXL + uvXsize, uvYL + uvYsize);
                             uvMain[numVertStart + 3] = new Vector2(uvXL + uvXsize, uvYL);
-
-                            if (x == 0)
-                            {
-                                //mainTexture.SetPixel(texturePosL.x, texturePosL.y, new Color(colorL.r, colorL.g, colorL.b, 1.0f));
-                            }
 
                             uvLight[numVertStart + 0] = new Vector2(getLightL_DB(pos), 0);
                             uvLight[numVertStart + 1] = new Vector2(getLightL_UB(pos), 1);
@@ -1176,7 +1177,7 @@ namespace Game
                                 numD = indexMax + 32 * 32 + x + z * 32;
                             }
 
-                            Vector2Int texturePosL = new Vector2Int(numD % sizeXTextureColor, numD / sizeXTextureColor);
+                            Vector2Int texturePosL = getTexPos(numD);
                             float uvXD = texturePosL.x * uvXsize;
                             float uvYD = texturePosL.y * uvYsize;
                             uvMain[numVertStart + 0 + 4] = new Vector2(uvXD, uvYD);
@@ -1184,10 +1185,6 @@ namespace Game
                             uvMain[numVertStart + 2 + 4] = new Vector2(uvXD + uvXsize, uvYD + uvYsize);
                             uvMain[numVertStart + 3 + 4] = new Vector2(uvXD + uvXsize, uvYD);
 
-                            if (y == 0)
-                            {
-                                //mainTexture.SetPixel(texturePosL.x, texturePosL.y, new Color(colorD.r, colorD.g, colorD.b, 1.0f));
-                            }
                             uvLight[numVertStart + 0 + 4] = new Vector2(getLightD_LB(pos), 0);
                             uvLight[numVertStart + 1 + 4] = new Vector2(getLightD_LF(pos), 1);
                             uvLight[numVertStart + 2 + 4] = new Vector2(getLightD_RF(pos), 1);
@@ -1220,7 +1217,7 @@ namespace Game
                                 numB = indexMax + 32 * 32 * 2 + x + y * 32;
                             }
 
-                            Vector2Int texturePosL = new Vector2Int(numB % sizeXTextureColor, numB / sizeXTextureColor);
+                            Vector2Int texturePosL = getTexPos(numB);
                             float uvXB = texturePosL.x * uvXsize;
                             float uvYB = texturePosL.y * uvYsize;
                             uvMain[numVertStart + 0 + 8] = new Vector2(uvXB, uvYB);
@@ -1244,7 +1241,6 @@ namespace Game
                                 triangles[numTrianStart + numNorm + 12] = 0;
                         }
                     }
-
                     //прибавляем счетчик завершенной работы
                     lock (countCalcLock)
                     {
@@ -1253,46 +1249,59 @@ namespace Game
                     }
 
 
-                    await Task.CompletedTask; //Завершено
+                    //await Task.CompletedTask; //Завершено
                 }
+                public static Vector2Int getTexPos(int index) {
 
-                void getDataColor(Vector3Int pos, out Color color)
+                    //Делим относительно sizeXTextureColor и только. не ошибка!
+                    Vector2Int texturePos = new Vector2Int(index % sizeXTextureColor, index / sizeXTextureColor);
+
+                    return texturePos;
+                }
+                static public void getDataColor(in Chank data, Vector3Int pos, out Color color)
                 {
 
                     byte neightbours = 0;
                     Side side = Side.left;
+                    Vector3Int posNeighbour = pos;
 
                     if (pos.x < 0)
                     {
                         neightbours++;
                         side = Side.left;
+                        posNeighbour.x += Chank.Size;
                     }
                     else if (pos.x > 31)
                     {
                         neightbours++;
                         side = Side.right;
+                        posNeighbour.x -= Chank.Size;
                     }
 
                     if (pos.y < 0)
                     {
                         neightbours++;
                         side = Side.down;
+                        posNeighbour.y += Chank.Size;
                     }
                     else if (pos.y > 31)
                     {
                         neightbours++;
                         side = Side.up;
+                        posNeighbour.y -= Chank.Size;
                     }
 
                     if (pos.z < 0)
                     {
                         neightbours++;
                         side = Side.back;
+                        posNeighbour.z += Chank.Size;
                     }
                     else if (pos.z > 31)
                     {
                         neightbours++;
                         side = Side.face;
+                        posNeighbour.z -= Chank.Size;
                     }
 
                     //Данные из этого чанка
@@ -1303,19 +1312,11 @@ namespace Game
                     //Данные какого-то соседа
                     else if (neightbours == 1)
                     {
-                        int index = 0;
+                        Chank neigbour = data.GetNeighbour(side);
 
-                        switch (side)
-                        {
-                            case Side.left: index = pos.z + pos.y * 32 + countSide * 0; break;
-                            case Side.right: index = pos.z + pos.y * 32 + countSide * 1; break;
-                            case Side.down: index = pos.x + pos.z * 32 + countSide * 2; break;
-                            case Side.up: index = pos.x + pos.z * 32 + countSide * 3; break;
-                            case Side.back: index = pos.x + pos.y * 32 + countSide * 4; break;
-                            case Side.face: index = pos.x + pos.y * 32 + countSide * 5; break;
-                        }
-
-                        color = data.neighbourColors[index];
+                        if (neigbour != null)
+                            color = neigbour.Colors[posNeighbour.x, posNeighbour.y, posNeighbour.z];
+                        else color = new Color();
                     }
                     //Слишком сбоку
                     else
@@ -1328,38 +1329,45 @@ namespace Game
 
                     byte neightbours = 0;
                     Side side = Side.left;
+                    Vector3Int posNeighbour = pos;
 
                     if (pos.x < 0)
                     {
                         neightbours++;
                         side = Side.left;
+                        posNeighbour.x += Chank.Size;
                     }
                     else if (pos.x > 31)
                     {
                         neightbours++;
                         side = Side.right;
+                        posNeighbour.x -= Chank.Size;
                     }
 
                     if (pos.y < 0)
                     {
                         neightbours++;
                         side = Side.down;
+                        posNeighbour.y += Chank.Size;
                     }
                     else if (pos.y > 31)
                     {
                         neightbours++;
                         side = Side.up;
+                        posNeighbour.y -= Chank.Size;
                     }
 
                     if (pos.z < 0)
                     {
                         neightbours++;
                         side = Side.back;
+                        posNeighbour.z += Chank.Size;
                     }
                     else if (pos.z > 31)
                     {
                         neightbours++;
                         side = Side.face;
+                        posNeighbour.z -= Chank.Size;
                     }
 
                     //Данные из этого чанка
@@ -1371,20 +1379,17 @@ namespace Game
                     //Данные какого-то соседа
                     else if (neightbours == 1)
                     {
-                        int index = 0;
+                        Chank neigbour = data.GetNeighbour(side);
 
-                        switch (side)
+                        if (neigbour != null)
                         {
-                            case Side.left: index = pos.z + pos.y * 32 + countSide * 0; break;
-                            case Side.right: index = pos.z + pos.y * 32 + countSide * 1; break;
-                            case Side.down: index = pos.x + pos.z * 32 + countSide * 2; break;
-                            case Side.up: index = pos.x + pos.z * 32 + countSide * 3; break;
-                            case Side.back: index = pos.x + pos.y * 32 + countSide * 4; break;
-                            case Side.face: index = pos.x + pos.y * 32 + countSide * 5; break;
+                            color = neigbour.Colors[posNeighbour.x, posNeighbour.y, posNeighbour.z];
+                            light = neigbour.Light[posNeighbour.x, posNeighbour.y, posNeighbour.z];
                         }
-
-                        color = data.neighbourColors[index];
-                        light = data.neighbourLights[index];
+                        else {
+                            color = new Color(0, 0, 0, 1.0f);
+                            light = 0;
+                        }
                     }
                     //Слишком сбоку
                     else
@@ -1615,812 +1620,151 @@ namespace Game
                 }
             }
 
-            struct JobRedraw : IJob
-            {
-                //ChankGO chankGO;
-                public const byte sizeXTextureColor = 180;
-                public const byte sizeYTextureColor = 200; //183 если без соседей
-
-                const int indexMax = 32 * 32 * 32;
-                const int countSide = 32 * 32;
-                const int countTriangles = indexMax * 3 * 2 * 3;
-                const int countVert = indexMax * 3 * 4;
-
-                public NativeArray<int> triangles;
-                public NativeArray<Vector2> uvMain;
-                public NativeArray<Vector2> uvLight;
-                public NativeArray<Vector3> normals;
-
-                public NativeArray<Color> colors;
-                public NativeArray<float> lights;
-                public NativeArray<Color> neighbourColors;
-                public NativeArray<float> neighbourLight;
-
-                public JobRedraw(NativeArray<Color> colors, NativeArray<float> lights, NativeArray<Color> neighbourColors, NativeArray<float> neighbourLight)
-                {
-                    triangles = new NativeArray<int>(countTriangles, Allocator.TempJob);
-                    uvMain = new NativeArray<Vector2>(countVert, Allocator.TempJob);
-                    uvLight = new NativeArray<Vector2>(countVert, Allocator.TempJob);
-                    normals = new NativeArray<Vector3>(countVert, Allocator.TempJob);
-
-                    this.colors = colors;
-                    this.lights = lights;
-                    this.neighbourColors = neighbourColors;
-                    this.neighbourLight = neighbourLight;
-
-                }
-
-                void calcMesh() {
-                    for (byte x = 0; x < 32; x++) {
-                        for (byte y = 0; y < 32; y++) {
-                            for(byte z = 0; z < 32; z++)
-                                calcBlock(x,y,z);
-                        }
-                    }
-                }
-
-                void calcBlock(byte x, byte y, byte z) {
-                    //get global index
-                    int index = x + y * 32 + z * 32 * 32;
-
-                    Color color = new Color(0.0f, 0.0f, 0.0f, 0.0f);
-                    if (index >= 0 && index < indexMax)
-                    {
-                        color = colors[index];
-                    }
-
-                    if (color.a > 0.9 && x >= 31) {
-                        bool test = true;
-                    }
-
-                    //get color if Neibour exist
-                    Color colorL, colorD, colorB;
-
-                    Vector3Int pos = new Vector3Int(x, y, z);
-                    Vector3Int posL = new Vector3Int(pos.x - 1, pos.y, pos.z);
-                    Vector3Int posD = new Vector3Int(pos.x, pos.y - 1, pos.z);
-                    Vector3Int posB = new Vector3Int(pos.x, pos.y, pos.z - 1);
-
-                    getDataColor(posL, out colorL);
-                    getDataColor(posD, out colorD);
-                    getDataColor(posB, out colorB);
-
-                    int num = x + y * 32 + z * 32 * 32;
-                    int numVertStart = num * 4 * 3;
-                    int numTrianStart = num * 3 * 2 * 3;
-
-                    Vector2 texturePos = new Vector2(num % sizeXTextureColor, num / sizeXTextureColor);
-                    float uvXsize = 1.0f / sizeXTextureColor;
-                    float uvYsize = 1.0f / sizeYTextureColor;
-                    float uvXnow = texturePos.x * uvXsize;
-                    float uvYnow = texturePos.y * uvYsize;
-
-
-                    //Left, Down, Back
-                    if (color.a > 0.9f)
-                    {
-
-                        //Left
-                        if (colorL.a <= 0.9f
-                            )
-                        {
-                            triangles[numTrianStart + 0] = numVertStart;
-                            triangles[numTrianStart + 1] = numVertStart + 3;
-                            triangles[numTrianStart + 2] = numVertStart + 2;
-
-                            triangles[numTrianStart + 3] = numVertStart + 2;
-                            triangles[numTrianStart + 4] = numVertStart + 1;
-                            triangles[numTrianStart + 5] = numVertStart;
-
-                            for (byte numNorm = 0; numNorm < 4; numNorm++)
-                                normals[numVertStart + numNorm] = new Vector3(-1.0f, 0.0f, 0.0f);
-
-                            uvMain[numVertStart + 0] = new Vector2(uvXnow, uvYnow);
-                            uvMain[numVertStart + 1] = new Vector2(uvXnow, uvYnow + uvYsize);
-                            uvMain[numVertStart + 2] = new Vector2(uvXnow + uvXsize, uvYnow + uvYsize);
-                            uvMain[numVertStart + 3] = new Vector2(uvXnow + uvXsize, uvYnow);
-
-                            uvLight[numVertStart + 0] = new Vector2(getLightL_DB(posL), 0);
-                            uvLight[numVertStart + 1] = new Vector2(getLightL_UB(posL), 1);
-                            uvLight[numVertStart + 2] = new Vector2(getLightL_UF(posL), 1);
-                            uvLight[numVertStart + 3] = new Vector2(getLightL_DF(posL), 0);
-                        }
-                        //Down
-                        if (colorD.a <= 0.9f
-                            )
-                        {
-                            triangles[numTrianStart + 6 + 0] = numVertStart + 4;
-                            triangles[numTrianStart + 6 + 1] = numVertStart + 4 + 3;
-                            triangles[numTrianStart + 6 + 2] = numVertStart + 4 + 2;
-
-                            triangles[numTrianStart + 6 + 3] = numVertStart + 4 + 2;
-                            triangles[numTrianStart + 6 + 4] = numVertStart + 4 + 1;
-                            triangles[numTrianStart + 6 + 5] = numVertStart + 4;
-
-                            for (int numNorm = 0; numNorm < 4; numNorm++)
-                                normals[numVertStart + numNorm + 4] = new Vector3(0.0f, -1.0f, 0.0f);
-
-                            uvMain[numVertStart + 0 + 4] = new Vector2(uvXnow, uvYnow);
-                            uvMain[numVertStart + 1 + 4] = new Vector2(uvXnow, uvYnow + uvYsize);
-                            uvMain[numVertStart + 2 + 4] = new Vector2(uvXnow + uvXsize, uvYnow + uvYsize);
-                            uvMain[numVertStart + 3 + 4] = new Vector2(uvXnow + uvXsize, uvYnow);
-
-                            uvLight[numVertStart + 0 + 4] = new Vector2(getLightD_LB(posD), 0);
-                            uvLight[numVertStart + 1 + 4] = new Vector2(getLightD_LF(posD), 1);
-                            uvLight[numVertStart + 2 + 4] = new Vector2(getLightD_RF(posD), 1);
-                            uvLight[numVertStart + 3 + 4] = new Vector2(getLightD_RB(posD), 0);
-                        }
-                        //Back
-                        if (colorB.a <= 0.9f
-                            )
-                        {
-                            triangles[numTrianStart + 12 + 0] = numVertStart + 8;
-                            triangles[numTrianStart + 12 + 1] = numVertStart + 8 + 3;
-                            triangles[numTrianStart + 12 + 2] = numVertStart + 8 + 2;
-
-                            triangles[numTrianStart + 12 + 3] = numVertStart + 8 + 2;
-                            triangles[numTrianStart + 12 + 4] = numVertStart + 8 + 1;
-                            triangles[numTrianStart + 12 + 5] = numVertStart + 8;
-
-                            for (int numNorm = 0; numNorm < 4; numNorm++)
-                                normals[numVertStart + numNorm + 8] = new Vector3(0.0f, 0.0f, -1.0f);
-
-                            uvMain[numVertStart + 0 + 8] = new Vector2(uvXnow, uvYnow);
-                            uvMain[numVertStart + 1 + 8] = new Vector2(uvXnow, uvYnow + uvYsize);
-                            uvMain[numVertStart + 2 + 8] = new Vector2(uvXnow + uvXsize, uvYnow + uvYsize);
-                            uvMain[numVertStart + 3 + 8] = new Vector2(uvXnow + uvXsize, uvYnow);
-
-                            uvLight[numVertStart + 0 + 8] = new Vector2(getLightB_RD(posB), 0);
-                            uvLight[numVertStart + 1 + 8] = new Vector2(getLightB_RU(posB), 1);
-                            uvLight[numVertStart + 2 + 8] = new Vector2(getLightB_LU(posB), 1);
-                            uvLight[numVertStart + 3 + 8] = new Vector2(getLightB_LD(posB), 0);
-                        }
-
-                    }
-                    //Neibour
-                    else
-                    {
-                        //Left
-                        if (colorL.a > 0.9f)
-                        {
-                            triangles[numTrianStart + 0] = numVertStart;
-                            triangles[numTrianStart + 1] = numVertStart + 1;
-                            triangles[numTrianStart + 2] = numVertStart + 2;
-
-                            triangles[numTrianStart + 3] = numVertStart + 2;
-                            triangles[numTrianStart + 4] = numVertStart + 3;
-                            triangles[numTrianStart + 5] = numVertStart;
-
-                            for (int numNorm = 0; numNorm < 4; numNorm++)
-                                normals[numVertStart + numNorm] = new Vector3(1.0f, 0.0f, 0.0f);
-
-                            int numL = 0;
-                            if (x != 0) numL = (x - 1) + y * 32 + z * 32 * 32;
-                            else
-                            {
-                                numL = indexMax + y + z * 32;
-                            }
-
-                            Vector2Int texturePosL = new Vector2Int(numL % sizeXTextureColor, numL / sizeXTextureColor);
-                            float uvXL = texturePosL.x * uvXsize;
-                            float uvYL = texturePosL.y * uvYsize;
-                            uvMain[numVertStart + 0] = new Vector2(uvXL, uvYL);
-                            uvMain[numVertStart + 1] = new Vector2(uvXL, uvYL + uvYsize);
-                            uvMain[numVertStart + 2] = new Vector2(uvXL + uvXsize, uvYL + uvYsize);
-                            uvMain[numVertStart + 3] = new Vector2(uvXL + uvXsize, uvYL);
-
-                            if (x == 0)
-                            {
-                                //mainTexture.SetPixel(texturePosL.x, texturePosL.y, new Color(colorL.r, colorL.g, colorL.b, 1.0f));
-                            }
-
-                            uvLight[numVertStart + 0] = new Vector2(getLightL_DB(pos), 0);
-                            uvLight[numVertStart + 1] = new Vector2(getLightL_UB(pos), 1);
-                            uvLight[numVertStart + 2] = new Vector2(getLightL_UF(pos), 1);
-                            uvLight[numVertStart + 3] = new Vector2(getLightL_DF(pos), 0);
-                        }
-                        else
-                        {
-                            for (int numNorm = 0; numNorm < 6; numNorm++)
-                                triangles[numTrianStart + numNorm] = 0;
-                        }
-                        //Down
-                        if (colorD.a > 0.9f)
-                        {
-                            triangles[numTrianStart + 6 + 0] = numVertStart + 4;
-                            triangles[numTrianStart + 6 + 1] = numVertStart + 4 + 1;
-                            triangles[numTrianStart + 6 + 2] = numVertStart + 4 + 2;
-
-                            triangles[numTrianStart + 6 + 3] = numVertStart + 4 + 2;
-                            triangles[numTrianStart + 6 + 4] = numVertStart + 4 + 3;
-                            triangles[numTrianStart + 6 + 5] = numVertStart + 4;
-
-                            for (int numNorm = 0; numNorm < 4; numNorm++)
-                                normals[numVertStart + numNorm + 4] = new Vector3(0.0f, 1.0f, 0.0f);
-
-                            int numD = 0;
-                            if (y != 0) numD = x + (y - 1) * 32 + z * 32 * 32;
-                            else
-                            {
-                                numD = indexMax + 32 * 32 + x + z * 32;
-                            }
-
-                            Vector2Int texturePosL = new Vector2Int(numD % sizeXTextureColor, numD / sizeXTextureColor);
-                            float uvXD = texturePosL.x * uvXsize;
-                            float uvYD = texturePosL.y * uvYsize;
-                            uvMain[numVertStart + 0 + 4] = new Vector2(uvXD, uvYD);
-                            uvMain[numVertStart + 1 + 4] = new Vector2(uvXD, uvYD + uvYsize);
-                            uvMain[numVertStart + 2 + 4] = new Vector2(uvXD + uvXsize, uvYD + uvYsize);
-                            uvMain[numVertStart + 3 + 4] = new Vector2(uvXD + uvXsize, uvYD);
-
-                            if (y == 0)
-                            {
-                                //mainTexture.SetPixel(texturePosL.x, texturePosL.y, new Color(colorD.r, colorD.g, colorD.b, 1.0f));
-                            }
-                            uvLight[numVertStart + 0 + 4] = new Vector2(getLightD_LB(pos), 0);
-                            uvLight[numVertStart + 1 + 4] = new Vector2(getLightD_LF(pos), 1);
-                            uvLight[numVertStart + 2 + 4] = new Vector2(getLightD_RF(pos), 1);
-                            uvLight[numVertStart + 3 + 4] = new Vector2(getLightD_RB(pos), 0);
-                        }
-                        else
-                        {
-                            for (int numNorm = 0; numNorm < 6; numNorm++)
-                                triangles[numTrianStart + numNorm + 6] = 0;
-                        }
-
-                        //Back
-                        if (colorB.a > 0.9f)
-                        {
-                            triangles[numTrianStart + 12 + 0] = numVertStart + 8;
-                            triangles[numTrianStart + 12 + 1] = numVertStart + 8 + 1;
-                            triangles[numTrianStart + 12 + 2] = numVertStart + 8 + 2;
-
-                            triangles[numTrianStart + 12 + 3] = numVertStart + 8 + 2;
-                            triangles[numTrianStart + 12 + 4] = numVertStart + 8 + 3;
-                            triangles[numTrianStart + 12 + 5] = numVertStart + 8;
-
-                            for (int numNorm = 0; numNorm < 4; numNorm++)
-                                normals[numVertStart + numNorm + 8] = new Vector3(0.0f, 0.0f, 1.0f);
-
-                            int numB = 0;
-                            if (z != 0) numB = x + y * 32 + (z - 1) * 32 * 32;
-                            else
-                            {
-                                numB = indexMax + 32 * 32 * 2 + x + y * 32;
-                            }
-
-                            Vector2Int texturePosL = new Vector2Int(numB % sizeXTextureColor, numB / sizeXTextureColor);
-                            float uvXB = texturePosL.x * uvXsize;
-                            float uvYB = texturePosL.y * uvYsize;
-                            uvMain[numVertStart + 0 + 8] = new Vector2(uvXB, uvYB);
-                            uvMain[numVertStart + 1 + 8] = new Vector2(uvXB, uvYB + uvYsize);
-                            uvMain[numVertStart + 2 + 8] = new Vector2(uvXB + uvXsize, uvYB + uvYsize);
-                            uvMain[numVertStart + 3 + 8] = new Vector2(uvXB + uvXsize, uvYB);
-
-                            if (z == 0)
-                            {
-                                //mainTexture.SetPixel(texturePosL.x, texturePosL.y, new Color(colorB.r, colorB.g, colorB.b, 1.0f));
-                            }
-
-                            uvLight[numVertStart + 0 + 8] = new Vector2(getLightB_RD(pos), 0);
-                            uvLight[numVertStart + 1 + 8] = new Vector2(getLightB_RU(pos), 1);
-                            uvLight[numVertStart + 2 + 8] = new Vector2(getLightB_LU(pos), 1);
-                            uvLight[numVertStart + 3 + 8] = new Vector2(getLightB_LD(pos), 0);
-                        }
-                        else
-                        {
-                            for (int numNorm = 0; numNorm < 6; numNorm++)
-                                triangles[numTrianStart + numNorm + 12] = 0;
-                        }
-                    }
-                }
-
-                void getDataColor(Vector3Int pos, out Color color) {
-
-                    byte neightbours = 0;
-                    Side side = Side.left;
-
-                    if (pos.x < 0) {
-                        neightbours++;
-                        side = Side.left;
-                    }
-                    else if (pos.x > 31)
-                    {
-                        neightbours++;
-                        side = Side.right;
-                    }
-
-                    if (pos.y < 0)
-                    {
-                        neightbours++;
-                        side = Side.down;
-                    }
-                    else if (pos.y > 31)
-                    {
-                        neightbours++;
-                        side = Side.up;
-                    }
-
-                    if (pos.z < 0)
-                    {
-                        neightbours++;
-                        side = Side.back;
-                    }
-                    else if (pos.z > 31)
-                    {
-                        neightbours++;
-                        side = Side.face;
-                    }
-
-                    //Данные из этого чанка
-                    if (neightbours == 0)
-                    {
-                        int index = pos.x + pos.y * 32 + pos.z * 32 * 32;
-                        color = colors[index];
-                    }
-                    //Данные какого-то соседа
-                    else if (neightbours == 1)
-                    {
-                        int index = 0;
-
-                        switch (side) {
-                            case Side.left: index = pos.z + pos.y * 32 + countSide * 0; break;
-                            case Side.right: index = pos.z + pos.y * 32 + countSide * 1; break;
-                            case Side.down: index = pos.x + pos.z * 32 + countSide * 2; break;
-                            case Side.up: index = pos.x + pos.z * 32 + countSide * 3; break;
-                            case Side.back: index = pos.x + pos.y * 32 + countSide * 4; break;
-                            case Side.face: index = pos.x + pos.y * 32 + countSide * 5; break;
-                        }
-
-                        color = neighbourColors[index];
-                    }
-                    //Слишком сбоку
-                    else {
-                        color = new Color();
-                    }
-                }
-                void getColorAndLight(Vector3Int pos, out Color color, out float light)
-                {
-
-                    byte neightbours = 0;
-                    Side side = Side.left;
-
-                    if (pos.x < 0)
-                    {
-                        neightbours++;
-                        side = Side.left;
-                    }
-                    else if (pos.x > 31)
-                    {
-                        neightbours++;
-                        side = Side.right;
-                    }
-
-                    if (pos.y < 0)
-                    {
-                        neightbours++;
-                        side = Side.down;
-                    }
-                    else if (pos.y > 31)
-                    {
-                        neightbours++;
-                        side = Side.up;
-                    }
-
-                    if (pos.z < 0)
-                    {
-                        neightbours++;
-                        side = Side.back;
-                    }
-                    else if (pos.z > 31)
-                    {
-                        neightbours++;
-                        side = Side.face;
-                    }
-
-                    //Данные из этого чанка
-                    if (neightbours == 0)
-                    {
-                        int index = pos.x + pos.y * 32 + pos.z * 32 * 32;
-                        color = colors[index];
-                        light = lights[index];
-                    }
-                    //Данные какого-то соседа
-                    else if (neightbours == 1)
-                    {
-                        int index = 0;
-
-                        switch (side)
-                        {
-                            case Side.left: index = pos.z + pos.y * 32 + countSide * 0; break;
-                            case Side.right: index = pos.z + pos.y * 32 + countSide * 1; break;
-                            case Side.down: index = pos.x + pos.z * 32 + countSide * 2; break;
-                            case Side.up: index = pos.x + pos.z * 32 + countSide * 3; break;
-                            case Side.back: index = pos.x + pos.y * 32 + countSide * 4; break;
-                            case Side.face: index = pos.x + pos.y * 32 + countSide * 5; break;
-                        }
-
-                        color = neighbourColors[index];
-                        light = neighbourLight[index];
-                    }
-                    //Слишком сбоку
-                    else
-                    {
-                        color = new Color(0,0,0,1.0f);
-                        light = 0;
-                    }
-                }
-
-                float calcShadow4(in Color c1, in float s1, in Color c2, in float s2, in Color c3, in float s3, in Color c4, in float s4)
-                {
-                    float result = 0.001f;
-
-                    byte count = 0;
-                    if (c1.a <= 0.9)
-                    {
-                        count++;
-                        result += s1;
-                    }
-                    if (c2.a <= 0.9 && s2 > 0)
-                    {
-                        count++;
-                        result += s2;
-                    }
-                    if (c3.a <= 0.9f && s3 > 0 && c2.a <= 0.9f && c4.a <= 0.9f)
-                    {
-                        count++;
-                        result += s3;
-                    }
-                    if (c4.a <= 0.9 && s4 > 0)
-                    {
-                        count++;
-                        result += s4;
-                    }
-
-                    if (count > 0)
-                        result /= count;
-                    else result = 0.99f;
-
-                    return result;
-                }
-
-                float getLightL_DB(Vector3Int pos)
-                {
-                    float result = 0;
-
-                    Color c1, c2, c3, c4;
-                    float s1, s2, s3, s4;
-
-                    getColorAndLight(new Vector3Int(pos.x, pos.y, pos.z), out c1, out s1);
-                    getColorAndLight(new Vector3Int(pos.x, pos.y, pos.z - 1), out c2, out s2);
-                    getColorAndLight(new Vector3Int(pos.x, pos.y - 1, pos.z - 1), out c3, out s3);
-                    getColorAndLight(new Vector3Int(pos.x, pos.y - 1, pos.z), out c4, out s4);
-
-                    result = calcShadow4(c1, s1, c2, s2, c3, s3, c4, s4);
-
-                    return result;
-                }
-                float getLightL_UB(Vector3Int pos)
-                {
-                    float result = 0;
-
-                    Color c1, c2, c3, c4;
-                    float s1, s2, s3, s4;
-
-                    getColorAndLight(new Vector3Int(pos.x, pos.y, pos.z), out c1, out s1);
-                    getColorAndLight(new Vector3Int(pos.x, pos.y, pos.z - 1), out c2, out s2);
-                    getColorAndLight(new Vector3Int(pos.x, pos.y + 1, pos.z - 1), out c3, out s3);
-                    getColorAndLight(new Vector3Int(pos.x, pos.y + 1, pos.z), out c4, out s4);
-
-                    result = calcShadow4(c1, s1, c2, s2, c3, s3, c4, s4);
-
-                    return result;
-                }
-                float getLightL_UF(Vector3Int pos)
-                {
-                    float result = 0;
-
-                    Color c1, c2, c3, c4;
-                    float s1, s2, s3, s4;
-
-                    getColorAndLight(new Vector3Int(pos.x, pos.y, pos.z), out c1, out s1);
-                    getColorAndLight(new Vector3Int(pos.x, pos.y, pos.z + 1), out c2, out s2);
-                    getColorAndLight(new Vector3Int(pos.x, pos.y + 1, pos.z + 1), out c3, out s3);
-                    getColorAndLight(new Vector3Int(pos.x, pos.y + 1, pos.z), out c4, out s4);
-
-                    result = calcShadow4(c1, s1, c2, s2, c3, s3, c4, s4);
-
-                    return result;
-                }
-                float getLightL_DF(Vector3Int pos)
-                {
-                    float result = 0;
-
-                    Color c1, c2, c3, c4;
-                    float s1, s2, s3, s4;
-
-                    getColorAndLight(new Vector3Int(pos.x, pos.y, pos.z), out c1, out s1);
-                    getColorAndLight(new Vector3Int(pos.x, pos.y, pos.z + 1), out c2, out s2);
-                    getColorAndLight(new Vector3Int(pos.x, pos.y - 1, pos.z + 1), out c3, out s3);
-                    getColorAndLight(new Vector3Int(pos.x, pos.y - 1, pos.z), out c4, out s4);
-
-                    result = calcShadow4(c1, s1, c2, s2, c3, s3, c4, s4);
-
-                    return result;
-                }
-
-                float getLightD_LB(Vector3Int pos)
-                {
-                    float result = 0;
-
-                    Color c1, c2, c3, c4;
-                    float s1, s2, s3, s4;
-
-                    getColorAndLight(new Vector3Int(pos.x, pos.y, pos.z), out c1, out s1);
-                    getColorAndLight(new Vector3Int(pos.x, pos.y, pos.z - 1), out c2, out s2);
-                    getColorAndLight(new Vector3Int(pos.x - 1, pos.y, pos.z - 1), out c3, out s3);
-                    getColorAndLight(new Vector3Int(pos.x - 1, pos.y, pos.z), out c4, out s4);
-
-                    result = calcShadow4(c1, s1, c2, s2, c3, s3, c4, s4);
-
-                    return result;
-                }
-                float getLightD_LF(Vector3Int pos)
-                {
-                    float result = 0;
-
-                    Color c1, c2, c3, c4;
-                    float s1, s2, s3, s4;
-
-                    getColorAndLight(new Vector3Int(pos.x, pos.y, pos.z), out c1, out s1);
-                    getColorAndLight(new Vector3Int(pos.x, pos.y, pos.z + 1), out c2, out s2);
-                    getColorAndLight(new Vector3Int(pos.x - 1, pos.y, pos.z + 1), out c3, out s3);
-                    getColorAndLight(new Vector3Int(pos.x - 1, pos.y, pos.z), out c4, out s4);
-
-                    result = calcShadow4(c1, s1, c2, s2, c3, s3, c4, s4);
-
-                    return result;
-                }
-                float getLightD_RF(Vector3Int pos)
-                {
-                    float result = 0;
-
-                    Color c1, c2, c3, c4;
-                    float s1, s2, s3, s4;
-
-                    getColorAndLight(new Vector3Int(pos.x, pos.y, pos.z), out c1, out s1);
-                    getColorAndLight(new Vector3Int(pos.x, pos.y, pos.z + 1), out c2, out s2);
-                    getColorAndLight(new Vector3Int(pos.x + 1, pos.y, pos.z + 1), out c3, out s3);
-                    getColorAndLight(new Vector3Int(pos.x + 1, pos.y, pos.z), out c4, out s4);
-
-                    result = calcShadow4(c1, s1, c2, s2, c3, s3, c4, s4);
-
-                    return result;
-                }
-                float getLightD_RB(Vector3Int pos)
-                {
-                    float result = 0;
-
-                    Color c1, c2, c3, c4;
-                    float s1, s2, s3, s4;
-
-                    getColorAndLight(new Vector3Int(pos.x, pos.y, pos.z), out c1, out s1);
-                    getColorAndLight(new Vector3Int(pos.x, pos.y, pos.z - 1), out c2, out s2);
-                    getColorAndLight(new Vector3Int(pos.x + 1, pos.y, pos.z - 1), out c3, out s3);
-                    getColorAndLight(new Vector3Int(pos.x + 1, pos.y, pos.z), out c4, out s4);
-
-                    result = calcShadow4(c1, s1, c2, s2, c3, s3, c4, s4);
-
-                    return result;
-                }
-
-                float getLightB_LD(Vector3Int pos)
-                {
-                    float result = 0;
-
-                    Color c1, c2, c3, c4;
-                    float s1, s2, s3, s4;
-
-                    getColorAndLight(new Vector3Int(pos.x, pos.y, pos.z), out c1, out s1);
-                    getColorAndLight(new Vector3Int(pos.x, pos.y - 1, pos.z), out c2, out s2);
-                    getColorAndLight(new Vector3Int(pos.x - 1, pos.y - 1, pos.z), out c3, out s3);
-                    getColorAndLight(new Vector3Int(pos.x - 1, pos.y, pos.z), out c4, out s4);
-                    result = calcShadow4(c1, s1, c2, s2, c3, s3, c4, s4);
-                    return result;
-                }
-                float getLightB_LU(Vector3Int pos)
-                {
-                    float result = 0;
-
-                    Color c1, c2, c3, c4;
-                    float s1, s2, s3, s4;
-
-                    getColorAndLight(new Vector3Int(pos.x, pos.y, pos.z), out c1, out s1);
-                    getColorAndLight(new Vector3Int(pos.x, pos.y + 1, pos.z), out c2, out s2);
-                    getColorAndLight(new Vector3Int(pos.x - 1, pos.y + 1, pos.z), out c3, out s3);
-                    getColorAndLight(new Vector3Int(pos.x - 1, pos.y, pos.z), out c4, out s4);
-                    result = calcShadow4(c1, s1, c2, s2, c3, s3, c4, s4);
-                    return result;
-                }
-                float getLightB_RU(Vector3Int pos)
-                {
-                    float result = 0;
-
-                    Color c1, c2, c3, c4;
-                    float s1, s2, s3, s4;
-
-                    getColorAndLight(new Vector3Int(pos.x, pos.y, pos.z), out c1, out s1);
-                    getColorAndLight(new Vector3Int(pos.x, pos.y + 1, pos.z), out c2, out s2);
-                    getColorAndLight(new Vector3Int(pos.x + 1, pos.y + 1, pos.z), out c3, out s3);
-                    getColorAndLight(new Vector3Int(pos.x + 1, pos.y, pos.z), out c4, out s4);
-                    result = calcShadow4(c1, s1, c2, s2, c3, s3, c4, s4);
-                    return result;
-                }
-                float getLightB_RD(Vector3Int pos)
-                {
-                    float result = 0;
-
-                    Color c1, c2, c3, c4;
-                    float s1, s2, s3, s4;
-
-                    getColorAndLight(new Vector3Int(pos.x, pos.y, pos.z), out c1, out s1);
-                    getColorAndLight(new Vector3Int(pos.x, pos.y - 1, pos.z), out c2, out s2);
-                    getColorAndLight(new Vector3Int(pos.x + 1, pos.y - 1, pos.z), out c3, out s3);
-                    getColorAndLight(new Vector3Int(pos.x + 1, pos.y, pos.z), out c4, out s4);
-                    result = calcShadow4(c1, s1, c2, s2, c3, s3, c4, s4);
-                    return result;
-                }
-
-                public void Execute()
-                {
-                    calcMesh();
-                }
-
-                
-            }
-
-            public void FixedReDraw()
-            {
-                int blocks = 32 * 32;
-
-                int blocksAll = 32 * 32 * 32;
-                int blocksNeighbour = blocks * 6;
-
-                NativeArray<Color> colors;
-                NativeArray<float> light;
-                NativeArray<Color> neighbourColors;
-                NativeArray<float> neighbourLight;
-
-                Color[] colorList = new Color[blocksAll];
-                float[] lightList = new float[blocksAll];
-
-                for (byte z = 0; z < 32; z++)
-                    for (byte x = 0; x < 32; x++)
-                        for (byte y = 0; y < 32; y++) {
-                            int index = x + y * 32 + z * 32 * 32;
-
-                            colorList[index] = data.Colors[x, y, z];
-                            lightList[index] = data.Light[x, y, z];
-                        }
-
-                colors = new NativeArray<Color>(colorList, Allocator.TempJob);
-                light = new NativeArray<float>(lightList, Allocator.TempJob);
-
-                //Проверяем соседей у чанка
-                data.UpdateNeighbour(Side.left);
-                data.UpdateNeighbour(Side.right);
-                data.UpdateNeighbour(Side.down);
-                data.UpdateNeighbour(Side.up);
-                data.UpdateNeighbour(Side.back);
-                data.UpdateNeighbour(Side.face);
-
-                neighbourColors = new NativeArray<Color>(data.neighbourColors, Allocator.TempJob);
-                neighbourLight = new NativeArray<float>(data.neighbourLights, Allocator.TempJob);
-
-                jobRedraw = new JobRedraw(colors, light, neighbourColors, neighbourLight);
-                jobRedrawHandle = jobRedraw.Schedule();
-
-                JobRedrawExist = true;
-            }
-            public bool LateReDraw() {
-                //Если работа есть и она еще не законченна, удалять нельзя
-                if (JobRedrawExist && !jobRedrawHandle.IsCompleted)
-                    return false;                    
-
-                // Ожидаем завершения всех задач с помощью JobHandle
-                jobRedrawHandle.Complete();
-
-                List<int> triangles = new List<int>();
-                List<Vector2> uvMain = new List<Vector2>();
-                List<Vector2> uvLight = new List<Vector2>();
-                List<Vector3> normals = new List<Vector3>();
-
-                // Теперь можно получить данные и освободить ресурсы
-
-                triangles.AddRange(jobRedraw.triangles.ToArray());
-                uvMain.AddRange(jobRedraw.uvMain.ToArray());
-                uvLight.AddRange(jobRedraw.uvLight.ToArray());
-                normals.AddRange(jobRedraw.normals.ToArray());
-
-                //Создаем текстуру
-                Texture2D texture = new Texture2D(JobRedraw.sizeXTextureColor, JobRedraw.sizeYTextureColor);
-                texture.filterMode = FilterMode.Point;
-                for (int num = 0; num < jobRedraw.colors.Length; num++) {
-                    Vector2Int texturePos = new Vector2Int(num % JobRedraw.sizeXTextureColor, num / JobRedraw.sizeXTextureColor);
-                    Color color = jobRedraw.colors[num];
-                    texture.SetPixel(texturePos.x, texturePos.y, new Color(color.r, color.g, color.b));
-                }
-                texture.Apply();
-
-                jobRedraw.triangles.Dispose();
-                jobRedraw.normals.Dispose();
-                jobRedraw.uvMain.Dispose();
-                jobRedraw.uvLight.Dispose();
-
-                jobRedraw.colors.Dispose();
-                jobRedraw.lights.Dispose();
-                jobRedraw.neighbourColors.Dispose();
-                jobRedraw.neighbourLight.Dispose();
-
-                JobRedrawExist = false;
-
-                meshColor.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
-                meshColor.vertices = MeshDataStatic.vertices32;
-                meshColor.triangles = triangles.ToArray();
-                meshColor.normals = normals.ToArray();
-                meshColor.uv = uvMain.ToArray();
-                meshColor.uv2 = uvLight.ToArray();
-
-                //texture = graficMesh.dataMesh.mainTexture;
-
-                meshRendererBasic.materials[0].SetTexture("_MainTex", texture);
-                meshRendererBasic.materials[0].SetTexture("_llluminationTex", MeshDataStatic.textureShadow);
-                meshFilterBasic.mesh = meshColor;
-
-                //Работа выполнена, удалять можно
-                return true;
-            }
-
             public void StartReDrawAll() {
                 UnityEngine.Debug.Log("Start Redraw All " + data.index + MeshDataStatic.allIDs.Length);
 
                 ParallelOptions options = new ParallelOptions();
                 options.MaxDegreeOfParallelism = System.Environment.ProcessorCount;
 
-                Parallel.ForEach(MeshDataStatic.allIDs, options, id => meshDataColor.ReDrawBlockIDAsync(id));
+                Stopwatch stopwatch = new Stopwatch();
+                stopwatch.Start();
+
+                List<int> layersZ = new List<int>();
+                for (int z = 0; z < Chank.Size; z++) {
+                    layersZ.Add(z);
+                }
+
+                //Parallel.ForEach(MeshDataStatic.allIDs, options, async id => meshDataColor.ReDrawBlockIDAsync(id));
+                Parallel.ForEach(layersZ, options, id => meshDataColor.ReDrawLayersZ(id));
+
+                stopwatch.Stop();
+
+                UnityEngine.Debug.Log("StartReDrawAll Parallel.ForEach: " + data.index +
+                    " stopwatch: " + stopwatch.ElapsedMilliseconds);
 
             }
-            public bool LateReDrawAwait() {
+            public bool LateAcceptAwait() {
                 //Если работа есть и она еще не законченна, удалять нельзя
                 if (meshDataColor.countCalc < MeshDataStatic.indexMax)
                     return false;
 
-                //Создаем текстуру
-                Texture2D texture = new Texture2D(JobRedraw.sizeXTextureColor, JobRedraw.sizeYTextureColor);
-                texture.filterMode = FilterMode.Point;
-                for (int num = 0; num < jobRedraw.colors.Length; num++)
-                {
-                    Vector2Int texturePos = new Vector2Int(num % JobRedraw.sizeXTextureColor, num / JobRedraw.sizeXTextureColor);
-                    Color color = jobRedraw.colors[num];
-                    texture.SetPixel(texturePos.x, texturePos.y, new Color(color.r, color.g, color.b));
-                }
-                texture.Apply();
-
-                meshColor.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
-                meshColor.vertices = MeshDataStatic.vertices32;
-                meshColor.triangles = meshDataColor.triangles;
-                meshColor.normals = meshDataColor.normals;
-                meshColor.uv = meshDataColor.uvMain;
-                meshColor.uv2 = meshDataColor.uvLight;
-
-                //texture = graficMesh.dataMesh.mainTexture;
-
-                meshRendererBasic.materials[0].SetTexture("_MainTex", texture);
-                meshRendererBasic.materials[0].SetTexture("_llluminationTex", MeshDataStatic.textureShadow);
-                meshFilterBasic.mesh = meshColor;
+                AcceptChange();
 
                 //Работа выполнена, удалять можно
                 return true;
+
+                async Task AcceptChange() {
+                    //Применяем цвет на текстуру
+                    SetColorThis();
+                    //Применяем цвет соседей
+                    SetColorNeighbour();
+
+                    //Применяем текстуру
+                    meshDataColor.textureMain.Apply();
+
+                    meshColor.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
+                    meshColor.vertices = MeshDataStatic.vertices32;
+                    meshColor.triangles = meshDataColor.triangles;
+                    meshColor.normals = meshDataColor.normals;
+                    meshColor.uv = meshDataColor.uvMain;
+                    meshColor.uv2 = meshDataColor.uvLight;
+
+                    //texture = graficMesh.dataMesh.mainTexture;
+
+                    meshRendererBasic.materials[0].SetTexture("_MainTex", meshDataColor.textureMain);
+                    meshRendererBasic.materials[0].SetTexture("_llluminationTex", MeshDataStatic.textureShadow);
+                    meshFilterBasic.mesh = meshColor;
+
+                    await Task.CompletedTask;
+
+                    void SetColorThis() {
+                        for (int x = 0; x < Chank.Size; x++) {
+                            for (int y = 0; y < Chank.Size; y++) {
+                                for (int z = 0; z < Chank.Size; z++) {
+                                    //Нужно узнать индекс вокселя чтобы по индексу расчитать позицию на текстуре
+                                    int index = x + y * Chank.Size + z * Chank.Size * Chank.Size;
+                                    Vector2Int texPos = MeshData.getTexPos(index);
+
+                                    Color color = data.Colors[x,y,z];
+                                    meshDataColor.textureMain.SetPixel(texPos.x, texPos.y, new Color(color.r, color.g, color.b));
+                                }
+                            }
+                        }   
+                    }
+
+                    void SetColorNeighbour() {
+
+                        //Левый
+                        calcLeft();
+                        //Нижний
+                        calcDown();
+                        //Задний
+                        calcBack();
+
+                        void calcLeft() {
+
+                            Chank left = data.GetNeighbour(Side.left);
+
+                            if (left == null)
+                                return;
+
+                            for (int y = 0; y < Chank.Size; y++)
+                                for (int z = 0; z < Chank.Size; z++)
+                                {
+                                    //Color color = data.Colors[31, y, z];
+                                    Vector3Int pos = new Vector3Int(-1, y, z);
+                                    Color color;
+                                    MeshData.getDataColor(data, pos, out color);
+
+                                    int index = MeshDataStatic.indexMax + y + z * 32;
+                                    Vector2Int texturePos = MeshData.getTexPos(index);
+                                    meshDataColor.textureMain.SetPixel(texturePos.x, texturePos.y, new Color(color.r, color.g, color.b));
+                                }
+                        }
+                        void calcDown()
+                        {
+
+                            Chank down = data.GetNeighbour(Side.down);
+
+                            if (down == null)
+                                return;
+
+                            for (int x = 0; x < Chank.Size; x++)
+                                for (int z = 0; z < Chank.Size; z++)
+                                {
+                                    //Color color = data.Colors[31, y, z];
+                                    Vector3Int pos = new Vector3Int(x, -1, z);
+                                    Color color;
+                                    MeshData.getDataColor(data, pos, out color);
+
+                                    int index = MeshDataStatic.indexMax + MeshDataStatic.countSide + x + z * 32;
+                                    Vector2Int texturePos = MeshData.getTexPos(index);
+                                    meshDataColor.textureMain.SetPixel(texturePos.x, texturePos.y, new Color(color.r, color.g, color.b));
+                                }
+                        }
+                        void calcBack()
+                        {
+
+                            Chank back = data.GetNeighbour(Side.back);
+
+                            if (back == null)
+                                return;
+
+                            for (int x = 0; x < Chank.Size; x++)
+                                for (int y = 0; y < Chank.Size; y++)
+                                {
+                                    //Color color = data.Colors[31, y, z];
+                                    Vector3Int pos = new Vector3Int(x, y, -1);
+                                    Color color;
+                                    MeshData.getDataColor(data, pos, out color);
+
+                                    int index = MeshDataStatic.indexMax + MeshDataStatic.countSide * 2 + x + y * 32;
+                                    Vector2Int texturePos = MeshData.getTexPos(index);
+                                    meshDataColor.textureMain.SetPixel(texturePos.x, texturePos.y, new Color(color.r, color.g, color.b));
+                                }
+                        }
+                    }
+                }
             }
 
             public void StartInicialize()

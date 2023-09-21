@@ -172,7 +172,7 @@ namespace Game
                     return;
 
                 ChankGO chankGO = endDrawQueue.Peek();
-                if(chankGO.LateReDrawAwait())
+                if(chankGO.LateAcceptAwait())
                     endDrawQueue.Dequeue();
             }
 
