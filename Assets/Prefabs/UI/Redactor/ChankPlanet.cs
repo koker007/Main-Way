@@ -70,11 +70,10 @@ public class ChankPlanet : Chank
                 //Перебираем каждую высоту чанка
                 for (int y = 0; y < Size; y++)
                 {
-
                     //ищем блок победитель
                     CalcWiner(new Vector3Int(x, y, z), biomeNum, heightSurface);
-                }
 
+                }
             }
         }
 
@@ -92,6 +91,7 @@ public class ChankPlanet : Chank
 
     void CalcNoisesSurface(int biomeNum)
     {
+        //Если шумы уже вычислялись то выходим
         if (biomesNoiseSurface[biomeNum] != null)
         {
             return;
@@ -153,9 +153,9 @@ public class ChankPlanet : Chank
         }
 
         //Если шум выше 0.5 то блок победил
-        if (noiseWiner > 0.5f)
+        //if (noiseWiner > 0.5f)
             BlocksID[pos.x, pos.y, pos.z] = blockWinerID;
-        else BlocksID[pos.x, pos.y, pos.z] = 0;
+        //else BlocksID[pos.x, pos.y, pos.z] = 0;
     }
 
     protected override void CalcColor()
@@ -164,7 +164,7 @@ public class ChankPlanet : Chank
             Colors = new Color[Size, Size, Size];
 
         //Нужно определить коофицент интерполяции цвета между цветом биома и блоком
-        float interpolateCoof = ((int)sizeBlock - 1) / 7;
+        float interpolateCoof = ((int)sizeBlock - 1) / 7f;
 
 
         Vector2Int index2D = new Vector2Int(index.x, index.z);
@@ -181,18 +181,29 @@ public class ChankPlanet : Chank
 
                 for (int y = 0; y < Size; y++)
                 {
-                    Color ColorBlock;// = Game.Blocks.GetColor(BID);
+                    //Делаем по умолчанию розовый цвет
+                    Color ColorBlock = new Color(1,0,1,0); // = Game.Blocks.GetColor(BID);
 
-                    ColorBlock = new Color(Random.Range(0.5f, 1.0f), Random.Range(0.5f, 1.0f), Random.Range(0.5f, 1.0f), Random.Range(0.0f, 1.0f));
+
+                    //Делаем по умолчанию никакой цвет
+
+                    //ColorBlock = new Color(Random.Range(0.5f, 1.0f), Random.Range(0.5f, 1.0f), Random.Range(0.5f, 1.0f), Random.Range(0.0f, 1.0f));
+
                     //if (z == 31 && x > 0 && 30 > Random.Range(0, 100))
                     //   ColorBlock = new Color(1.0f, 0.0f, 0.0f, 1.0f);
                     //else {
                     //    ColorBlock = new Color(0.0f, 0.0f, 0.0f, 0.0f);
                     //}
 
-                    Colors[x, y, z] = Color.Lerp(ColorBlock, planetData.pattern.biomesSurface[biomeWinerSurface].color, interpolateCoof);
+                    //смотрим какой блок победитель в данном месте и берем его цвет
+                    int id = BlocksID[x, y, z];
+                    if (BlocksID[x,y,z] != 0)
+                        ColorBlock = new Color(1, 0, 1, 0.95f); //new Color(Random.Range(0.5f, 1.0f), Random.Range(0.5f, 1.0f), Random.Range(0.5f, 1.0f), Random.Range(0.0f, 1.0f));
 
-                    Light[x, y, z] = Random.Range(0.0f, 1.0f);
+                    Colors[x, y, z] = Color.Lerp(ColorBlock, planetData.pattern.biomesSurface[biomeWinerSurface].color, interpolateCoof);
+                    Colors[x, y, z].a = ColorBlock.a;
+
+                    Light[x, y, z] = Random.Range(0.98f, 0.98f);
                 }
             }
         }
