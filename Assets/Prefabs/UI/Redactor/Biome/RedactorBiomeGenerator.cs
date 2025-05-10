@@ -122,15 +122,20 @@ public class RedactorBiomeGenerator : MonoBehaviour
     }
 
     void TestCamera() {
-        if (cameraPlane == null)
+        if (cameraPlane == null ||
+            cameraChanks == null)
             return;
 
         //проинициалзировать камеру
         if (cameraPlane.targetTexture != null && cameraPlane.targetTexture.width != Screen.width && cameraPlane.targetTexture.height != Screen.height) {
             cameraPlane.targetTexture = null;
         }
+        if (cameraChanks.targetTexture != null && cameraChanks.targetTexture.width != Screen.width && cameraChanks.targetTexture.height != Screen.height) {
+            cameraChanks.targetTexture = null;
+        }
 
         cameraPlane.targetTexture ??= new RenderTexture(Screen.width, Screen.height, 32);
+        cameraChanks.targetTexture ??= new RenderTexture(Screen.width, Screen.height, 32);
     }
 
     static public void TestOpen() {
@@ -262,7 +267,7 @@ public class RedactorBiomeGenerator : MonoBehaviour
             PlanetLiquidFilter.mesh = mesh;
 
             float scale = Calc.GetSizeInt(planetData.size) / Chank.Size;
-            PlanetLiquid.gameObject.transform.localPosition = new Vector3(0, 0.5f, 0);
+            PlanetLiquid.gameObject.transform.localPosition = new Vector3(0, 0.4999f, 0);
 
             Vector3[] GetVertices()
             {

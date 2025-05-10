@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4798347425341416583}
   - component: {fileID: 4798347425341416576}
   - component: {fileID: 4798347425341416577}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: TestCube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -94,7 +94,7 @@ GameObject:
   - component: {fileID: 4798347425545229907}
   - component: {fileID: 4798347425545229917}
   - component: {fileID: 4798347425545229906}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: MeshBasic
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -177,9 +177,9 @@ GameObject:
   m_Component:
   - component: {fileID: 4798347426494085759}
   - component: {fileID: 4798347426494085758}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: ChankGO
-  m_TagString: Untagged
+  m_TagString: ChankGO
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

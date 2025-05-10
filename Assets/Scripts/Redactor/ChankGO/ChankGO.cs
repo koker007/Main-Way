@@ -245,7 +245,9 @@ namespace Game
                     mesh.vertices = vert.ToArray();
                     mesh.triangles = triangles.ToArray();
                     mesh.normals = normals.ToArray();
-                    //mesh.Optimize();
+
+                    //Может быть долгим
+                    mesh.Optimize();
 
                     texture2Dnew.Apply();
                     texture2Dnew.filterMode = FilterMode.Point;
